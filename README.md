@@ -299,7 +299,7 @@ Please read `CONTRIBUTING.md` before submitting a PR. All contributors are expec
 
 ## License
 
-This project is licensed under the terms of the [LICENSE](./LICENSE) file included in this repository.
+This project is licensed under the [MIT License](./LICENSE).
 
 ---
 

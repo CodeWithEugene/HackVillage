@@ -328,4 +328,4 @@ Report security issues directly to the maintainers by emailing the address liste
 
 ## License
 
-By contributing to HackVillage you agree that your contributions will be licensed under the [Apache License 2.0](./LICENSE) that covers this project. You retain copyright over your own contributions; by submitting a PR you grant the project a perpetual, irrevocable license to use, modify, and distribute your contribution under those terms.
+By contributing to HackVillage you agree that your contributions will be licensed under the [MIT License](./LICENSE) that covers this project. You retain copyright over your own contributions; by submitting a PR you grant the project a perpetual, irrevocable license to use, modify, and distribute your contribution under those terms.
