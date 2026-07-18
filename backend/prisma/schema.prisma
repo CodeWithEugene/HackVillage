@@ -1,0 +1,231 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  DEVELOPER
+  ORGANIZER
+  JUDGE
+  ADMIN
+}
+
+enum EventStatus {
+  DRAFT
+  PENDING_ESCROW
+  PRIZE_VERIFIED
+  LIVE
+  JUDGING
+  CLOSED
+  ARCHIVED
+}
+
+enum SubmissionStatus {
+  DEMO
+  IN_PRODUCTION
+  PIVOTED_TO_STARTUP
+  ARCHIVED
+}
+
+enum EscrowState {
+  PENDING_DEPOSIT
+  PRIZE_VAULT
+  PARTIAL_RELEASED
+  FULLY_RELEASED
+  LOCKED_ERROR
+}
+
+enum PayoutPhase {
+  INSTANT_50
+  MILESTONE_50
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  role          UserRole @default(DEVELOPER)
+  githubHandle  String?
+  mpesaPhone    String?
+  bankAccountRef String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  organizedEvents Event[]           @relation("OrganizerEvents")
+  teamMemberships TeamMember[]
+  judgeAssignments JudgeAssignment[]
+  endorsementsGiven JudgeEndorsement[] @relation("EndorsementsGiven")
+  endorsementsReceived JudgeEndorsement[] @relation("EndorsementsReceived")
+  profile         DeveloperProfile?
+}
+
+model DeveloperProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  winCount        Int      @default(0)
+  eventCount      Int      @default(0)
+  bio             String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Event {
+  id               String      @id @default(cuid())
+  slug             String      @unique
+  title            String
+  problemStatement String
+  status           EventStatus @default(DRAFT)
+  prizePoolKes     Decimal     @db.Decimal(14, 2)
+  startsAt         DateTime?
+  endsAt           DateTime?
+  mediaDeadlineAt  DateTime?
+  organizerId      String
+  organizer        User        @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  teams            Team[]
+  submissions      Submission[]
+  escrowVault      EscrowVault?
+  judgeAssignments JudgeAssignment[]
+  mediaAssets      MediaAsset[]
+  internshipTags   InternshipTag[]
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  members     TeamMember[]
+  submissions Submission[]
+}
+
+model TeamMember {
+  id       String @id @default(cuid())
+  teamId   String
+  userId   String
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+}
+
+model Submission {
+  id           String           @id @default(cuid())
+  eventId      String
+  teamId       String
+  title        String
+  repoUrl      String?
+  demoUrl      String?
+  status       SubmissionStatus @default(DEMO)
+  isWinner     Boolean          @default(false)
+  event        Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  team         Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  feedback     JudgeFeedback[]
+  payouts      Payout[]
+}
+
+model JudgeAssignment {
+  id      String @id @default(cuid())
+  eventId String
+  judgeId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  judge   User   @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, judgeId])
+}
+
+model JudgeFeedback {
+  id           String     @id @default(cuid())
+  submissionId String
+  judgeId      String
+  points       String[]
+  score        Int?
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([submissionId, judgeId])
+}
+
+model JudgeEndorsement {
+  id        String   @id @default(cuid())
+  judgeId   String
+  userId    String
+  eventId   String?
+  note      String?
+  judge     User     @relation("EndorsementsGiven", fields: [judgeId], references: [id])
+  user      User     @relation("EndorsementsReceived", fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model EscrowVault {
+  id                   String      @id @default(cuid())
+  eventId              String      @unique
+  event                Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  state                EscrowState @default(PENDING_DEPOSIT)
+  amountKes            Decimal     @db.Decimal(14, 2)
+  paystackReference    String?
+  ledgerTxHash         String?
+  publicLedgerUrl      String?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  payouts              Payout[]
+  ledgerEntries        LedgerEntry[]
+}
+
+model Payout {
+  id                String      @id @default(cuid())
+  escrowVaultId     String
+  submissionId      String?
+  phase             PayoutPhase
+  amountKes         Decimal     @db.Decimal(14, 2)
+  idempotencyKey    String      @unique
+  paystackTransferCode String?
+  ledgerTxHash      String?
+  status            String      @default("PENDING")
+  escrowVault       EscrowVault @relation(fields: [escrowVaultId], references: [id], onDelete: Cascade)
+  submission        Submission? @relation(fields: [submissionId], references: [id])
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model LedgerEntry {
+  id            String      @id @default(cuid())
+  escrowVaultId String
+  kind          String
+  amountKes     Decimal     @db.Decimal(14, 2)
+  txHash        String
+  publicUrl     String?
+  metadata      Json?
+  escrowVault   EscrowVault @relation(fields: [escrowVaultId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  eventId      String
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  url          String
+  uploadedAt   DateTime @default(now())
+}
+
+model InternshipTag {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  label     String
+  hrContact String?
+  createdAt DateTime @default(now())
+}

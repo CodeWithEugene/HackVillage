@@ -1,0 +1,50 @@
+{
+  "name": "hackvillage",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-source infrastructure for high-impact tech events — Trust-as-a-Service",
+  "scripts": {
+    "dev": "next dev ./frontend",
+    "build": "next build ./frontend",
+    "start": "next start ./frontend",
+    "lint": "eslint frontend backend tests --ext .js,.jsx,.ts,.tsx --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "prisma generate --schema backend/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema backend/prisma/schema.prisma",
+    "db:push": "prisma db push --schema backend/prisma/schema.prisma",
+    "db:seed": "tsx backend/db/seeds/index.ts",
+    "db:studio": "prisma studio --schema backend/prisma/schema.prisma",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:watch": "vitest",
+    "postinstall": "prisma generate --schema backend/prisma/schema.prisma"
+  },
+  "prisma": {
+    "schema": "backend/prisma/schema.prisma",
+    "seed": "tsx backend/db/seeds/index.ts"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@prisma/client": "6.9.0",
+    "next": "14.2.35",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@ducanh2912/next-pwa": "10.2.9",
+    "@types/node": "20.17.30",
+    "@types/react": "18.3.20",
+    "@types/react-dom": "18.3.6",
+    "eslint": "8.57.1",
+    "eslint-config-next": "14.2.35",
+    "prettier": "3.5.3",
+    "prisma": "6.9.0",
+    "tsx": "4.19.3",
+    "typescript": "5.8.3",
+    "vitest": "2.1.9"
+  }
+}

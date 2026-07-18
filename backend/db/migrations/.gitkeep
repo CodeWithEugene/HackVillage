@@ -1,0 +1,1 @@
+# Keep directory for SQL migration history produced by `npm run db:migrate`.

@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://www.technetium.co.ke/assets/images/logo.webp" alt="Technetium Kenya" height="60" />
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="./public/images/salamander-logo-yellow.svg" alt="HackVillage" height="60" />
+  <img src="./frontend/public/images/salamander-logo-yellow.svg" alt="HackVillage" height="60" />
 </div>
 
 <br />
@@ -153,9 +153,9 @@ HackVillage operates as a three-phase engine:
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| Frontend | Next.js 14 | SEO-optimized project discovery |
-| Backend | Node.js / TypeScript | High-concurrency event-day API |
-| Database | PostgreSQL | Structured Proof of Work records |
+| Frontend | Next.js 14 + PWA | SEO-optimized discovery; installable app |
+| Backend | Node.js / TypeScript (`backend/`) | Escrow, payouts, Prisma domain services |
+| Database | PostgreSQL + Prisma | Structured Proof of Work records |
 | Payments | Paystack | Fiat deposits, M-Pesa & bank payouts |
 | Ledger | Smart Contract (Polygon/Solana) | Transparent, tamper-proof transaction log |
 | Open Source Core | GitHub | Judging logic & escrow mechanics are public |
@@ -247,17 +247,37 @@ Paystack API ──── Final transfer ──── Public Ledger entry record
 - PostgreSQL >= 15
 - A Paystack account (test keys sufficient for local development)
 
+### Repository layout
+
+The codebase is split so frontend and backend contributors can work in parallel:
+
+```
+HackVillage/
+├── frontend/     # Next.js 14 App Router UI + PWA + Route Handlers
+├── backend/      # Prisma/PostgreSQL, escrow & payout services, ledger stubs
+└── tests/        # Unit tests (vitest)
+```
+
+| Area | Docs |
+|---|---|
+| UI / PWA | [frontend/README.md](./frontend/README.md) |
+| Data / escrow / payouts | [backend/README.md](./backend/README.md) |
+| Contributions | [CONTRIBUTING.md](./CONTRIBUTING.md) |
+
+Still a **single npm package** — install and run everything from the repo root.
+
 ### Installation
 
 ```bash
-git clone https://github.com/CodeWithEugene/HackVillage.git
+git clone https://github.com/Salamander-Tech-Hub/HackVillage.git
 cd HackVillage
 npm install
+cp .env.example .env.local
 ```
 
 ### Environment Variables
 
-Create a `.env.local` file at the project root:
+Create a `.env.local` file at the project root (see `.env.example`):
 
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/hackvillage
@@ -265,17 +285,37 @@ PAYSTACK_SECRET_KEY=sk_test_...
 NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_...
 SMART_CONTRACT_ADDRESS=0x...
 RPC_URL=https://...
+NEXTAUTH_SECRET=replace-with-a-long-random-string
+NEXTAUTH_URL=http://localhost:3000
 ```
 
 ### Development
 
 ```bash
+npm run db:migrate
+npm run db:seed   # optional — demo organizer + Prize Verified event
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+Useful scripts:
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Next.js dev server (`./frontend`) |
+| `npm run build` | Production build (enables PWA service worker) |
+| `npm run db:migrate` / `db:seed` / `db:studio` | Prisma against `backend/prisma/schema.prisma` |
+| `npm test` | Unit tests |
+| `npm run typecheck` / `npm run lint` | CI-style checks |
+
+### Progressive Web App
+
+HackVillage is installable as a PWA (manifest + service worker). The service worker is **disabled in development** and generated on production builds — use `npm run build && npm start` to verify install / offline behavior (`/offline` fallback).
+
 ### Database
+
+Prisma schema lives at `backend/prisma/schema.prisma` and models events, escrow vaults, payouts, submissions, judging, and developer profiles.
 
 ```bash
 npm run db:migrate
@@ -295,6 +335,8 @@ HackVillage is open-source at its core. The judging logic and escrow mechanics a
 
 Please read `CONTRIBUTING.md` before submitting a PR. All contributors are expected to uphold the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+UI work lives under `frontend/`; escrow, payouts, and schema changes live under `backend/`. Import backend modules from the app with `@backend/...`.
+
 ---
 
 ## License
@@ -307,6 +349,6 @@ This project is licensed under the [MIT License](./LICENSE).
 
 Built with intention for the African developer community.
 
-**[technetium.co.ke](https://www.technetium.co.ke)** &nbsp;·&nbsp; **[github.com/CodeWithEugene/HackVillage](https://github.com/CodeWithEugene/HackVillage)**
+**[technetium.co.ke](https://www.technetium.co.ke)** &nbsp;·&nbsp; **[github.com/Salamander-Tech-Hub/HackVillage](https://github.com/Salamander-Tech-Hub/HackVillage)**
 
 </div>

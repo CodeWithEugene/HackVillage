@@ -142,21 +142,34 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ```
 HackVillage/
-├── app/                  # Next.js App Router — pages and layouts
-├── components/           # Shared React components
-├── lib/                  # Shared utilities, DB client, API helpers
-├── services/
-│   ├── escrow/           # Escrow microservice — Paystack + smart contract calls
-│   └── payout/           # Split disbursement logic
-├── contracts/            # Smart contract source and ABI
-├── db/
-│   ├── migrations/       # PostgreSQL migrations
-│   └── seeds/            # Seed data for development
-├── public/               # Static assets
-└── tests/                # Unit and integration tests
+├── frontend/                 # Next.js UI + Route Handlers (App Router)
+│   ├── app/                  # Pages, layouts, PWA manifest, API routes
+│   ├── components/           # Shared React components
+│   └── public/               # Static assets & PWA icons
+├── backend/                  # Domain logic, data, and financial engines
+│   ├── services/
+│   │   ├── escrow/           # Escrow — Paystack + smart contract calls
+│   │   └── payout/           # Split disbursement logic
+│   ├── contracts/            # Smart contract source and ABI
+│   ├── lib/                  # DB client, env helpers
+│   ├── prisma/               # Prisma schema
+│   └── db/
+│       ├── migrations/       # PostgreSQL migrations
+│       └── seeds/            # Seed data for development
+└── tests/                    # Unit and integration tests
 ```
 
-Changes to `services/escrow/` and `contracts/` carry the highest risk and require the most thorough review. See [Working with the Escrow Layer](#working-with-the-escrow-layer) before touching those areas.
+**Where to contribute**
+
+| Area | Work in |
+|---|---|
+| Pages, UI, PWA, Route Handlers | `frontend/` |
+| Escrow, payouts, Prisma, seeds | `backend/` |
+| Tests | `tests/` (mirror backend service names) |
+
+Import backend modules from the frontend with `@backend/...` (e.g. `@backend/services/escrow`).
+
+Changes to `backend/services/escrow/`, `backend/services/payout/`, and `backend/contracts/` carry the highest risk and require the most thorough review. See [Working with the Escrow Layer](#working-with-the-escrow-layer) before touching those areas.
 
 ---
 
@@ -256,7 +269,7 @@ Before marking your PR ready for review, confirm:
 
 ### General
 
-- **TypeScript everywhere** — No plain `.js` files in `app/`, `components/`, `lib/`, or `services/`.
+- **TypeScript everywhere** — No plain `.js` files in `frontend/` or `backend/`.
 - **Strict mode** — `"strict": true` in `tsconfig.json`. Do not disable strict checks.
 - **No `any`** — Use proper types. If the type is genuinely unknown, use `unknown` and narrow it.
 - **Named exports** — Prefer named exports over default exports for better refactoring support.
@@ -299,7 +312,7 @@ npm run test:e2e      # End-to-end tests (requires running dev server)
 
 ### Requirements
 
-- Every new function in `services/escrow/` and `services/payout/` must have unit tests.
+- Every new function in `backend/services/escrow/` and `backend/services/payout/` must have unit tests.
 - Payout failure and rollback paths must be covered — these are the highest-risk code paths.
 - Integration tests for Paystack interactions must use Paystack's test mode with recorded fixtures; they must not make live network calls in CI.
 - Smart contract tests must run against a local hardhat or anchor test node, not a public testnet.
@@ -308,13 +321,13 @@ npm run test:e2e      # End-to-end tests (requires running dev server)
 
 ## Working with the Escrow Layer
 
-The escrow and payout engine (`services/escrow/`, `services/payout/`, `contracts/`) is the most sensitive part of the codebase. Bugs here can result in funds being locked permanently or paid out incorrectly. Before contributing to these areas:
+The escrow and payout engine (`backend/services/escrow/`, `backend/services/payout/`, `backend/contracts/`) is the most sensitive part of the codebase. Bugs here can result in funds being locked permanently or paid out incorrectly. Before contributing to these areas:
 
 1. **Read the architecture section** in the README in full.
 2. **Open an issue first** for any non-trivial change, even if it looks like a fix. Describe the current behavior, the desired behavior, and your proposed approach. Wait for maintainer acknowledgment before writing code.
 3. **Never remove or weaken rollback logic.** If a Paystack call fails or a network error occurs, funds must remain locked in the vault. This is a hard invariant.
 4. **Smart contract changes require a testnet deployment** and a link to the verified contract in the PR description before review will begin.
-5. **Two maintainer approvals** are required to merge any PR that touches `services/escrow/`, `services/payout/`, or `contracts/`.
+5. **Two maintainer approvals** are required to merge any PR that touches `backend/services/escrow/`, `backend/services/payout/`, or `backend/contracts/`.
 
 ---
 

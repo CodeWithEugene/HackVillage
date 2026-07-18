@@ -1,0 +1,11 @@
+node_modules
+.next
+frontend/.next
+out
+coverage
+public/sw.js
+public/workbox-*.js
+public/swe-worker-*.js
+frontend/public/sw.js
+frontend/public/workbox-*.js
+frontend/public/swe-worker-*.js
