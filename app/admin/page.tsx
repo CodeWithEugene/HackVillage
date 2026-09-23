@@ -36,7 +36,7 @@ export default async function AdminHomePage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
         <Link href="/admin/users">
           <Card className="transition-shadow hover:shadow-lg">
             <CardTitle>Users</CardTitle>
@@ -47,6 +47,12 @@ export default async function AdminHomePage() {
           <Card className="transition-shadow hover:shadow-lg">
             <CardTitle>Events</CardTitle>
             <CardDescription>All events across organizations, with lifecycle status.</CardDescription>
+          </Card>
+        </Link>
+        <Link href="/admin/kyb">
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardTitle>KYB review</CardTitle>
+            <CardDescription>Business verification queue — gates first deposits.</CardDescription>
           </Card>
         </Link>
       </div>

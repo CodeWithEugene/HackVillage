@@ -116,9 +116,12 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
           </CardTitle>
           <CardDescription>
             This event is public as <strong>pending deposit</strong> — visible but not live.
-            The deposit flow opens with Phase 3 of the platform build: {formatKes(poolKes)} plus the
-            5% fee locks the vault, flips the event live, and issues the Prize Verified badge.
+            Fund the vault ({formatKes(poolKes)} pool + 5% fee) and the event flips LIVE with the
+            Prize Verified badge the moment the deposit confirms.
           </CardDescription>
+          <Link href={`/organizer/events/${event.slug}/vault`} className="mt-4 inline-block">
+            <Button>Open the Prize Vault</Button>
+          </Link>
         </Card>
       ) : null}
 
