@@ -928,8 +928,8 @@ Per workflow-architect methodology — every workflow has a status. Specs live i
 
 | Workflow | Spec | Status | Phase | Trigger |
 |---|---|---|---|---|
-| User signup + verification | — | Planned | 1 | /signup |
-| Onboarding (dev/org) | — | Planned | 1 | First login |
+| User signup + verification | — | **Built (Phase 1)** | 1 | /signup |
+| Onboarding (dev/org) | — | **Built (Phase 1)** | 1 | First login |
 | Event creation wizard | — | Planned | 2 | /organizer/events/new |
 | Team formation & invites | — | Planned | 2 | Registration |
 | **Deposit → Lock → Attest** | WORKFLOW-deposit.md | Planned | 3 | Fund vault CTA |

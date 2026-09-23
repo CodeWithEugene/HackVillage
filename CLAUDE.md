@@ -11,15 +11,18 @@ This repository is **in active build-out** following `docs/BUILD_PLAN.md` — th
 build contract. Read it (plus `README.md` and `CONTRIBUTING.md`) before writing
 code; all product decisions are locked in its §20 Decision Log.
 
-**Phase 0 (Foundations) is complete and verified**: Next.js 15.5 + strict
-TypeScript, Tailwind v4 brand tokens, UI primitives, baseline Prisma identity
-schema at `db/schema.prisma`, pg-boss wiring, Vitest + GitHub Actions CI, and
-all governance files. Verified green: lint, typecheck, unit tests, production
-build (5 routes, 106 kB first-load JS). Live routes: `/` landing, `/events`
-stub, system pages (404/error). Branch: `feature/phase-0-foundations`.
+**Phase 1 (Identity & Profiles) is complete and verified**: Auth.js v5
+(credentials + conditional Google/GitHub OAuth, database sessions), email
+verification + password reset (Resend with dev console fallback), adapter
+assigning handles/primaryRole to OAuth users, server-side RBAC guards,
+signup/signin/verify-email/forgot/reset pages, onboarding wizards (developer
+profile, org create/join via 7-day invite codes), authenticated app shell
+(dashboard, profile editor, settings with soft-delete deactivation, organizer
+overview), and public `/developers` + `/developers/[handle]` profiles.
+Verified green: lint, typecheck, 39 unit tests, production build.
 
 Everything else is planned per the build plan phases — build features **in
-phase order** (Phase 1 = Auth.js identity + onboarding next).
+phase order** (Phase 2 = Events & Teams next).
 
 ## Tech Stack (live)
 | Layer | Technology |
