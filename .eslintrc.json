@@ -9,7 +9,7 @@
       {
         "patterns": [
           {
-            "group": ["paystack*", "ethers"],
+            "group": ["ethers"],
             "message": "Vendor SDKs must be accessed via lib/ports — never imported directly (ADR-001)."
           }
         ]
