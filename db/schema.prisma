@@ -48,6 +48,45 @@ enum OrgMemberStatus {
   REVOKED
 }
 
+/// Event lifecycle (plan §10.1). Phase 2 owns DRAFT → PENDING_DEPOSIT only —
+/// LIVE and beyond are gated by the escrow service in Phase 3.
+enum EventStatus {
+  DRAFT
+  PENDING_DEPOSIT
+  LIVE
+  IN_PROGRESS
+  JUDGING
+  WINNERS_ANNOUNCED
+  SETTLED
+  CANCELLED
+  DISPUTED
+}
+
+enum VenueType {
+  PHYSICAL
+  ONLINE
+  HYBRID
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  WAITLISTED
+  CANCELLED
+}
+
+enum TeamStatus {
+  OPEN
+  LOCKED
+  DISBANDED
+}
+
+enum TeamMemberStatus {
+  INVITED
+  JOINED
+  LEFT
+  DECLINED
+}
+
 // ── Identity (Auth.js v5 adapter-compatible shapes) ───────────────────────
 
 model User {
@@ -74,6 +113,9 @@ model User {
   ownedOrgs      Organization[] @relation("OrgOwner")
   orgMemberships OrgMember[]
   profile        DeveloperProfile?
+  registrations  Registration[]
+  teamMemberships TeamMember[]
+  ledTeams       Team[] @relation("TeamLeader")
 }
 
 model Account {
@@ -139,6 +181,7 @@ model Organization {
   owner   User        @relation("OrgOwner", fields: [ownerId], references: [id])
   members OrgMember[]
   invitations OrgInvitation[]
+  events Event[]
 }
 
 model OrgMember {
@@ -193,4 +236,122 @@ model DeveloperProfile {
   updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ── Events & Teams (Phase 2 — no money code; deposits arrive in Phase 3) ──
+
+model Event {
+  id String @id @default(cuid())
+  orgId String
+  slug String @unique
+  title String
+  summary String?
+  problemStatement String?
+  rules String?
+  venueType VenueType
+  location String?
+  coverUrl String?
+  startsAt DateTime
+  endsAt DateTime
+  registrationDeadline DateTime
+  maxTeams Int @default(20)
+  rolesWanted String[]
+  status EventStatus @default(DRAFT)
+  // Set by the escrow service when the vault locks (Phase 3).
+  prizeVerifiedAt DateTime?
+  // endsAt + 48h — enforced by the media job (Phase 7).
+  mediaDeadlineAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  publishedAt DateTime?
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  prizes PrizeBreakdown[]
+  roleTags EventRoleTag[]
+  registrations Registration[]
+  teams Team[]
+
+  @@index([status, startsAt])
+}
+
+/// Pool amount is derived: the pool equals Σ PrizeBreakdown.amountKes for the
+/// event (Decision D1/D5 — organizers fund the pool, platform adds 5% on top
+/// at deposit time, ADR-012).
+model PrizeBreakdown {
+  id String @id @default(cuid())
+  eventId String
+  place Int
+  label String
+  amountKes Int
+  milestoneRequired Boolean @default(true)
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, place])
+}
+
+model EventRoleTag {
+  id String @id @default(cuid())
+  eventId String
+  tag String
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, tag])
+}
+
+model Registration {
+  id String @id @default(cuid())
+  eventId String
+  userId String
+  status RegistrationStatus @default(REGISTERED)
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+}
+
+model Team {
+  id String @id @default(cuid())
+  eventId String
+  name String
+  leaderId String
+  inviteCode String @unique
+  status TeamStatus @default(OPEN)
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  leader User @relation("TeamLeader", fields: [leaderId], references: [id])
+  members TeamMember[]
+  submission Submission?
+
+  @@index([eventId])
+}
+
+model TeamMember {
+  id String @id @default(cuid())
+  teamId String
+  userId String
+  status TeamMemberStatus @default(INVITED)
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+}
+
+model Submission {
+  id String @id @default(cuid())
+  teamId String @unique
+  repoUrl String
+  demoUrl String?
+  description String
+  submittedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  /// [{userId, percent}] — must sum to 100; visible to all members (ADR-013).
+  splitDeclaration Json?
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
