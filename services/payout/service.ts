@@ -7,6 +7,7 @@ import {
   transferReference,
   tranchePlanFor,
 } from "@/services/payout/tranches";
+import { materializePortfolioForWinner } from "@/services/pow/service";
 
 /**
  * Payout service — HARD BOUNDARY (ADR-001). Only this service touches
@@ -220,10 +221,13 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
   // without a running job is picked up by sweepStuckPayouts).
   const payouts = await prisma.payout.findMany({
     where: { winner: { eventId: event.id }, tranche: "INSTANT", status: "QUEUED" },
-    select: { id: true },
+    select: { id: true, winnerId: true },
   });
   for (const payout of payouts) {
     await enqueue("payout.execute", { payoutId: payout.id });
+    // Proof-of-Work (Phase 6): the winning submission becomes a portfolio
+    // item automatically — the profile writes itself from verified results.
+    await materializePortfolioForWinner(payout.winnerId);
   }
 }
 
