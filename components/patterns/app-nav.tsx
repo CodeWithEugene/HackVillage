@@ -13,7 +13,11 @@ export default function AppTopNav({
 }: {
   user: { name?: string | null; handle: string; roles: string[] };
 }) {
-  const links: { href: string; label: string }[] = [{ href: "/dashboard", label: "Dashboard" }];
+  const links: { href: string; label: string }[] = [
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/dashboard/events", label: "My events" },
+    { href: "/dashboard/teams", label: "Teams" },
+  ];
 
   if (user.roles.includes("ORGANIZER")) {
     links.push({ href: "/organizer", label: "Organize" });
