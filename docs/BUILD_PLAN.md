@@ -941,11 +941,11 @@ Per workflow-architect methodology — every workflow has a status. Specs live i
 | Payout failure ops | WORKFLOW-payout-failure.md | **Built (Phase 5)** | 5 | transfer.failed |
 | Refund (pre-live cancel) | WORKFLOW-refund.md | Planned | 5 | Event cancel |
 | Dispute resolution | WORKFLOW-dispute.md | Planned | 8 | Developer dispute |
-| 48h media enforcement | WORKFLOW-media-deadline.md | Planned | 7 | Cron |
-| Trust adjustment + appeal | — | Planned | 7 | Penalty |
+| 48h media enforcement | WORKFLOW-media-deadline.md | **Built (Phase 7)** | 7 | Cron |
+| Trust adjustment + appeal | — | **Built (Phase 7)** | 7 | Penalty |
 | Legacy check-in | — | Planned | 8 | Cron +3mo |
 | Introduction request/accept | — | Planned | 6 | Hiring CTA |
-| Notification dispatch | — | Planned | 7 | All events above |
+| Notification dispatch | — | **Built (Phase 7)** | 7 | All events above |
 | Ledger reconcile (3-way) | — | Planned | 3/5 | Nightly |
 
 ---
