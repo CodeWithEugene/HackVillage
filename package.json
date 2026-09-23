@@ -2,7 +2,7 @@
   "name": "hackvillage",
   "version": "0.1.0",
   "private": true,
-  "description": "The open-source infrastructure for high-impact tech events — escrowed prize pools, instant payouts, verified Proof-of-Work profiles.",
+  "description": "The open-source infrastructure for high-impact tech events \u2014 escrowed prize pools, instant payouts, verified Proof-of-Work profiles.",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=18.18.0"
@@ -24,7 +24,8 @@
     "db:deploy": "prisma migrate deploy --schema db/schema.prisma",
     "db:seed": "tsx --env-file=.env db/seeds/seed.ts",
     "db:studio": "prisma studio --schema db/schema.prisma",
-    "dev:fund": "tsx --env-file=.env scripts/fund-event.ts"
+    "dev:fund": "tsx --env-file=.env scripts/fund-event.ts",
+    "dev:cycle": "tsx --env-file=.env scripts/cycle-event.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",

@@ -71,8 +71,51 @@ export async function processPaystackWebhook(
     return { ok: true, status: 200, duplicate: true };
   }
 
+  if (eventType === "transfer.success") {
+    const payout = await prisma.payout.findFirst({
+      where: { paystackReference: reference },
+      select: { id: true },
+    });
+    if (payout) {
+      const { confirmTransferSuccess } = await import("@/services/payout/service");
+      await confirmTransferSuccess(payout.id, reference);
+    } else {
+      console.error(`[webhook] transfer.success with unknown reference: ${reference}`);
+    }
+    await prisma.webhookEvent.update({
+      where: { id: stored.id },
+      data: { processedAt: new Date() },
+    });
+    return { ok: true, status: 200 };
+  }
+
+  if (eventType === "transfer.failed" || eventType === "transfer.reversed") {
+    // Terminal failure from the provider: straight to the ops queue — funds
+    // stay locked; a human decides (P4 fail-closed).
+    const payout = await prisma.payout.findFirst({
+      where: { paystackReference: reference },
+      select: { id: true },
+    });
+    if (payout) {
+      await prisma.payout.updateMany({
+        where: { id: payout.id, status: { not: "SUCCEEDED" } },
+        data: {
+          status: eventType === "transfer.reversed" ? "REVERSED" : "MANUAL_REVIEW",
+          lastError: `Provider reported ${eventType}.`,
+        },
+      });
+    } else {
+      console.error(`[webhook] ${eventType} with unknown reference: ${reference}`);
+    }
+    await prisma.webhookEvent.update({
+      where: { id: stored.id },
+      data: { processedAt: new Date() },
+    });
+    return { ok: true, status: 200 };
+  }
+
   if (eventType !== "charge.success") {
-    // Recorded for forensics; non-money events are not processed yet.
+    // Recorded for forensics; other events are not processed yet.
     await prisma.webhookEvent.update({
       where: { id: stored.id },
       data: { processedAt: new Date() },
