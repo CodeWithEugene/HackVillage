@@ -932,8 +932,8 @@ Per workflow-architect methodology — every workflow has a status. Specs live i
 | Onboarding (dev/org) | — | **Built (Phase 1)** | 1 | First login |
 | Event creation wizard | — | **Built (Phase 2)** | 2 | /organizer/events/new |
 | Team formation & invites | — | **Built (Phase 2)** | 2 | Registration |
-| **Deposit → Lock → Attest** | WORKFLOW-deposit.md | Planned | 3 | Fund vault CTA |
-| Go-live gating | WORKFLOW-golive.md | Planned | 3 | Deposit locked |
+| **Deposit → Lock → Attest** | WORKFLOW-deposit.md | **Built (Phase 3)** | 3 | Fund vault CTA |
+| Go-live gating | WORKFLOW-golive.md | **Built (Phase 3)** | 3 | Deposit locked |
 | Submission (edit window) | — | **Built (Phase 2)** | 2 | Workspace form |
 | Judging + feedback gate | WORKFLOW-judging.md | Planned | 4 | Judge finalize |
 | **Instant payout (50%)** | WORKFLOW-payout-instant.md | Planned | 5 | Announce winners |
