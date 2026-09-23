@@ -154,6 +154,7 @@ model User {
   portfolioItems PortfolioItem[] @relation("PortfolioItems")
   introRequestsSent Introduction[] @relation("IntroRequests")
   introRequestsReceived Introduction[] @relation("IntroDeveloper")
+  notifications Notification[]
 }
 
 model Account {
@@ -220,6 +221,7 @@ model Organization {
   members OrgMember[]
   invitations OrgInvitation[]
   events Event[]
+  trustEvents TrustEvent[]
 }
 
 model OrgMember {
@@ -317,6 +319,7 @@ model Event {
   endorsements Endorsement[]
   internshipTags InternshipTag[]
   introductions Introduction[]
+  media MediaAsset[]
 
   @@index([status, startsAt])
 }
@@ -742,4 +745,70 @@ model Introduction {
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@unique([hiringPartnerId, developerId, eventId])
+}
+
+// ── Media Vault & Trust (Phase 7 — plan §6.7) ───────────────────────────
+
+enum MediaKind {
+  PHOTO
+  VIDEO
+}
+
+enum MediaStatus {
+  PENDING
+  APPROVED
+  HIDDEN
+}
+
+model MediaAsset {
+  id String @id @default(cuid())
+  eventId String
+  /// Storage key — R2 in prod, local dev dir in simulation.
+  r2Key String @unique
+  url String
+  kind MediaKind
+  caption String?
+  uploadedBy String
+  status MediaStatus @default(PENDING)
+  uploadedAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+enum TrustEventType {
+  MEDIA_PENALTY
+  PAYOUT_EXCELLENCE
+  MANUAL_ADJUST
+  APPEAL_GRANTED
+}
+
+model TrustEvent {
+  id String @id @default(cuid())
+  orgId String
+  type TrustEventType
+  /// Score delta applied (negative for penalties).
+  delta Int
+  reason String
+  actorId String?
+  createdAt DateTime @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+/// In-app notifications (email fan-out happens via the notifications job).
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  type String
+  payload Json?
+  readAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
 }
