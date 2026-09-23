@@ -11,11 +11,23 @@ concurrency:
 
 jobs:
   verify:
-    name: Lint, typecheck, test, build
+    name: Lint, typecheck, test, migrate, build
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: hackvillage_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
-      # Phase 0: unit tests and build need no real secrets — these are dummies.
-      # Integration jobs (later phases) will use a postgres service container.
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hackvillage_ci
       NEXTAUTH_SECRET: ci-dummy-secret-0123456789abcdef
       NEXTAUTH_URL: http://localhost:3000
@@ -41,6 +53,9 @@ jobs:
 
       - name: Unit tests
         run: npm test
+
+      - name: Apply database migrations
+        run: npm run db:deploy
 
       - name: Build
         run: npm run build
