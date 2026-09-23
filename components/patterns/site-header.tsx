@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Github } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { currentUser } from "@/lib/auth/guards";
 import { cn } from "@/lib/utils";
 
 interface NavLink {
@@ -10,24 +12,26 @@ interface NavLink {
 
 const NAV_LINKS: NavLink[] = [
   { href: "/events", label: "Events" },
+  { href: "/developers", label: "Developers" },
 ];
 
-export function SiteHeader({ className }: { className?: string }) {
+export async function SiteHeader({ className }: { className?: string }) {
+  const user = await currentUser();
+  const destination = user
+    ? user.onboardingCompletedAt
+      ? "/dashboard"
+      : "/onboarding/choose"
+    : "/signin";
+
   return (
-    <header
-      className={cn("border-b border-ink/10 bg-paper/90 backdrop-blur", className)}
-    >
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
+    <header className={cn("border-b border-ink/10 bg-paper/90 backdrop-blur", className)}>
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
         <Link href="/" className="flex items-center gap-3" aria-label="HackVillage home">
           {/* eslint-disable-next-line @next/next/no-img-element -- SVG wordmark, no raster source */}
-          <img
-            src="/images/salamander-logo-yellow.svg"
-            alt="HackVillage"
-            className="h-8 w-auto"
-          />
+          <img src="/images/salamander-logo-yellow.svg" alt="HackVillage" className="h-8 w-auto" />
         </Link>
 
-        <nav aria-label="Primary" className="flex items-center gap-6">
+        <nav aria-label="Primary" className="flex items-center gap-4 sm:gap-6">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
@@ -39,11 +43,14 @@ export function SiteHeader({ className }: { className?: string }) {
           ))}
           <a
             href="https://github.com/CodeWithEugene/HackVillage"
-            className="flex size-9 items-center justify-center rounded-control text-ink hover:bg-ink/5"
+            className="hidden size-9 items-center justify-center rounded-control text-ink hover:bg-ink/5 sm:flex"
             aria-label="HackVillage on GitHub"
           >
             <Github aria-hidden className="size-5" />
           </a>
+          <Link href={destination}>
+            <Button size="sm">{user ? "Go to app" : "Sign in"}</Button>
+          </Link>
         </nav>
       </div>
     </header>
