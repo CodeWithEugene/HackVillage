@@ -60,6 +60,11 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
         },
       },
       _count: { select: { teams: { where: { status: { not: "DISBANDED" } } } } },
+      media: {
+        where: { status: "APPROVED" },
+        orderBy: { uploadedAt: "desc" },
+        take: 9,
+      },
     },
   });
   if (!event) notFound();
@@ -67,6 +72,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
   const poolKes = event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0);
   const verified = isPrizeVerified(event.status, event.prizeVerifiedAt);
   const open = registrationOpen(event);
+  const gallery = event.media;
 
   const registration_ = viewer
     ? await prisma.registration.findUnique({
@@ -223,6 +229,28 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           </CardDescription>
         </Card>
       </div>
+
+      {/* Public gallery — 48-hour media vault */}
+      {gallery.length > 0 ? (
+        <Card className="mt-6">
+          <CardTitle>Event gallery</CardTitle>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+            {gallery.map((asset) => (
+              <li key={asset.id} className="overflow-hidden rounded-card border border-ink/10">
+                {asset.kind === "PHOTO" ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- media vault assets from dynamic storage
+                  <img src={asset.url} alt={asset.caption ?? "Event photo"} className="aspect-[4/3] w-full object-cover" />
+                ) : (
+                  <video src={asset.url} controls className="aspect-[4/3] w-full" />
+                )}
+              </li>
+            ))}
+          </ul>
+          <CardDescription>
+            Delivered within the 48-hour standard — high-resolution, community-first.
+          </CardDescription>
+        </Card>
+      ) : null}
 
       {/* CTA */}
       <div className="mt-8">

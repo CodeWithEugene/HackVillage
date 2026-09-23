@@ -142,9 +142,14 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
             milestone confirmation. Track every payout and confirm handovers in the winners
             console.
           </CardDescription>
-          <Link href={`/organizer/events/${event.slug}/winners`} className="mt-4 inline-block">
-            <Button>Open winners console</Button>
-          </Link>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href={`/organizer/events/${event.slug}/winners`}>
+              <Button>Open winners console</Button>
+            </Link>
+            <Link href={`/organizer/events/${event.slug}/media`}>
+              <Button variant="secondary">Media vault (48h)</Button>
+            </Link>
+          </div>
         </Card>
       )}
 

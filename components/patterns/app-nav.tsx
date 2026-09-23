@@ -19,6 +19,7 @@ export default function AppTopNav({
     { href: "/dashboard/teams", label: "Teams" },
     { href: "/dashboard/winnings", label: "Winnings" },
     { href: "/dashboard/intros", label: "Intros" },
+    { href: "/dashboard/notifications", label: "Alerts" },
   ];
 
   if (user.roles.includes("ORGANIZER")) {

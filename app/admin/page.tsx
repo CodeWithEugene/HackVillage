@@ -61,6 +61,12 @@ export default async function AdminHomePage() {
             <CardDescription>Failed payouts, retries, and manual receipts.</CardDescription>
           </Card>
         </Link>
+        <Link href="/admin/trust">
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardTitle>Trust ledger</CardTitle>
+            <CardDescription>Penalties, appeals, and manual adjustments.</CardDescription>
+          </Card>
+        </Link>
       </div>
     </div>
   );

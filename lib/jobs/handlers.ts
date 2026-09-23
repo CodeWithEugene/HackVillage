@@ -96,5 +96,23 @@ export async function registerJobs(): Promise<void> {
     }
   });
 
-  console.log("[jobs] registered escrow + payout handlers");
+  // Phase 7: media deadline enforcement every 15 minutes.
+  const media = await import("@/services/media/service");
+  await boss.createQueue("media.cron").catch((error: { code?: string }) => {
+    if (error?.code !== "B03") throw error;
+  });
+  await boss
+    .schedule("media.cron", "*/15 * * * *", { kind: "enforce-media-deadlines" })
+    .catch(() => undefined);
+  await boss.work("media.cron", async (jobs: Job<{ kind?: string }>[]) => {
+    for (const job of jobs) {
+      if (job.data?.kind !== "enforce-media-deadlines") continue;
+      const result = await media.enforceMediaDeadlines();
+      if (result.penalized > 0) {
+        console.log(`[cron] media deadlines: penalized ${result.penalized} event(s)`);
+      }
+    }
+  });
+
+  console.log("[jobs] registered escrow + payout + media handlers");
 }
