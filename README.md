@@ -16,7 +16,7 @@ _Trust-as-a-Service for Developers. Innovation-as-a-Service for Organizations._
 
 [![License](https://img.shields.io/github/license/CodeWithEugene/HackVillage?style=flat-square)](./LICENSE)
 [![Open Source](https://img.shields.io/badge/open--source-core-brightgreen?style=flat-square)](https://github.com/CodeWithEugene/HackVillage)
-[![Built with Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org)
+[![Built with Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org)
 [![Backend](https://img.shields.io/badge/Node.js-TypeScript-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
 [![Database](https://img.shields.io/badge/PostgreSQL-structured-336791?style=flat-square&logo=postgresql)](https://www.postgresql.org)
 
@@ -243,7 +243,7 @@ Paystack API ──── Final transfer ──── Public Ledger entry record
 
 ### Prerequisites
 
-- Node.js >= 18
+- Node.js >= 18.18 (Next.js 15 requirement)
 - PostgreSQL >= 15
 - A Paystack account (test keys sufficient for local development)
 

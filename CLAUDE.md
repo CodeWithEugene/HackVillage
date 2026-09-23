@@ -7,27 +7,33 @@ Proof-of-Work developer portfolios, and organizer accountability tools. Backed b
 Technetium Kenya. Repo: github.com/CodeWithEugene/HackVillage
 
 ## Current State — IMPORTANT
-This repository is **pre-code**. It contains only documentation and a logo
-(`README.md`, `CONTRIBUTING.md`, `LICENSE` Apache-2.0, `public/images/`). The entire
-application described below is planned, not implemented. `README.md` and
-`CONTRIBUTING.md` are the specification source of truth — read both before writing
-any code.
+This repository is **in active build-out** following `docs/BUILD_PLAN.md` — the
+build contract. Read it (plus `README.md` and `CONTRIBUTING.md`) before writing
+code; all product decisions are locked in its §20 Decision Log.
 
-Referenced-but-missing files (known gaps, do not assume they exist):
-`CODE_OF_CONDUCT.md`, `SECURITY.md`, `.env.example`, `.gitignore`,
-`package.json`, CI workflows, issue/PR templates.
+**Phase 0 (Foundations) is complete and verified**: Next.js 15.5 + strict
+TypeScript, Tailwind v4 brand tokens, UI primitives, baseline Prisma identity
+schema at `db/schema.prisma`, pg-boss wiring, Vitest + GitHub Actions CI, and
+all governance files. Verified green: lint, typecheck, unit tests, production
+build (5 routes, 106 kB first-load JS). Live routes: `/` landing, `/events`
+stub, system pages (404/error). Branch: `feature/phase-0-foundations`.
 
-## Planned Tech Stack
+Everything else is planned per the build plan phases — build features **in
+phase order** (Phase 1 = Auth.js identity + onboarding next).
+
+## Tech Stack (live)
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 14 (App Router, React Server Components, SEO-optimized) |
+| Frontend | Next.js 15 (App Router, React Server Components, SEO-optimized) |
 | Backend | Node.js / TypeScript (strict mode, no `any`) |
-| Database | PostgreSQL >= 15 |
-| Payments | Paystack (M-Pesa + bank transfers, Split API) |
-| Ledger | Smart contract on Polygon/Solana (escrow "Prize Vault" state) |
-| Auth | NextAuth |
+| Database | PostgreSQL + Prisma 6 (`db/schema.prisma`; migrations in `db/`) |
+| Jobs | pg-boss (Postgres-backed queue, `lib/queue.ts`) |
+| Payments | Paystack (M-Pesa + bank transfers) — ports in `lib/ports/` from Phase 3 |
+| Ledger | `PrizeVault` attestation contract on Polygon (Amoy first) — ADR-007 |
+| Auth | Auth.js v5, database sessions (Phase 1) |
+| Styling | Tailwind CSS v4, tokens in `app/globals.css` (brand `#FFED00` / ink `#222`) |
 
-## Planned Structure (from CONTRIBUTING.md)
+## Repository Structure (Phase 0 live; services/ and contracts/ land in Phases 2–3)
 ```
 app/                  # Next.js App Router pages/layouts
 components/           # Shared React components
@@ -48,7 +54,7 @@ public/  tests/       # tests mirror source structure
   update in PR, and two maintainer approvals to merge.
 - Trust Score KPI: >90% of prizes disbursed within 1 hour of event conclusion.
 
-## Code Style (to be enforced once code exists)
+## Code Style (enforced — CI runs lint + typecheck)
 - TypeScript everywhere in `app/`, `components/`, `lib/`, `services/` — no plain `.js`.
 - `"strict": true`; use `unknown` + narrowing instead of `any`.
 - Prefer named exports; prefer Server Components (`"use client"` only when needed).
@@ -63,8 +69,9 @@ public/  tests/       # tests mirror source structure
 - Squash on merge; never commit directly to `main`/`develop`.
 - Never commit `.env.local` or real credentials.
 
-## Testing (once code exists)
-- `npm test` / `npm run test:unit` / `npm run test:e2e` (e2e needs running dev server).
+## Testing
+- `npm test` (Vitest) / `npm run db:seed` / e2e arrives with later phases (Playwright).
+- Unit tests live in `tests/unit/` mirroring source structure.
 - Every function in `services/escrow/` and `services/payout/` needs unit tests.
 - Failure/rollback paths must be covered. Paystack integration tests use recorded
   fixtures (no live calls in CI); contract tests run on local hardhat/anchor node.
