@@ -98,7 +98,7 @@ export async function initiateDeposit(eventId: string, userId: string): Promise<
 
   // Best-effort: the vault-creation attestation follows the deposit attempt.
   const { enqueue } = await import("@/lib/queue");
-  await enqueue("escrow", "escrow.attest-vault-created", { eventId: event.id }, {
+  await enqueue("escrow.attest-vault-created", { eventId: event.id }, {
     singletonKey: `vault-created:${event.id}`,
   });
 
@@ -173,7 +173,7 @@ export async function recordChargeSuccess(input: {
   // Best-effort attestation enqueue after the money state committed (§10.3).
   if (covered) {
     const { enqueue } = await import("@/lib/queue");
-    await enqueue("escrow", "escrow.attest-vault-locked", { eventId: event.id }, {
+    await enqueue("escrow.attest-vault-locked", { eventId: event.id }, {
       singletonKey: `vault-locked:${event.id}`,
     });
   }

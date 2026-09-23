@@ -23,7 +23,8 @@
     "db:migrate": "prisma migrate dev --schema db/schema.prisma",
     "db:deploy": "prisma migrate deploy --schema db/schema.prisma",
     "db:seed": "tsx --env-file=.env db/seeds/seed.ts",
-    "db:studio": "prisma studio --schema db/schema.prisma"
+    "db:studio": "prisma studio --schema db/schema.prisma",
+    "dev:fund": "tsx --env-file=.env scripts/fund-event.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
