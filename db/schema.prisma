@@ -61,6 +61,8 @@ model User {
   handle        String    @unique
   avatarUrl     String?
   primaryRole   PrimaryRole
+  // Set when the onboarding wizard completes — gates app routes (Phase 1).
+  onboardingCompletedAt DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   // Soft delete: anonymize on account deletion, payout obligations remain.
@@ -136,6 +138,7 @@ model Organization {
 
   owner   User        @relation("OrgOwner", fields: [ownerId], references: [id])
   members OrgMember[]
+  invitations OrgInvitation[]
 }
 
 model OrgMember {
@@ -151,6 +154,23 @@ model OrgMember {
   @@unique([orgId, userId])
 }
 
+/// Invite codes for joining an organization (Phase 1: create/join org in
+/// onboarding, plus /invites/[code] for existing users).
+model OrgInvitation {
+  id        String        @id @default(cuid())
+  orgId     String
+  email     String
+  role      OrgMemberRole @default(MEMBER)
+  token     String        @unique
+  expiresAt DateTime
+  acceptedAt DateTime?
+  createdAt DateTime      @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+}
+
 // ── Developer Proof-of-Work profile ──────────────────────────────────────
 
 model DeveloperProfile {
@@ -161,6 +181,8 @@ model DeveloperProfile {
   githubLogin String?
   linkedinUrl String?
   location String?
+  // Public browse visibility (privacy toggle, plan §7.4).
+  visible Boolean @default(true)
   // Paystack transfer recipient — required before a user can be marked a
   // winner (plan §6.1 invariant). Wired in Phase 5.
   payoutRecipientCode String?
