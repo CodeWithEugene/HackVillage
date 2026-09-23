@@ -53,7 +53,16 @@ committed to (see `docs/BUILD_PLAN.md` §14 and §10):
 - The platform does **not** custody funds on-chain: fiat custody sits with
   Paystack (a licensed PSP); the contract is a tamper-proof public ledger of
   state attestations (ADR-007 in `docs/BUILD_PLAN.md`).
-- An independent audit is required before any mainnet deployment.
+- An independent audit is required before any mainnet deployment. Findings
+  from the audit are tracked in the go-live checklist
+  (`docs/GO_LIVE_CHECKLIST.md`).
+- **Attester key operations**: the platform signer key lives only in
+  environment configuration (never in the repo, never in logs). Rotation
+  procedure: deploy a new factory + vaults from the new key, verify the
+  ledger mirror, then retire the old key — the runbooks
+  (`docs/runbooks/chain-outage.md`) cover the ledger-pending mode that
+  bridges the rotation window. The contract is immutable by design; there is
+  no upgrade path to abuse.
 
 ## Preferred languages
 
