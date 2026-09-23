@@ -408,6 +408,7 @@ model Submission {
   splitDeclaration Json?
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  legacyCheckin LegacyCheckin?
 }
 
 // ── Escrow (Phase 3 — hard boundary; services/escrow owns these rows) ────
@@ -615,6 +616,7 @@ model Winner {
   team Team @relation("TeamWins", fields: [teamId], references: [id])
   payouts Payout[]
   milestone Milestone?
+  dispute Dispute?
 
   @@unique([eventId, place])
 }
@@ -811,4 +813,54 @@ model Notification {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, readAt])
+}
+
+// ── Legacy & Disputes (Phase 8 — plan §6.7, §10.5) ───────────────────────
+
+enum LegacyOutcome {
+  STILL_DEMO
+  IN_PRODUCTION
+  PIVOTED
+  ABANDONED
+  UNRESPONSIVE
+}
+
+/// The 3-month check-in: did the prototype become a product? (plan §10.7)
+model LegacyCheckin {
+  id String @id @default(cuid())
+  submissionId String @unique
+  dueAt DateTime
+  completedAt DateTime?
+  outcome LegacyOutcome?
+  notes String?
+  reminderCount Int @default(0)
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([dueAt, completedAt])
+}
+
+enum DisputeStatus {
+  OPEN
+  RESOLVED_RELEASE
+  RESOLVED_REFUND
+  REJECTED
+}
+
+/// Milestone disputes: developer claims non-confirmation; admins arbitrate
+/// (plan §10.5) — force-release or refund (refund needs 2-admin approval).
+model Dispute {
+  id String @id @default(cuid())
+  winnerId String @unique
+  openedBy String
+  claim String
+  evidenceUrl String?
+  status DisputeStatus @default(OPEN)
+  resolvedBy String?
+  resolvedAt DateTime?
+  resolutionNote String?
+  secondApproverId String? // refunds require two admins (plan §14.1)
+  createdAt DateTime @default(now())
+
+  winner Winner @relation(fields: [winnerId], references: [id], onDelete: Cascade)
 }
