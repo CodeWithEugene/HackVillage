@@ -9,6 +9,7 @@ import { z } from "zod";
 import { signIn, signOut } from "@/lib/auth";
 import { passwordResetEmail, verificationEmail } from "@/lib/auth/mail-templates";
 import { candidateHandles, firstAvailableHandle, validateHandle } from "@/lib/auth/handles";
+import { passwordSchema } from "@/lib/auth/password-policy";
 import { getEnv } from "@/lib/env";
 import { sendMail } from "@/lib/ports/mail";
 import { prisma } from "@/lib/db";
@@ -56,14 +57,8 @@ async function issueToken(email: string, ttlMs: number): Promise<string> {
 }
 
 // ── Password policy ──────────────────────────────────────────────────────
-
-export const passwordSchema = z
-  .string()
-  .min(10, "Passwords need at least 10 characters.")
-  .max(200, "Passwords can be at most 200 characters.")
-  .refine((p) => /[a-zA-Z]/.test(p) && /[0-9]/.test(p), {
-    message: "Passwords need at least one letter and one number.",
-  });
+// (see lib/auth/password-policy.ts — "use server" files export async
+// functions only)
 
 // ── Sign up (credentials) ────────────────────────────────────────────────
 
