@@ -22,6 +22,9 @@ export default function AppTopNav({
   if (user.roles.includes("ORGANIZER")) {
     links.push({ href: "/organizer", label: "Organize" });
   }
+  if (user.roles.includes("JUDGE")) {
+    links.push({ href: "/judge", label: "Judge" });
+  }
   links.push(
     { href: "/dashboard/profile", label: "Profile" },
     { href: "/settings", label: "Settings" }
