@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 import { getEnv } from "@/lib/env";
 
@@ -34,12 +34,45 @@ export interface TransactionVerification {
   raw: unknown;
 }
 
+export type PayoutMethod = "MPESA" | "BANK";
+
+export interface RecipientInput {
+  /** The winner's verified payout destination (ADR-013). */
+  type: PayoutMethod;
+  name: string;
+  /// M-Pesa phone number (2547…) or bank account number.
+  accountNumber: string;
+  /// Bank code (Paystack's list) — required for BANK only.
+  bankCode?: string;
+}
+
+export interface RecipientResult {
+  recipientCode: string;
+  simulated: boolean;
+}
+
+export interface TransferInput {
+  /// Unique per payout — Paystack dedupes by transfer reference (P3).
+  reference: string;
+  recipientCode: string;
+  amountKes: number;
+  reason: string;
+}
+
+export interface TransferResult {
+  transferCode: string;
+  status: "pending" | "success" | "failed" | "reversed";
+  simulated: boolean;
+}
+
 export interface PaystackPort {
   mode: "live" | "simulation";
   initializeCheckout(input: CheckoutInput): Promise<CheckoutSession>;
   verifyTransaction(reference: string): Promise<TransactionVerification | null>;
   /** HMAC-SHA512 over the raw body, constant-time compared (plan §14.2). */
   verifyWebhookSignature(rawBody: string, signature: string | null): boolean;
+  createTransferRecipient(input: RecipientInput): Promise<RecipientResult>;
+  initiateTransfer(input: TransferInput): Promise<TransferResult>;
 }
 
 const PAYSTACK_BASE = "https://api.paystack.co";
@@ -105,6 +138,69 @@ export class PaystackLive implements PaystackPort {
     const b = Buffer.from(signature, "utf8");
     return a.length === b.length && timingSafeEqual(a, b);
   }
+
+  async createTransferRecipient(input: RecipientInput): Promise<RecipientResult> {
+    const response = await fetch(`${PAYSTACK_BASE}/transferrecipient`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${this.secretKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: input.type === "MPESA" ? "mobile_money" : "nuban",
+        name: input.name,
+        account_number: input.accountNumber,
+        bank_code: input.type === "MPESA" ? "MPS" : input.bankCode,
+        currency: "KES",
+      }),
+    });
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      throw new Error(`Paystack recipient failed (${response.status}): ${body.slice(0, 300)}`);
+    }
+    const payload = (await response.json()) as {
+      status: boolean;
+      data?: { recipient_code?: string };
+    };
+    if (!payload.status || !payload.data?.recipient_code) {
+      throw new Error("Paystack returned no recipient_code.");
+    }
+    return { recipientCode: payload.data.recipient_code, simulated: false };
+  }
+
+  async initiateTransfer(input: TransferInput): Promise<TransferResult> {
+    const response = await fetch(`${PAYSTACK_BASE}/transfer`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${this.secretKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        source: "balance",
+        amount: input.amountKes * 100, // pesewas
+        recipient: input.recipientCode,
+        reference: input.reference,
+        reason: input.reason,
+        currency: "KES",
+      }),
+    });
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      throw new Error(`Paystack transfer failed (${response.status}): ${body.slice(0, 300)}`);
+    }
+    const payload = (await response.json()) as {
+      status: boolean;
+      data?: { transfer_code?: string; status?: string };
+    };
+    if (!payload.status || !payload.data?.transfer_code) {
+      throw new Error("Paystack returned no transfer_code.");
+    }
+    return {
+      transferCode: payload.data.transfer_code,
+      status: (payload.data.status as TransferResult["status"]) ?? "pending",
+      simulated: false,
+    };
+  }
 }
 
 class PaystackSimulation implements PaystackPort {
@@ -132,6 +228,27 @@ class PaystackSimulation implements PaystackPort {
   verifyWebhookSignature(): boolean {
     // Simulation traffic never enters the production webhook route.
     return false;
+  }
+
+  async createTransferRecipient(input: RecipientInput): Promise<RecipientResult> {
+    // Deterministic pseudo-code — readable in the dev DB and on /trust.
+    const digest = createHash("sha256")
+      .update(`${input.type}:${input.accountNumber}`)
+      .digest("hex")
+      .slice(0, 13);
+    return { recipientCode: `RCP_SIM_${digest}`, simulated: true };
+  }
+
+  async initiateTransfer(input: TransferInput): Promise<TransferResult> {
+    // Test hook: references containing "-simfail" or "-simreverse" exercise
+    // the failure paths of the payout engine without any network.
+    if (input.reference.includes("-simfail")) {
+      return { transferCode: `TRF_SIM_${input.reference}`, status: "failed", simulated: true };
+    }
+    if (input.reference.includes("-simreverse")) {
+      return { transferCode: `TRF_SIM_${input.reference}`, status: "reversed", simulated: true };
+    }
+    return { transferCode: `TRF_SIM_${input.reference}`, status: "success", simulated: true };
   }
 }
 
