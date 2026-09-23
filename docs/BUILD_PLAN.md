@@ -935,7 +935,7 @@ Per workflow-architect methodology — every workflow has a status. Specs live i
 | **Deposit → Lock → Attest** | WORKFLOW-deposit.md | **Built (Phase 3)** | 3 | Fund vault CTA |
 | Go-live gating | WORKFLOW-golive.md | **Built (Phase 3)** | 3 | Deposit locked |
 | Submission (edit window) | — | **Built (Phase 2)** | 2 | Workspace form |
-| Judging + feedback gate | WORKFLOW-judging.md | Planned | 4 | Judge finalize |
+| Judging + feedback gate | WORKFLOW-judging.md | **Built (Phase 4)** | 4 | Judge finalize |
 | **Instant payout (50%)** | WORKFLOW-payout-instant.md | Planned | 5 | Announce winners |
 | **Milestone payout (50%)** | WORKFLOW-payout-milestone.md | Planned | 5/6 | Organizer confirm |
 | Payout failure ops | WORKFLOW-payout-failure.md | Planned | 5 | transfer.failed |
