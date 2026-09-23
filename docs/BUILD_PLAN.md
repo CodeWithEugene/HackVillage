@@ -930,11 +930,11 @@ Per workflow-architect methodology — every workflow has a status. Specs live i
 |---|---|---|---|---|
 | User signup + verification | — | **Built (Phase 1)** | 1 | /signup |
 | Onboarding (dev/org) | — | **Built (Phase 1)** | 1 | First login |
-| Event creation wizard | — | Planned | 2 | /organizer/events/new |
-| Team formation & invites | — | Planned | 2 | Registration |
+| Event creation wizard | — | **Built (Phase 2)** | 2 | /organizer/events/new |
+| Team formation & invites | — | **Built (Phase 2)** | 2 | Registration |
 | **Deposit → Lock → Attest** | WORKFLOW-deposit.md | Planned | 3 | Fund vault CTA |
 | Go-live gating | WORKFLOW-golive.md | Planned | 3 | Deposit locked |
-| Submission (edit window) | — | Planned | 2 | Workspace form |
+| Submission (edit window) | — | **Built (Phase 2)** | 2 | Workspace form |
 | Judging + feedback gate | WORKFLOW-judging.md | Planned | 4 | Judge finalize |
 | **Instant payout (50%)** | WORKFLOW-payout-instant.md | Planned | 5 | Announce winners |
 | **Milestone payout (50%)** | WORKFLOW-payout-milestone.md | Planned | 5/6 | Organizer confirm |
