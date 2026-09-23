@@ -28,6 +28,15 @@ const serverEnvSchema = z.object({
   GITHUB_CLIENT_ID: z.string().optional(),
   GITHUB_CLIENT_SECRET: z.string().optional(),
 
+  // Paystack (optional — absent key switches payments to dev simulation)
+  PAYSTACK_SECRET_KEY: z.string().optional(),
+
+  // Chain (optional — absent config switches attestations to simulation)
+  SMART_CONTRACT_ADDRESS: z.string().optional(),
+  RPC_URL: z.string().optional(),
+  ATTESTER_PRIVATE_KEY: z.string().optional(),
+  POLYGONSCAN_URL: z.string().default("https://amoy.polygonscan.com"),
+
   // Email (optional in dev — falls back to console logging)
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default("HackVillage <no-reply@hackvillage.app>"),
