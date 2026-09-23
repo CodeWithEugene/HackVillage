@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarX2, Plus, ShieldCheck } from "lucide-react";
+import { Plus, ShieldCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { InviteCodeManager } from "@/components/organizer/invite-code-manager";
 import { requireSurface } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
+import { formatKes } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Organize" };
 
@@ -36,11 +37,22 @@ export default async function OrganizerPage() {
   }
 
   const org = membership.org;
-  const activeInvites = await prisma.orgInvitation.findMany({
-    where: { orgId: org.id, acceptedAt: null, expiresAt: { gt: new Date() } },
-    orderBy: { createdAt: "desc" },
-    take: 5,
-  });
+  const [activeInvites, orgEvents] = await Promise.all([
+    prisma.orgInvitation.findMany({
+      where: { orgId: org.id, acceptedAt: null, expiresAt: { gt: new Date() } },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
+    prisma.event.findMany({
+      where: { orgId: org.id },
+      include: { prizes: { select: { amountKes: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+  const eventsWithPools = orgEvents.map((event) => ({
+    ...event,
+    poolKes: event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0),
+  }));
 
   return (
     <div className="space-y-6">
@@ -58,23 +70,43 @@ export default async function OrganizerPage() {
       </div>
 
       <Card>
-        <CardTitle className="flex items-center gap-2">
-          <Plus aria-hidden className="size-5" /> Run your first event
-        </CardTitle>
-        <CardDescription>
-          The event builder arrives in Phase 2 of the platform build — problem statements, prize
-          breakdowns, and the escrowed Prize Vault that makes it Prize Verified.
-        </CardDescription>
-        <Button variant="secondary" disabled className="mt-4">
-          Create event (coming soon)
-        </Button>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Plus aria-hidden className="size-5" /> Run an event
+            </CardTitle>
+            <CardDescription>
+              Five steps to a draft; publishing declares the prize pool. The vault deposit flow
+              (Phase 3) flips it live with the Prize Verified badge.
+            </CardDescription>
+          </div>
+          <Link href="/organizer/events/new">
+            <Button>Create event</Button>
+          </Link>
+        </div>
       </Card>
 
-      <EmptyState
-        icon={CalendarX2}
-        title="No events yet"
-        description="When your events run, they'll show here with vault state, registrations, and judging — all in one command center."
-      />
+      {eventsWithPools.length > 0 ? (
+        <Card>
+          <CardTitle>Events</CardTitle>
+          <ul className="mt-3 divide-y divide-ink/5">
+            {eventsWithPools.map((event) => (
+              <li key={event.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                <span className="text-sm font-semibold text-ink">{event.title}</span>
+                <span className="flex items-center gap-3">
+                  <span className="text-xs text-muted">{formatKes(event.poolKes)} pool</span>
+                  <Badge variant={event.status === "DRAFT" ? "neutral" : event.status === "PENDING_DEPOSIT" ? "warning" : "success"}>
+                    {event.status === "PENDING_DEPOSIT" ? "pending deposit" : event.status.toLowerCase()}
+                  </Badge>
+                  <Link href={`/organizer/events/${event.slug}`}>
+                    <Button size="sm" variant="secondary">Manage</Button>
+                  </Link>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
 
       <InviteCodeManager
         codes={activeInvites.map((invite) => ({
