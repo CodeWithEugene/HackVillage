@@ -144,6 +144,10 @@ model User {
   registrations  Registration[]
   teamMemberships TeamMember[]
   ledTeams       Team[] @relation("TeamLeader")
+  judgeAssignments JudgeAssignment[]
+  judgeScores Score[] @relation("JudgeScores")
+  judgeFeedback Feedback[] @relation("JudgeFeedback")
+  judgingProgress JudgingProgress[] @relation("JudgeProgress")
 }
 
 model Account {
@@ -301,6 +305,8 @@ model Event {
   deposits Deposit[]
   vault VaultState?
   ledgerEntries LedgerEntry[]
+  judges JudgeAssignment[]
+  rubric Rubric?
 
   @@index([status, startsAt])
 }
@@ -357,6 +363,9 @@ model Team {
   leader User @relation("TeamLeader", fields: [leaderId], references: [id])
   members TeamMember[]
   submission Submission?
+  scores Score[]
+  feedback Feedback[]
+  judgingProgress JudgingProgress[]
 
   @@index([eventId])
 }
@@ -474,4 +483,88 @@ model AuditLog {
   reason String?
   meta Json?
   createdAt DateTime @default(now())
+}
+
+// ── Judging (Phase 4 — plan §6.5) ───────────────────────────────────────
+
+enum JudgeAssignmentStatus {
+  INVITED
+  ACTIVE
+  DECLINED
+}
+
+enum FeedbackKind {
+  STRENGTH
+  IMPROVEMENT
+  NEXT_STEP
+}
+
+model JudgeAssignment {
+  id String @id @default(cuid())
+  eventId String
+  userId String
+  status JudgeAssignmentStatus @default(INVITED)
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+}
+
+/// Organizer-tuned rubric from the platform template (Decision D4): ≥3
+/// criteria, weights summing to 100. Locked once judging opens.
+model Rubric {
+  id String @id @default(cuid())
+  eventId String @unique
+  /// [{id, label, weight}]
+  criteria Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Score {
+  id String @id @default(cuid())
+  judgeId String
+  teamId String
+  criterionId String
+  /// 0–10 per criterion.
+  value Int
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation("JudgeScores", fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@unique([judgeId, teamId, criterionId])
+  @@index([teamId])
+}
+
+model Feedback {
+  id String @id @default(cuid())
+  judgeId String
+  teamId String
+  point String
+  kind FeedbackKind
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation("JudgeFeedback", fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+}
+
+/// Finalization gate: a judge locks their review of one team only after the
+/// structured-feedback requirement is satisfied (≥3 points, one per kind).
+model JudgingProgress {
+  id String @id @default(cuid())
+  judgeId String
+  teamId String
+  finalizedAt DateTime?
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation("JudgeProgress", fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@unique([judgeId, teamId])
 }
