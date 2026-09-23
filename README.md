@@ -1,7 +1,9 @@
 <div align="center">
-  <img src="https://www.technetium.co.ke/assets/images/logo.webp" alt="Technetium Kenya" height="60" />
+  <img src="./app/icon.png" alt="HackVillage" height="72" />
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="./public/images/salamander-logo-yellow.svg" alt="HackVillage" height="60" />
+  <img src="./public/images/salamander-logo-yellow.svg" alt="salamander · HackVillage" height="56" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://www.technetium.co.ke/assets/images/logo.webp" alt="Technetium Kenya" height="56" />
 </div>
 
 <br />

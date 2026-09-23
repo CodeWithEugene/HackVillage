@@ -22,9 +22,13 @@ export function SiteFooter() {
     <footer className="border-t border-ink/10 bg-ink text-paper">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-display text-lg font-bold">
-            Hack<span className="text-brand">Village</span>
-          </p>
+          <div className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element -- brand PNG */}
+            <img src="/branding/icon-96.png" alt="" className="size-10 rounded-control" />
+            <p className="font-display text-lg font-bold">
+              Hack<span className="text-brand">Village</span>
+            </p>
+          </div>
           <p className="mt-2 max-w-xs text-sm leading-6 text-paper/70">
             The open-source infrastructure for high-impact tech events. Built with
             intention for the African developer community.

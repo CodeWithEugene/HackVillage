@@ -20,6 +20,14 @@ export const metadata: Metadata = {
       "100% of the prize pool is locked in escrow before an event goes live. Winners are paid 50% the same day — verified on a public ledger.",
     type: "website",
     siteName: "HackVillage",
+    images: [
+      {
+        src: "/branding/og.png",
+        width: 1200,
+        height: 630,
+        alt: "HackVillage — the open-source infrastructure for high-impact tech events",
+      },
+    ],
   },
 };
 
