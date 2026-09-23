@@ -54,7 +54,6 @@ export function KybRequestForm({ orgId }: { orgId: string }) {
     requestKybAction,
     {}
   );
-  const done = !state.error;
 
   return (
     <form action={action} className="space-y-4">

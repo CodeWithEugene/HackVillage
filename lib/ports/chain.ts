@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+// eslint-disable-next-line no-restricted-imports -- this file IS the chain port (ADR-001): the sanctioned ethers import site.
 import { Contract, JsonRpcProvider, Wallet } from "ethers";
 
 import { getEnv } from "@/lib/env";
