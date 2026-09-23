@@ -149,6 +149,11 @@ model User {
   judgeFeedback Feedback[] @relation("JudgeFeedback")
   judgingProgress JudgingProgress[] @relation("JudgeProgress")
   payoutsWon Winner[] @relation("PayoutWinners")
+  endorsementsGiven Endorsement[] @relation("EndorsementJudge")
+  endorsementsReceived Endorsement[] @relation("EndorsementDeveloper")
+  portfolioItems PortfolioItem[] @relation("PortfolioItems")
+  introRequestsSent Introduction[] @relation("IntroRequests")
+  introRequestsReceived Introduction[] @relation("IntroDeveloper")
 }
 
 model Account {
@@ -309,6 +314,9 @@ model Event {
   judges JudgeAssignment[]
   rubric Rubric?
   winners Winner[]
+  endorsements Endorsement[]
+  internshipTags InternshipTag[]
+  introductions Introduction[]
 
   @@index([status, startsAt])
 }
@@ -642,4 +650,96 @@ model Milestone {
   dueAt DateTime
 
   winner Winner @relation(fields: [winnerId], references: [id], onDelete: Cascade)
+}
+
+// ── Proof of Work & Career (Phase 6 — plan §6.6) ────────────────────────
+
+enum EndorsementVisibility {
+  PUBLISHED
+  HIDDEN
+}
+
+/// Judge endorsements of winners — the human layer on verified metrics.
+model Endorsement {
+  id String @id @default(cuid())
+  judgeId String
+  developerId String
+  eventId String
+  quote String
+  visibility EndorsementVisibility @default(PUBLISHED)
+  createdAt DateTime @default(now())
+
+  judge User @relation("EndorsementJudge", fields: [judgeId], references: [id], onDelete: Cascade)
+  developer User @relation("EndorsementDeveloper", fields: [developerId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([judgeId, developerId, eventId])
+}
+
+enum PortfolioLifecycle {
+  DEMO
+  IN_PRODUCTION
+  PIVOTED
+  ARCHIVED
+}
+
+/// The permanent home for every submission — auto-created at announcement.
+model PortfolioItem {
+  id String @id @default(cuid())
+  submissionId String @unique
+  developerId String
+  title String
+  summary String
+  repoUrl String
+  demoUrl String?
+  lifecycle PortfolioLifecycle @default(DEMO)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  developer User @relation("PortfolioItems", fields: [developerId], references: [id], onDelete: Cascade)
+
+  @@index([developerId])
+}
+
+enum InternshipTagKind {
+  INTERNSHIP
+  APPRENTICESHIP
+  MENTORSHIP
+}
+
+/// Value add-ons organizers attach to events (plan §2 A).
+model InternshipTag {
+  id String @id @default(cuid())
+  eventId String
+  kind InternshipTagKind
+  partnerName String
+  slots Int @default(1)
+  description String?
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+enum IntroStatus {
+  REQUESTED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+/// One-click introductions (plan §6.6): hiring partners request, winners accept.
+model Introduction {
+  id String @id @default(cuid())
+  hiringPartnerId String
+  developerId String
+  eventId String
+  message String
+  status IntroStatus @default(REQUESTED)
+  createdAt DateTime @default(now())
+  respondedAt DateTime?
+
+  hiringPartner User @relation("IntroRequests", fields: [hiringPartnerId], references: [id], onDelete: Cascade)
+  developer User @relation("IntroDeveloper", fields: [developerId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([hiringPartnerId, developerId, eventId])
 }
