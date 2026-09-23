@@ -55,6 +55,12 @@ export default async function AdminHomePage() {
             <CardDescription>Business verification queue — gates first deposits.</CardDescription>
           </Card>
         </Link>
+        <Link href="/admin/payments">
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardTitle>Payment ops</CardTitle>
+            <CardDescription>Failed payouts, retries, and manual receipts.</CardDescription>
+          </Card>
+        </Link>
       </div>
     </div>
   );
