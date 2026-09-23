@@ -1,0 +1,174 @@
+// HackVillage — baseline identity schema (Phase 0 of docs/BUILD_PLAN.md §6.1)
+// Events, escrow, payout, judging, and media models land in Phases 2–7.
+// Note: migrations and seeds live in db/ to match the structure documented in
+// CONTRIBUTING.md (npm scripts pass --schema=db/schema.prisma).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ─────────────────────────────────────────────────────────────────
+
+/// The role chosen at signup — routes onboarding only; roles are additive.
+enum PrimaryRole {
+  DEVELOPER
+  ORGANIZER
+}
+
+/// Capability roles — additive per user; enforced server-side (plan §14.1).
+enum Role {
+  DEVELOPER
+  ORGANIZER
+  JUDGE
+  HIRING
+  ADMIN
+}
+
+/// Organizer organization KYB status — gate for the first deposit (Phase 3).
+enum KycStatus {
+  NONE
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum OrgMemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum OrgMemberStatus {
+  ACTIVE
+  REVOKED
+}
+
+// ── Identity (Auth.js v5 adapter-compatible shapes) ───────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  // Null for OAuth-only accounts. Credentials auth lands in Phase 1.
+  passwordHash String?
+  handle        String    @unique
+  avatarUrl     String?
+  primaryRole   PrimaryRole
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  // Soft delete: anonymize on account deletion, payout obligations remain.
+  deletedAt     DateTime?
+
+  accounts       Account[]
+  sessions       Session[]
+  roleGrants     RoleGrant[]
+  ownedOrgs      Organization[] @relation("OrgOwner")
+  orgMemberships OrgMember[]
+  profile        DeveloperProfile?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model RoleGrant {
+  id        String   @id @default(cuid())
+  userId    String
+  role      Role
+  grantedBy String?
+  grantedAt DateTime @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+}
+
+// ── Organizations ─────────────────────────────────────────────────────────
+
+model Organization {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String    @unique
+  logoUrl    String?
+  about      String?
+  ownerId    String
+  kycStatus  KycStatus @default(NONE)
+  // 100 + Σ TrustEvents (floor 0) — maintained by the trust service (Phase 7).
+  trustScore Int       @default(100)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  owner   User        @relation("OrgOwner", fields: [ownerId], references: [id])
+  members OrgMember[]
+}
+
+model OrgMember {
+  id     String          @id @default(cuid())
+  orgId  String
+  userId String
+  role   OrgMemberRole
+  status OrgMemberStatus @default(ACTIVE)
+
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+}
+
+// ── Developer Proof-of-Work profile ──────────────────────────────────────
+
+model DeveloperProfile {
+  userId String @id
+  headline String?
+  bio String?
+  skills String[]
+  githubLogin String?
+  linkedinUrl String?
+  location String?
+  // Paystack transfer recipient — required before a user can be marked a
+  // winner (plan §6.1 invariant). Wired in Phase 5.
+  payoutRecipientCode String?
+  // "MPESA" | "BANK" — promoted to an enum when the payout service lands.
+  payoutMethod String?
+  // Derived metric — recomputed by jobs, never client-writable.
+  winRateCached Float?
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

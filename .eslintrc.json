@@ -1,0 +1,19 @@
+{
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    // Escrow/payout service boundaries are hard (ADR-001): vendor SDKs are
+    // only reachable through lib/ports. Kept as a warning until the boundary
+    // import lint rule lands in Phase 3.
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": ["paystack*", "ethers"],
+            "message": "Vendor SDKs must be accessed via lib/ports — never imported directly (ADR-001)."
+          }
+        ]
+      }
+    ]
+  }
+}
