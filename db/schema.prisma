@@ -148,6 +148,7 @@ model User {
   judgeScores Score[] @relation("JudgeScores")
   judgeFeedback Feedback[] @relation("JudgeFeedback")
   judgingProgress JudgingProgress[] @relation("JudgeProgress")
+  payoutsWon Winner[] @relation("PayoutWinners")
 }
 
 model Account {
@@ -307,6 +308,7 @@ model Event {
   ledgerEntries LedgerEntry[]
   judges JudgeAssignment[]
   rubric Rubric?
+  winners Winner[]
 
   @@index([status, startsAt])
 }
@@ -366,6 +368,7 @@ model Team {
   scores Score[]
   feedback Feedback[]
   judgingProgress JudgingProgress[]
+  wins Winner[] @relation("TeamWins")
 
   @@index([eventId])
 }
@@ -567,4 +570,76 @@ model JudgingProgress {
   user User @relation("JudgeProgress", fields: [judgeId], references: [id], onDelete: Cascade)
 
   @@unique([judgeId, teamId])
+}
+
+// ── Payouts (Phase 5 — hard boundary; services/payout owns these rows) ───
+
+enum PayoutTranche {
+  INSTANT
+  MILESTONE
+}
+
+enum PayoutStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  REVERSED
+  MANUAL_REVIEW
+}
+
+model Winner {
+  id String @id @default(cuid())
+  eventId String
+  teamId String
+  place Int
+  /// The team LEADER (ADR-013) — the single verified recipient per win.
+  userId String
+  amountKes Int
+  milestoneRequired Boolean @default(true)
+  announcedAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user User @relation("PayoutWinners", fields: [userId], references: [id])
+  team Team @relation("TeamWins", fields: [teamId], references: [id])
+  payouts Payout[]
+  milestone Milestone?
+
+  @@unique([eventId, place])
+}
+
+model Payout {
+  id String @id @default(cuid())
+  winnerId String
+  tranche PayoutTranche
+  amountKes Int
+  /// ⬤ {winnerId}:{tranche} — the unique constraint makes a double payout
+  /// structurally impossible, even under races and retries (P3).
+  idempotencyKey String @unique
+  paystackTransferCode String?
+  paystackReference String?
+  recipientCode String
+  status PayoutStatus @default(QUEUED)
+  attemptCount Int @default(0)
+  lastError String?
+  queuedAt DateTime @default(now())
+  paidAt DateTime?
+
+  winner Winner @relation(fields: [winnerId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([winnerId])
+}
+
+model Milestone {
+  id String @id @default(cuid())
+  winnerId String @unique
+  title String
+  description String?
+  confirmedBy String?
+  confirmedAt DateTime?
+  /// Auto-reminders at 30/60/90 days (plan §10.5), job-driven.
+  dueAt DateTime
+
+  winner Winner @relation(fields: [winnerId], references: [id], onDelete: Cascade)
 }
