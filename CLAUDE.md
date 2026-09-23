@@ -109,9 +109,22 @@ approve/hide gallery, public event gallery, admin trust ledger with penalty
 appeals, the notifications inbox with auto-mark-read). Verified: lint,
 typecheck, 145 tests, production build.
 
+**Phase 8 (Legacy & Polish) is complete and verified**: legacy & disputes
+data model (migration 9 — LegacyCheckin, Dispute), the Legacy Tracker
+(3-month check-ins scheduled at winner announcement, daily cron with
+two-reminder escalation → UNRESPONSIVE after 28 days, outcome capture that
+syncs portfolio lifecycle badges — demo → in production → pivoted),
+milestone reminders (30/60/90-day organizer nudges), and milestone disputes
+(winner entry after 14 days unconfirmed, admin console with audited
+release-through-the-payout-path or reject — the release creates the
+milestone payout through the same idempotent key as a normal confirm).
+Surfaces: check-in cards on the dashboard, dispute entry on winnings, the
+admin disputes console. Verified: lint, typecheck, 153 tests, production
+build.
+
 Everything else is planned per the build plan phases — build features **in
-phase order** (Phase 8 = Legacy & Polish next: 3-month check-ins, milestone
-reminders, disputes queue, system-state/a11y/perf polish).
+phase order** (Phase 9 = Hardening & Launch next: runbooks, load tests,
+go-live checklist, final full verification).
 
 ## Tech Stack (live)
 | Layer | Technology |
