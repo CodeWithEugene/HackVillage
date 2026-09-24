@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Github } from "lucide-react";
 import { signIn } from "next-auth/react";
 
@@ -15,13 +15,16 @@ export function SignInForm({
   googleEnabled,
   githubEnabled,
   notice,
+  errorNotice,
 }: {
   googleEnabled: boolean;
   githubEnabled: boolean;
   notice?: string;
+  errorNotice?: string;
 }) {
   const [state, action, pending] = useActionState<AuthActionState, FormData>(signInAction, {});
   const unverified = state.error === "EMAIL_NOT_VERIFIED";
+  const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
 
   return (
     <Card>
@@ -29,6 +32,7 @@ export function SignInForm({
       <p className="mt-1 text-sm text-muted">Sign in to your HackVillage account.</p>
 
       {notice ? <FormSuccess message={notice} /> : null}
+      {errorNotice ? <FormError message={errorNotice} /> : null}
 
       {(googleEnabled || githubEnabled) && (
         <>
@@ -37,18 +41,28 @@ export function SignInForm({
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => signIn("google", { redirectTo: "/dashboard" })}
+                loading={oauthLoading === "google"}
+                disabled={oauthLoading !== null}
+                onClick={() => {
+                  setOauthLoading("google");
+                  void signIn("google", { redirectTo: "/dashboard" });
+                }}
               >
-                <GoogleIcon className="size-4" /> Continue with Google
+                {oauthLoading !== "google" && <GoogleIcon className="size-4" />} Continue with Google
               </Button>
             )}
             {githubEnabled && (
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => signIn("github", { redirectTo: "/dashboard" })}
+                loading={oauthLoading === "github"}
+                disabled={oauthLoading !== null}
+                onClick={() => {
+                  setOauthLoading("github");
+                  void signIn("github", { redirectTo: "/dashboard" });
+                }}
               >
-                <Github aria-hidden className="size-4" /> Continue with GitHub
+                {oauthLoading !== "github" && <Github aria-hidden className="size-4" />} Continue with GitHub
               </Button>
             )}
           </div>
