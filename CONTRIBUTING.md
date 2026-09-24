@@ -80,7 +80,7 @@ Large features (new escrow flows, DAO mechanics, cross-border payment rails) sho
 
 | Requirement | Minimum Version |
 |---|---|
-| Node.js | 18.x |
+| Node.js | 22.13+ |
 | pnpm | 9.x |
 | PostgreSQL | 15.x |
 | Git | 2.x |

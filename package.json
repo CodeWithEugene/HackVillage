@@ -2,11 +2,11 @@
   "name": "hackvillage",
   "version": "0.1.0",
   "private": true,
-  "description": "The open-source infrastructure for high-impact tech events \u2014 escrowed prize pools, instant payouts, verified Proof-of-Work profiles.",
+  "description": "The open-source infrastructure for high-impact tech events — escrowed prize pools, instant payouts, verified Proof-of-Work profiles.",
   "license": "Apache-2.0",
   "packageManager": "pnpm@11.21.0",
   "engines": {
-    "node": ">=18.18.0",
+    "node": ">=22.13.0",
     "pnpm": ">=9.0.0"
   },
   "scripts": {
@@ -45,7 +45,6 @@
     "pg-boss": "^10.1.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "resend": "^6.28.1",
     "tailwind-merge": "^3.0.1",
     "zod": "^3.25.0"
   },

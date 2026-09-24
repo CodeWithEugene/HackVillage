@@ -38,8 +38,8 @@ const serverEnvSchema = z.object({
   POLYGONSCAN_URL: z.string().default("https://amoy.polygonscan.com"),
 
   // Email (optional in dev — falls back to console logging)
-  RESEND_API_KEY: z.string().optional(),
-  EMAIL_FROM: z.string().default("HackVillage <no-reply@hackvillage.app>"),
+  BREVO_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().default("HackVillage <info@hackvillage.xyz>"),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

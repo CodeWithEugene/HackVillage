@@ -21,6 +21,13 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
       { label: "License (Apache-2.0)", href: "https://github.com/CodeWithEugene/HackVillage/blob/main/LICENSE" },
     ],
   },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/terms" },
+    ],
+  },
 ];
 
 export function SiteFooter() {
@@ -28,8 +35,8 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-ink/10 bg-ink text-paper">
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="lg:col-span-2">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="sm:col-span-2 lg:col-span-2">
           {/* Heritage mark — Salamander Tech Hub's wordmark is retired from
               the rest of the product UI but kept here as a nod to HackVillage's roots. */}
           {/* eslint-disable-next-line @next/next/no-img-element -- SVG wordmark, no raster source */}

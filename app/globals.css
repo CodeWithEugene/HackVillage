@@ -58,3 +58,32 @@
     }
   }
 }
+
+@layer components {
+  /* Long-form legal document typography (Privacy Policy, Terms of Service) —
+     no @tailwindcss/typography plugin installed, so this scopes plain
+     semantic markup instead of repeating utility classes per element. */
+  .legal h2 {
+    @apply mt-10 font-display text-xl font-bold text-ink first:mt-0;
+  }
+
+  .legal h3 {
+    @apply mt-6 text-base font-semibold text-ink;
+  }
+
+  .legal p {
+    @apply mt-3 leading-7 text-ink-soft;
+  }
+
+  .legal ul {
+    @apply mt-3 list-disc space-y-2 pl-6 leading-7 text-ink-soft;
+  }
+
+  .legal a {
+    @apply text-brand underline underline-offset-2 hover:text-ink-soft;
+  }
+
+  .legal strong {
+    @apply font-semibold text-ink;
+  }
+}
