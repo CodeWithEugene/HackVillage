@@ -57,12 +57,24 @@ const providers: Provider[] = [
 ];
 
 // OAuth providers activate only when configured — the app runs fully
-// functional (credentials flow) without them, e.g. in CI.
+// functional (credentials flow) without them, e.g. in CI. Called explicitly
+// with clientId/clientSecret: this project's env vars are GOOGLE_CLIENT_ID /
+// GITHUB_CLIENT_ID, not Auth.js's auto-detected AUTH_GOOGLE_ID / AUTH_GITHUB_ID.
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-  providers.push(Google);
+  providers.push(
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    })
+  );
 }
 if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
-  providers.push(GitHub);
+  providers.push(
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    })
+  );
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
