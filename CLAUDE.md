@@ -21,8 +21,23 @@ profile, org create/join via 7-day invite codes), authenticated app shell
 overview), and public `/developers` + `/developers/[handle]` profiles.
 Verified green: lint, typecheck, 39 unit tests, production build.
 
+**Phase 2 (Events & Teams) is complete and verified**: events & teams data
+model (migration 2), the event lifecycle state machine (DRAFT → PENDING_DEPOSIT
+only in this phase — zero money code), organizer 5-step event wizard with
+draft editing and a publish gate (min pool KES 10,000, Decision D3), public
+browse with filters + event detail with Prize Verified / pending-deposit
+states and status timelines, developer registration (plain-form API
+endpoints — no client JS), team creation/invites by handle & code
+(5-member cap), and the team workspace with submissions incl. the ADR-013
+prize-split declaration (must sum to 100%). Dashboards (my events, my
+teams), organizer command center (registrations, teams & submissions), and
+a DB-granted-ADMIN console. Seed: realistic Nairobi demo (`npm run db:seed`,
+password `demopass123`). Verified green: lint, typecheck, 64 unit tests,
+production build.
+
 Everything else is planned per the build plan phases — build features **in
-phase order** (Phase 2 = Events & Teams next).
+phase order** (Phase 3 = Escrow Engine next: Paystack deposits + PrizeVault
+contract on Amoy).
 
 ## Tech Stack (live)
 | Layer | Technology |
@@ -36,7 +51,7 @@ phase order** (Phase 2 = Events & Teams next).
 | Auth | Auth.js v5, database sessions (Phase 1) |
 | Styling | Tailwind CSS v4, tokens in `app/globals.css` (brand `#FFED00` / ink `#222`) |
 
-## Repository Structure (Phase 0 live; services/ and contracts/ land in Phases 2–3)
+## Repository Structure (Phases 0–2 live; services/escrow lands in Phase 3, contracts in Phase 3)
 ```
 app/                  # Next.js App Router pages/layouts
 components/           # Shared React components
