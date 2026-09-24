@@ -35,6 +35,7 @@ export function SignUpForm({
 }) {
   const [state, action, pending] = useActionState<AuthActionState, FormData>(signUpAction, {});
   const [role, setRole] = useState<"DEVELOPER" | "ORGANIZER">("DEVELOPER");
+  const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
 
   return (
     <Card>
@@ -45,23 +46,34 @@ export function SignUpForm({
 
       {(googleEnabled || githubEnabled) && (
         <>
-          <div className="mt-6 grid gap-2">
+          <p className="mt-6 text-sm font-semibold text-ink">Continue with:</p>
+          <div className={`mt-2 grid gap-2 ${googleEnabled && githubEnabled ? "grid-cols-2" : "grid-cols-1"}`}>
             {googleEnabled && (
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => signIn("google", { redirectTo: "/dashboard" })}
+                loading={oauthLoading === "google"}
+                disabled={oauthLoading !== null}
+                onClick={() => {
+                  setOauthLoading("google");
+                  void signIn("google", { redirectTo: "/dashboard" });
+                }}
               >
-                <GoogleIcon className="size-4" /> Continue with Google
+                {oauthLoading !== "google" && <GoogleIcon className="size-4" />} Google
               </Button>
             )}
             {githubEnabled && (
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => signIn("github", { redirectTo: "/dashboard" })}
+                loading={oauthLoading === "github"}
+                disabled={oauthLoading !== null}
+                onClick={() => {
+                  setOauthLoading("github");
+                  void signIn("github", { redirectTo: "/dashboard" });
+                }}
               >
-                <Github aria-hidden className="size-4" /> Continue with GitHub
+                {oauthLoading !== "github" && <Github aria-hidden className="size-4" />} GitHub
               </Button>
             )}
           </div>

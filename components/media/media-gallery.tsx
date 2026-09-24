@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { EyeOff, Check } from "lucide-react";
+import { EyeOff, Check, Loader2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardTitle } from "@/components/ui/card";
@@ -61,7 +61,11 @@ export function MediaGallery({ assets }: { assets: Asset[] }) {
                     className="rounded-control p-2 text-success hover:bg-success/10"
                     onClick={() => startTransition(() => void setMediaStatusAction(asset.id, "APPROVED"))}
                   >
-                    <Check aria-hidden className="size-4" />
+                    {pending ? (
+                      <Loader2 aria-hidden className="size-4 animate-spin" />
+                    ) : (
+                      <Check aria-hidden className="size-4" />
+                    )}
                   </button>
                 ) : null}
                 {asset.status !== "HIDDEN" ? (
@@ -72,7 +76,11 @@ export function MediaGallery({ assets }: { assets: Asset[] }) {
                     className="rounded-control p-2 text-muted hover:bg-ink/5"
                     onClick={() => startTransition(() => void setMediaStatusAction(asset.id, "HIDDEN"))}
                   >
-                    <EyeOff aria-hidden className="size-4" />
+                    {pending ? (
+                      <Loader2 aria-hidden className="size-4 animate-spin" />
+                    ) : (
+                      <EyeOff aria-hidden className="size-4" />
+                    )}
                   </button>
                 ) : null}
               </div>
