@@ -35,7 +35,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-ink/10 bg-ink text-paper">
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-5">
         <div className="sm:col-span-2 lg:col-span-2">
           {/* Heritage mark — Salamander Tech Hub's wordmark is retired from
               the rest of the product UI but kept here as a nod to HackVillage's roots. */}
@@ -79,7 +79,7 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-paper/10">
-        <div className="mx-auto flex w-full max-w-6xl flex-col-reverse items-center gap-3 px-4 py-6 text-xs text-paper/50 sm:flex-row sm:justify-between">
+        <div className="mx-auto flex w-full max-w-7xl flex-col-reverse items-center gap-3 px-4 py-6 text-xs text-paper/50 sm:flex-row sm:justify-between">
           <p>© {year} HackVillage. Apache-2.0 licensed.</p>
           <a
             href="https://github.com/CodeWithEugene/HackVillage"
