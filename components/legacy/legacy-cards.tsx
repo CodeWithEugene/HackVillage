@@ -40,7 +40,7 @@ export function LegacyCheckinCard({
           ].map((option) => (
             <label
               key={option.value}
-              className="flex cursor-pointer items-center justify-center rounded-control border-2 border-ink/10 bg-white px-3 py-2.5 text-sm font-semibold text-ink hover:border-ink/30 has-[:checked]:border-brand has-[:checked]:bg-brand/10"
+              className="flex cursor-pointer items-center justify-center rounded-control border-2 border-ink/10 bg-surface px-3 py-2.5 text-sm font-semibold text-ink hover:border-ink/30 has-[:checked]:border-brand has-[:checked]:bg-brand/10"
             >
               <input
                 type="radio"

@@ -47,7 +47,7 @@ export default async function AdminUsersPage({
           defaultValue={q ?? ""}
           placeholder="Search name, handle, email…"
           aria-label="Search users"
-          className="h-11 flex-1 rounded-control border border-ink/15 bg-white px-3 text-ink"
+          className="h-11 flex-1 rounded-control border border-ink/15 bg-surface px-3 text-ink"
         />
         <button
           type="submit"

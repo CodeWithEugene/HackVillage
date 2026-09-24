@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Github } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { currentUser } from "@/lib/auth/guards";
+import { ThemeSwitcher } from "@/components/patterns/theme-switcher";
 import { cn } from "@/lib/utils";
 
 interface NavLink {
@@ -15,17 +14,10 @@ const NAV_LINKS: NavLink[] = [
   { href: "/developers", label: "Developers" },
 ];
 
-export async function SiteHeader({ className }: { className?: string }) {
-  const user = await currentUser();
-  const destination = user
-    ? user.onboardingCompletedAt
-      ? "/dashboard"
-      : "/onboarding/choose"
-    : "/signin";
-
+export function SiteHeader({ className }: { className?: string }) {
   return (
-    <header className={cn("border-b border-ink/10 bg-paper/90 backdrop-blur", className)}>
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
+    <header className={cn("sticky top-0 z-50 shrink-0 bg-paper/95 backdrop-blur", className)}>
+      <div className="site-container site-header-grid">
         <Link href="/" className="flex shrink-0 items-center gap-3" aria-label="HackVillage home">
           {/* eslint-disable-next-line @next/next/no-img-element -- animated brand lockup, no static/SVG source */}
           <img
@@ -35,7 +27,7 @@ export async function SiteHeader({ className }: { className?: string }) {
           />
         </Link>
 
-        <nav aria-label="Primary" className="flex items-center gap-4 sm:gap-6">
+        <nav aria-label="Primary" className="site-header-links">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
@@ -45,17 +37,23 @@ export async function SiteHeader({ className }: { className?: string }) {
               {link.label}
             </Link>
           ))}
+        </nav>
+        <div className="site-header-actions">
           <a
             href="https://github.com/CodeWithEugene/HackVillage"
-            className="hidden size-9 items-center justify-center rounded-control text-ink hover:bg-ink/5 sm:flex"
+            className="header-icon"
             aria-label="HackVillage on GitHub"
           >
-            <Github aria-hidden className="size-5" />
+            <Github aria-hidden className="size-4" />
           </a>
-          <Link href={destination}>
-            <Button size="sm">{user ? "Go To App" : "Sign In"}</Button>
+          <ThemeSwitcher />
+          <Link href="/signin" className="header-signin">
+            Sign In
           </Link>
-        </nav>
+          <Link href="/signup" className="header-signup">
+            Sign Up
+          </Link>
+        </div>
       </div>
     </header>
   );

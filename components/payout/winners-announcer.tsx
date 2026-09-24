@@ -104,7 +104,7 @@ export function WinnersAnnouncer({
                 onChange={(event) =>
                   setSelection((current) => ({ ...current, [prize.place]: event.target.value }))
                 }
-                className="mt-2 h-11 w-full rounded-control border border-ink/15 bg-white px-3 text-ink"
+                className="mt-2 h-11 w-full rounded-control border border-ink/15 bg-surface px-3 text-ink"
               >
                 <option value="">— select the winning team —</option>
                 {rankedTeams.map((team) => (

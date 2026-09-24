@@ -11,7 +11,7 @@ export function Input({
     <input
       ref={ref}
       className={cn(
-        "h-11 w-full rounded-control border border-ink/15 bg-white px-3 text-ink placeholder:text-muted/60 focus-visible:border-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50",
+        "h-11 w-full rounded-control border border-ink/15 bg-surface px-3 text-ink placeholder:text-muted/60 focus-visible:border-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50",
         className
       )}
       {...props}
@@ -23,7 +23,7 @@ export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTex
   return (
     <textarea
       className={cn(
-        "min-h-24 w-full rounded-control border border-ink/15 bg-white p-3 text-ink placeholder:text-muted/60 focus-visible:border-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+        "min-h-24 w-full rounded-control border border-ink/15 bg-surface p-3 text-ink placeholder:text-muted/60 focus-visible:border-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
         className
       )}
       {...props}

@@ -28,7 +28,7 @@ export function RoleChoiceCards({ currentRole }: { currentRole?: "DEVELOPER" | "
         <form key={choice.role} action={() => void chooseRoleAction(choice.role)}>
           <button
             type="submit"
-            className={`h-full w-full rounded-card border-2 bg-white p-6 text-left shadow-card transition-colors ${
+            className={`h-full w-full rounded-card border-2 bg-surface p-6 text-left shadow-card transition-colors ${
               currentRole === choice.role ? "border-brand" : "border-ink/10 hover:border-ink/25"
             }`}
           >

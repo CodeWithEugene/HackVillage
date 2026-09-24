@@ -1,0 +1,34 @@
+{
+  "generator": "Built-in image_gen",
+  "note": "AI-generated editorial imagery depicting Kenyan hackathon organizers and participants; not photos of actual HackVillage attendees.",
+  "images": [
+    {
+      "name": "launch",
+      "prompt": "Use case: photorealistic-natural. Generate ONE standalone premium documentary photograph for a HackVillage website card, portrait 4:5 aspect ratio, ideally 1024x1280. Realistic Black Kenyan adults at a contemporary Nairobi hackathon. Authentic candid expressions, natural skin texture, professional editorial photography, soft warm daylight, navy and light blue clothing accents, modern Kenyan coworking architecture. Frame the main faces in the upper half, with the bottom quarter showing desk, clothing or softly blurred surroundings so website captions can overlay there. No embedded text, logos, watermarks, interface graphics, badges, collage or borders. A Black Kenyan female hackathon organizer in her early thirties with neat natural braids and a light blue shirt, seated at a workspace planning an event with a Black Kenyan male colleague wearing a navy shirt. She gestures toward a laptop and an open notebook on the desk. Medium shot, genuine focused discussion, bright Nairobi office with plants and large windows.",
+      "width": 768,
+      "height": 960,
+      "path": "public/marketing/how-it-works/launch.webp"
+    },
+    {
+      "name": "build",
+      "prompt": "Use case: photorealistic-natural. Generate ONE standalone premium documentary photograph for a HackVillage website card, portrait 4:5 aspect ratio, ideally 1024x1280. Realistic Black Kenyan adults at a contemporary Nairobi hackathon. Authentic candid expressions, natural skin texture, professional editorial photography, soft warm daylight, navy and light blue clothing accents, modern Kenyan coworking architecture. Frame the main faces in the upper half, with the bottom quarter showing desk, clothing or softly blurred surroundings so website captions can overlay there. No embedded text, logos, watermarks, interface graphics, badges, collage or borders. Three Black Kenyan software engineers, two women and one man in their twenties, collaborating around a laptop at a hackathon desk. One woman in a cobalt blue casual shirt points toward the screen, her colleagues lean in smiling and problem-solving. Natural hairstyles and casual tech-event clothes, energetic focused teamwork, medium shot, bright Nairobi coworking venue.",
+      "width": 768,
+      "height": 960,
+      "path": "public/marketing/how-it-works/build.webp"
+    },
+    {
+      "name": "judge",
+      "prompt": "Use case: photorealistic-natural. Generate ONE standalone premium documentary photograph for a HackVillage website card, portrait 4:5 aspect ratio, ideally 1024x1280. Realistic Black Kenyan adults at a contemporary Nairobi hackathon. Authentic candid expressions, natural skin texture, professional editorial photography, soft warm daylight, navy and light blue clothing accents, modern Kenyan coworking architecture. Frame the main faces in the upper half, with the bottom quarter showing desk, clothing or softly blurred surroundings so website captions can overlay there. No embedded text, logos, watermarks, interface graphics, badges, collage or borders. A Black Kenyan male developer with short natural hair and a navy overshirt presenting his laptop demo to a Black Kenyan female judge in a pale blue blazer at a Nairobi hackathon table. The judge listens intently, notebook and pen on the desk, small blurred audience behind them. Medium shot with both faces clearly visible in upper half, authentic professional discussion rather than posing.",
+      "width": 768,
+      "height": 960,
+      "path": "public/marketing/how-it-works/judge.webp"
+    },
+    {
+      "name": "reward",
+      "prompt": "Use case: photorealistic-natural. Generate ONE standalone premium documentary photograph for a HackVillage website card, portrait 4:5 aspect ratio, ideally 1024x1280. Realistic Black Kenyan adults at a contemporary Nairobi hackathon. Authentic candid expressions, natural skin texture, professional editorial photography, soft warm daylight, navy and light blue clothing accents, modern Kenyan coworking architecture. Frame the main faces in the upper half, with the bottom quarter showing desk, clothing or softly blurred surroundings so website captions can overlay there. No embedded text, logos, watermarks, interface graphics, badges, collage or borders. Two joyful Black Kenyan hackathon winners, a woman with natural afro hair in a cobalt blue shirt and a man with short twists in a navy shirt, standing together holding a small elegant clear glass trophy between them. Genuine proud smiles, blurred fellow Kenyan participants applauding in a bright Nairobi event venue behind them. Medium portrait framed from waist up, faces and trophy in upper two thirds. No huge cheque, no printed text, no confetti.",
+      "width": 768,
+      "height": 960,
+      "path": "public/marketing/how-it-works/reward.webp"
+    }
+  ]
+}

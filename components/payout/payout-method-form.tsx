@@ -94,7 +94,7 @@ export function PayoutMethodForm({
               id="payout-bank"
               name="bankCode"
               required
-              className="h-11 w-full rounded-control border border-ink/15 bg-white px-3 text-ink"
+              className="h-11 w-full rounded-control border border-ink/15 bg-surface px-3 text-ink"
             >
               {BANKS.map((bank) => (
                 <option key={bank.code} value={bank.code}>
