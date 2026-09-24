@@ -35,9 +35,26 @@ a DB-granted-ADMIN console. Seed: realistic Nairobi demo (`npm run db:seed`,
 password `demopass123`). Verified green: lint, typecheck, 64 unit tests,
 production build.
 
+**Phase 3 (Escrow Engine) is complete, verified against a live Postgres, and
+smoke-tested end to end through the running app**: PrizeVault + factory
+contracts (9/9 Hardhat tests on a local chain), Paystack + chain ports with
+hard-disabled dev simulation modes (HMAC-SHA512 webhook verification,
+constant-time), the deposit engine (KYB gate with admin approval queue,
+split deposits, idempotent confirmations — replayed webhooks never
+double-flip), webhook pipeline with replay guard, pg-boss v10 job pipeline
+(attestations + hourly deposit-expiry cron; queue name == job name exactly),
+vault UI, `/trust` public ledger, and the PENDING_DEPOSIT → LIVE transition.
+Verified: lint, typecheck, 86 unit+integration tests (~95% escrow coverage),
+9 contract tests, production build, plus a live run: seeded event funded
+through the dev checkout → vault LOCKED → event LIVE → attestations on
+/trust. Auth note: Auth.js v5 requires JWT sessions for the credentials
+provider — sessions re-verify against the DB on every request (revocation
+preserved). Local dev: Postgres on 5432 (db: hackvillage_dev), demo login
+`organizer@hackvillage.dev` / `demopass123`, `npm run dev:fund -- <slug>`.
+
 Everything else is planned per the build plan phases — build features **in
-phase order** (Phase 3 = Escrow Engine next: Paystack deposits + PrizeVault
-contract on Amoy).
+phase order** (Phase 4 = Judging next: rubrics, scoring, 3-point feedback
+gate, results computation).
 
 ## Tech Stack (live)
 | Layer | Technology |

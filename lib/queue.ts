@@ -23,11 +23,47 @@ export async function getQueue(): Promise<PgBoss> {
   return boss;
 }
 
-/** Queue names — one per job family from the build plan §12. */
-export const JOB_QUEUES = {
-  payout: "payout",
-  escrow: "escrow",
-  media: "media",
-  legacy: "legacy",
-  notifications: "notifications",
+/**
+ * Job family names (plan §12). pg-boss v10: queue name == job name exactly.
+ * Kept as the registry of record for documentation; enqueue() derives queues
+ * from these names.
+ */
+export const JOB_NAMES = {
+  attestVaultCreated: "escrow.attest-vault-created",
+  attestVaultLocked: "escrow.attest-vault-locked",
+  escrowCron: "escrow.cron",
 } as const;
+
+/**
+ * Best-effort enqueue. pg-boss v10 semantics: a job's name must EXACTLY match
+ * an existing queue's name (the insert inner-joins on name equality and
+ * silently no-ops otherwise) — so the queue is ensured right here. Jobs are
+ * never allowed to break a money-path response: failures are logged and the
+ * recovery sweep re-drives anything stuck.
+ */
+export async function enqueue(
+  name: string,
+  data: Record<string, unknown>,
+  options?: { singletonKey?: string; delaySeconds?: number }
+): Promise<void> {
+  try {
+    const boss = await getQueue();
+    // Queue name == job name (pg-boss v10). B03/duplicate on concurrent create.
+    await boss.createQueue(name).catch((error: { code?: string }) => {
+      if (error?.code !== "B03") throw error;
+    });
+    await boss.send({
+      name,
+      data,
+      options: {
+        singletonKey: options?.singletonKey,
+        startAfter: options?.delaySeconds ? options.delaySeconds : undefined,
+        retryLimit: 5,
+        retryBackoff: true,
+        expireInSeconds: 300,
+      },
+    });
+  } catch (error) {
+    console.error(`[queue] enqueue failed (name=${name})`, error);
+  }
+}

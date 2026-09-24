@@ -87,6 +87,34 @@ enum TeamMemberStatus {
   DECLINED
 }
 
+enum DepositStatus {
+  INITIATED
+  SUCCEEDED
+  FAILED
+  REVERSED
+}
+
+/// Mirrors the on-chain PrizeVault state machine 1:1 (plan §10.2, §11.2).
+enum VaultChainState {
+  AWAITING
+  LOCKED
+  HALF_RELEASED
+  SETTLED
+  REFUNDED
+}
+
+enum LedgerEntryType {
+  VAULT_CREATED
+  DEPOSIT_LOCKED
+  INSTANT_PAYOUT
+  MILESTONE_PAYOUT
+  VAULT_REFUNDED
+}
+
+enum WebhookSource {
+  PAYSTACK
+}
+
 // ── Identity (Auth.js v5 adapter-compatible shapes) ───────────────────────
 
 model User {
@@ -270,6 +298,9 @@ model Event {
   roleTags EventRoleTag[]
   registrations Registration[]
   teams Team[]
+  deposits Deposit[]
+  vault VaultState?
+  ledgerEntries LedgerEntry[]
 
   @@index([status, startsAt])
 }
@@ -354,4 +385,93 @@ model Submission {
   splitDeclaration Json?
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
+// ── Escrow (Phase 3 — hard boundary; services/escrow owns these rows) ────
+
+model Deposit {
+  id String @id @default(cuid())
+  eventId String
+  /// Unique per attempt — the Paystack transaction reference. Idempotency
+  /// anchor for webhook replays (P3).
+  paystackReference String @unique
+  /// gross = pool portion + platform fee (ADR-012).
+  grossAmountKes Int
+  poolAmountKes Int
+  feeKes Int
+  currency String @default("KES")
+  channel String?
+  status DepositStatus @default(INITIATED)
+  /// Paystack authorization_url — or the dev simulation checkout in local dev.
+  authorizationUrl String?
+  paidAt DateTime?
+  rawWebhook Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+model VaultState {
+  id String @id @default(cuid())
+  eventId String @unique
+  /// The pool portion only — the fee never enters the vault (ADR-012).
+  amountKes Int
+  contractAddress String?
+  chainState VaultChainState @default(AWAITING)
+  lockedAt DateTime?
+  halfReleasedAt DateTime?
+  settledAt DateTime?
+  refundedAt DateTime?
+  lastTxHash String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+/// Mirror of on-chain attestation events — the /trust page reads this table;
+/// the chain remains the source of truth (plan §11.3).
+model LedgerEntry {
+  id String @id @default(cuid())
+  eventId String
+  type LedgerEntryType
+  payload Json
+  txHash String @unique
+  blockNumber Int?
+  mirroredAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+/// Webhook replay guard — unique(source, eventType, reference). Raw payloads
+/// are retained for forensics (plan §14.2).
+model WebhookEvent {
+  id String @id @default(cuid())
+  source WebhookSource
+  eventType String
+  reference String
+  signatureOk Boolean @default(false)
+  payload Json
+  processedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@unique([source, eventType, reference])
+}
+
+/// Append-only audit log for privileged actions (KYB approvals, trust
+/// adjustments, admin overrides — plan §6.8, P10).
+model AuditLog {
+  id String @id @default(cuid())
+  actorId String?
+  action String
+  entity String
+  entityId String?
+  reason String?
+  meta Json?
+  createdAt DateTime @default(now())
 }

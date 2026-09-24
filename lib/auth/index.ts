@@ -67,17 +67,33 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: HackVillageAdapter(prisma),
-  session: { strategy: "database", maxAge: 30 * 24 * 60 * 60 }, // 30 days
+  // Auth.js v5 constraint: the Credentials provider requires JWT sessions.
+  // Revocation is preserved in practice — the session callback re-reads the
+  // user from the DB on every request and neuters deleted accounts (ADR-005
+  // amended; documented in the session callback).
+  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 }, // 30 days
   pages: { signIn: "/signin", error: "/signin" },
   trustHost: true,
   providers,
   callbacks: {
-    async session({ session, user }) {
-      // Database strategy: re-read our fields (the adapter types don't carry
-      // them) and attach the role set. One small indexed query per session.
+    async jwt({ token, user }) {
+      // First sign-in: capture the DB id so the session callback never has to
+      // resolve by email (OAuth and credentials both provide it here).
+      if (user?.id) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      const userId = token.id as string | undefined;
+      if (!userId) return session;
+
+      // Re-read our fields on EVERY request (the adapter types don't carry
+      // them) and attach the role set. This is also the revocation check:
+      // deleted accounts get a neutered session until sign-out is forced.
       const [dbUser, grants] = await Promise.all([
         prisma.user.findUnique({
-          where: { id: user.id },
+          where: { id: userId },
           select: {
             handle: true,
             primaryRole: true,
@@ -87,14 +103,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
         }),
         prisma.roleGrant.findMany({
-          where: { userId: user.id },
+          where: { userId },
           select: { role: true },
         }),
       ]);
 
+      session.user.id = userId;
       if (!dbUser || dbUser.deletedAt) {
-        // Deleted accounts keep a neutered session until sign-out is forced.
-        session.user.id = user.id;
         session.user.handle = "";
         session.user.primaryRole = "DEVELOPER";
         session.user.roles = [];
@@ -103,7 +118,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return session;
       }
 
-      session.user.id = user.id;
       session.user.handle = dbUser.handle;
       session.user.primaryRole = dbUser.primaryRole;
       session.user.roles = grants.map((grant) => grant.role);
