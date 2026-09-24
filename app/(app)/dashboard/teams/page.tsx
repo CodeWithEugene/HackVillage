@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "My teams" };
+export const metadata: Metadata = { title: "My Teams" };
 
 export default async function DashboardTeamsPage({
   searchParams,
@@ -50,7 +50,7 @@ export default async function DashboardTeamsPage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-2xl font-bold text-ink">My teams</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">My Teams</h1>
         <p className="mt-1 text-sm text-muted">Invitations and the teams you build with.</p>
       </header>
 
@@ -87,7 +87,7 @@ export default async function DashboardTeamsPage({
           description="Register for an event, then create a team or join one with a leader's code — teams hold up to 5 members."
           action={
             <Link href="/events">
-              <Button>Find an event</Button>
+              <Button>Find An Event</Button>
             </Link>
           }
         />

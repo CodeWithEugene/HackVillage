@@ -28,7 +28,7 @@ export default async function AdminDisputesPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-bold text-ink">Milestone disputes</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Milestone Disputes</h1>
         <Badge variant={open.length > 0 ? "warning" : "success"}>
           {open.length} open · {disputes.length} total
         </Badge>
@@ -41,7 +41,7 @@ export default async function AdminDisputesPage() {
 
       {disputes.length === 0 ? (
         <Card>
-          <CardTitle>No disputes</CardTitle>
+          <CardTitle>No Disputes</CardTitle>
           <p className="mt-2 text-sm text-muted">
             The queue is clear — no milestones are being disputed.
           </p>

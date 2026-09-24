@@ -14,12 +14,12 @@ export function ResetPasswordForm({ token }: { token: string }) {
   if (!token) {
     return (
       <Card className="text-center">
-        <h1 className="font-display text-2xl font-bold text-ink">Reset link needed</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Reset Link Needed</h1>
         <p className="mt-2 text-sm text-muted">
           Open this page from the link in your reset email, or request a new one.
         </p>
         <Link href="/forgot-password" className="mt-6 inline-block">
-          <Button variant="secondary">Request a reset link</Button>
+          <Button variant="secondary">Request A Reset Link</Button>
         </Link>
       </Card>
     );
@@ -27,7 +27,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
   return (
     <Card>
-      <h1 className="font-display text-2xl font-bold text-ink">Choose a new password</h1>
+      <h1 className="font-display text-2xl font-bold text-ink">Choose A New Password</h1>
       <p className="mt-1 text-sm text-muted">This link expires one hour after it was sent.</p>
 
       <form action={action} className="mt-6 space-y-4">
@@ -46,7 +46,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
         </div>
         <FormError message={state.error} />
         <Button type="submit" className="w-full" loading={pending}>
-          Update password
+          Update Password
         </Button>
       </form>
     </Card>

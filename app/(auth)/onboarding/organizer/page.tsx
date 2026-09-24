@@ -5,7 +5,7 @@ import { OrganizerOnboardingForm } from "@/components/onboarding/organizer-onboa
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Organizer onboarding" };
+export const metadata: Metadata = { title: "Organizer Onboarding" };
 
 export default async function OrganizerOnboardingPage() {
   const user = await requireUser();

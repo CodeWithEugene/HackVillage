@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Intro requests" };
+export const metadata: Metadata = { title: "Intro Requests" };
 
 export default async function HiringRequestsPage() {
   const user = await requireOnboardedUser();
@@ -26,7 +26,7 @@ export default async function HiringRequestsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-2xl font-bold text-ink">Your intro requests</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Your Intro Requests</h1>
         <p className="mt-1 text-sm text-muted">
           Accepted introductions include contact details.
         </p>

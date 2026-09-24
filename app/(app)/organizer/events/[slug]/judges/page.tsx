@@ -51,7 +51,7 @@ export default async function EventJudgesPage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-2xl font-bold text-ink">Judges &amp; review</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Judges &amp; Review</h1>
         <p className="mt-1 text-sm text-muted">
           {event.title} ·{" "}
           <span className="font-semibold text-ink">
@@ -74,7 +74,7 @@ export default async function EventJudgesPage({
       />
 
       <Card>
-        <CardTitle>How results compute</CardTitle>
+        <CardTitle>How Results Compute</CardTitle>
         <CardDescription>
           Per judge: Σ(criterion score × weight) ÷ Σweights. Per team: the mean across finalized
           judge reviews. Teams rank by that weighted score — ties share a rank. The rubric locks

@@ -52,7 +52,7 @@ export function JudgesManager({
           <Input id="judge-handle" name="handle" required placeholder="@their-handle" maxLength={30} />
         </div>
         <Button type="submit" loading={pending}>
-          Invite judge
+          Invite Judge
         </Button>
       </form>
       <FormError message={state.error} />

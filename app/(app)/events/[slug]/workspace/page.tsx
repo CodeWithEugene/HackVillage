@@ -15,7 +15,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 import { registrationOpen, submissionWindowOpen } from "@/lib/events/lifecycle";
 
-export const metadata: Metadata = { title: "Team workspace" };
+export const metadata: Metadata = { title: "Team Workspace" };
 
 const NOTICES: Record<string, string> = {
   "leader": "Leaders can't leave — disband the team instead (only before submitting).",
@@ -53,7 +53,7 @@ export default async function WorkspacePage({
         description="Register from the event page first — then this workspace becomes your team's build hub."
         action={
           <a href={`/events/${event.slug}`}>
-            <Button>Go to event page</Button>
+            <Button>Go To Event Page</Button>
           </a>
         }
       />
@@ -110,7 +110,7 @@ export default async function WorkspacePage({
 
       {pendingInvites.length > 0 ? (
         <Card>
-          <CardTitle>Team invitations</CardTitle>
+          <CardTitle>Team Invitations</CardTitle>
           <ul className="mt-3 space-y-3">
             {pendingInvites.map((invite) => (
               <li
@@ -160,7 +160,7 @@ export default async function WorkspacePage({
             <TeamForms eventId={event.id} />
           ) : (
             <Card>
-              <CardTitle>Registration has closed</CardTitle>
+              <CardTitle>Registration Has Closed</CardTitle>
               <CardDescription>
                 Teams locked when registration closed. If you already have a team, it appears above.
               </CardDescription>
@@ -192,7 +192,7 @@ export default async function WorkspacePage({
           />
         ) : (
           <Card>
-            <CardTitle>Submissions open when the event starts</CardTitle>
+            <CardTitle>Submissions Open When The Event Starts</CardTitle>
             <CardDescription>
               The submission form (repo, demo, description, and the prize split declaration) unlocks
               when the event goes live.
@@ -202,7 +202,7 @@ export default async function WorkspacePage({
       ) : null}
 
       <Card>
-        <CardTitle>What happens after announcement</CardTitle>
+        <CardTitle>What Happens After Announcement</CardTitle>
         <CardDescription>
           Endorse the winners you judged —{" "}
           <a href={`/judge/events/${event.slug}/endorse`} className="underline hover:text-ink">

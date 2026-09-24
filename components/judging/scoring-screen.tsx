@@ -58,7 +58,7 @@ export function ScoringScreen({
       <form action={saveScores} className="space-y-6">
         <input type="hidden" name="teamId" value={teamId} />
         <Card>
-          <CardTitle>Rubric scoring — {teamName}</CardTitle>
+          <CardTitle>Rubric Scoring — {teamName}</CardTitle>
           <CardDescription>
             Whole numbers 0–10 per criterion. Save as often as you like; finalization locks
             everything.
@@ -98,14 +98,14 @@ export function ScoringScreen({
           <FormSuccess message={scoresState.message} />
           {!locked ? (
             <Button type="submit" className="mt-5" loading={saving}>
-              Save scores
+              Save Scores
             </Button>
           ) : null}
         </Card>
       </form>
 
       <Card>
-        <CardTitle>Structured feedback</CardTitle>
+        <CardTitle>Structured Feedback</CardTitle>
         <CardDescription>
           The gate: one <strong>strength</strong>, one <strong>improvement</strong>, and one{" "}
           <strong>next step</strong> per team before scores can finalize — this is what developers
@@ -180,7 +180,7 @@ export function ScoringScreen({
 
       {judgingOpen ? (
         <Card>
-          <CardTitle>Finalize your review</CardTitle>
+          <CardTitle>Finalize Your Review</CardTitle>
           <CardDescription>
             Finalization requires every criterion scored and the full feedback gate. After
             finalizing, your scores and feedback lock.

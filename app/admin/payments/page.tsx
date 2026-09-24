@@ -38,14 +38,14 @@ export default async function AdminPaymentsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-bold text-ink">Payment operations</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Payment Operations</h1>
         <Badge variant={kpi.trustScore >= 0.9 ? "success" : "warning"}>
           Trust KPI: {(kpi.trustScore * 100).toFixed(0)}% in 1h ({kpi.withinWindow}/{kpi.total})
         </Badge>
       </div>
 
       <Card>
-        <CardTitle>Open payout queue ({payouts.length})</CardTitle>
+        <CardTitle>Open Payout Queue ({payouts.length})</CardTitle>
         <p className="mt-2 text-sm text-muted">
           Failed payouts retry automatically with backoff until the attempt cap, then land here.
           Funds stay locked the whole time — nothing is ever lost. &ldquo;Mark paid&rdquo; requires

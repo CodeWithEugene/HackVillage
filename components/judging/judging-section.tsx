@@ -56,10 +56,10 @@ export async function JudgingSection({
           </CardDescription>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Link href={`/organizer/events/${slug}/judges`}>
-              <Button variant="secondary">Manage judges</Button>
+              <Button variant="secondary">Manage Judges</Button>
             </Link>
             <Link href={`/organizer/events/${slug}/rubric`}>
-              <Button variant="secondary">Edit rubric</Button>
+              <Button variant="secondary">Edit Rubric</Button>
             </Link>
             {ended ? <OpenJudgingButton eventId={eventId} /> : null}
           </div>
@@ -78,10 +78,10 @@ export async function JudgingSection({
           </CardDescription>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link href={`/organizer/events/${slug}/winners`}>
-              <Button>Announce winners →</Button>
+              <Button>Announce Winners →</Button>
             </Link>
             <Link href={`/organizer/events/${slug}/judges`}>
-              <Button variant="secondary">Judges &amp; readiness</Button>
+              <Button variant="secondary">Judges &amp; Readiness</Button>
             </Link>
           </div>
         </>
@@ -95,7 +95,7 @@ export async function JudgingSection({
           <div className="mt-3 flex flex-wrap gap-3">
             <Link href={`/organizer/events/${slug}/judges`}>
               <Button size="sm" variant="secondary">
-                Judges &amp; readiness
+                Judges &amp; Readiness
               </Button>
             </Link>
           </div>

@@ -56,7 +56,7 @@ export function PayoutOpsActions({ payoutId }: { payoutId: string }) {
           />
         </div>
         <Button type="submit" size="sm" variant="danger" loading={marking}>
-          Mark paid with receipt
+          Mark Paid With Receipt
         </Button>
       </form>
       <FormError message={markState.error} />

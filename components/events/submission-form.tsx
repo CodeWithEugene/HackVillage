@@ -151,7 +151,7 @@ export function SubmissionForm({
 
         {windowOpen ? (
           <Button type="submit" loading={pending}>
-            {defaults ? "Update submission" : "Submit project"}
+            {defaults ? "Update Submission" : "Submit Project"}
           </Button>
         ) : (
           <p className="text-sm font-semibold text-muted">Window closed — submission locked.</p>

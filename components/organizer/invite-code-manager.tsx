@@ -1,10 +1,11 @@
 "use client";
 
-import { useTransition } from "react";
+import { useRef, useTransition } from "react";
 import { Copy, Ticket } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { Input, Label } from "@/components/ui/input";
 import { createOrgInviteAction } from "@/lib/onboarding/actions";
 
 export function InviteCodeManager({
@@ -13,11 +14,12 @@ export function InviteCodeManager({
   codes: { token: string; expiresAt: string }[];
 }) {
   const [pending, startTransition] = useTransition();
+  const emailRef = useRef<HTMLInputElement>(null);
 
   return (
     <Card>
       <CardTitle className="flex items-center gap-2">
-        <Ticket aria-hidden className="size-5" /> Invite teammates
+        <Ticket aria-hidden className="size-5" /> Invite Teammates
       </CardTitle>
       <CardDescription>
         Codes give organizer access to this organization and expire after 7 days.
@@ -56,14 +58,34 @@ export function InviteCodeManager({
         <p className="mt-4 text-sm text-muted">No active invites — generate one below.</p>
       )}
 
-      <Button
-        className="mt-4"
-        variant="secondary"
-        loading={pending}
-        onClick={() => startTransition(() => void createOrgInviteAction())}
-      >
-        Generate invite code
-      </Button>
+      <div className="mt-4">
+        <Label htmlFor="invite-email">Email an invite (optional)</Label>
+        <div className="mt-1.5 flex gap-2">
+          <Input
+            id="invite-email"
+            ref={emailRef}
+            type="email"
+            placeholder="teammate@example.com"
+            className="flex-1"
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            loading={pending}
+            onClick={() =>
+              startTransition(async () => {
+                await createOrgInviteAction(emailRef.current?.value || undefined);
+                if (emailRef.current) emailRef.current.value = "";
+              })
+            }
+          >
+            Generate Or Send Invite
+          </Button>
+        </div>
+        <p className="mt-1.5 text-xs text-muted">
+          Leave the email blank to just generate a code you can share yourself.
+        </p>
+      </div>
     </Card>
   );
 }

@@ -4,7 +4,7 @@ import { EditProfileForm } from "@/components/profile/edit-profile-form";
 import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Your profile" };
+export const metadata: Metadata = { title: "Your Profile" };
 
 export default async function ProfileEditPage() {
   const user = await requireOnboardedUser();

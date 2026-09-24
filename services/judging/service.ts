@@ -5,6 +5,10 @@ import {
   type Criterion,
   type FeedbackKind,
 } from "@/lib/judging/compute";
+import { sendMail } from "@/lib/ports/mail";
+import { sendNotification } from "@/lib/notifications/send";
+import { judgeInvitedEmail, judgeRespondedEmail, judgingOpenEmail } from "@/lib/notifications/templates/judging";
+import { appUrl } from "@/lib/url";
 
 /**
  * Judging service (Phase 4). Authorization passes explicit userIds — the
@@ -59,11 +63,11 @@ export async function inviteJudge(
   organizerId: string,
   judgeHandle: string
 ): Promise<void> {
-  await requireOrgAdmin(eventId, organizerId);
+  const event = await requireOrgAdmin(eventId, organizerId);
 
   const judge = await prisma.user.findFirst({
     where: { handle: { equals: judgeHandle, mode: "insensitive" }, deletedAt: null },
-    select: { id: true },
+    select: { id: true, email: true },
   });
   if (!judge) throw new JudgingError("No HackVillage user has that handle.", "NOT_FOUND");
 
@@ -90,6 +94,13 @@ export async function inviteJudge(
       update: {},
     });
   });
+
+  await sendNotification({
+    userId: judge.id,
+    to: judge.email,
+    category: "judging",
+    template: judgeInvitedEmail(event.title, appUrl("/judge")),
+  });
 }
 
 export async function respondToInvite(
@@ -97,13 +108,24 @@ export async function respondToInvite(
   userId: string,
   accept: boolean
 ): Promise<void> {
-  const assignment = await prisma.judgeAssignment.findUnique({ where: { id: assignmentId } });
+  const assignment = await prisma.judgeAssignment.findUnique({
+    where: { id: assignmentId },
+    include: {
+      user: { select: { name: true, handle: true } },
+      event: { select: { title: true, org: { select: { owner: { select: { id: true, email: true } } } } } },
+    },
+  });
   if (!assignment || assignment.userId !== userId) {
     throw new JudgingError("Invitation not found.", "NOT_FOUND");
   }
   await prisma.judgeAssignment.update({
     where: { id: assignmentId },
     data: { status: accept ? "ACTIVE" : "DECLINED" },
+  });
+
+  await sendMail({
+    to: assignment.event.org.owner.email,
+    ...judgeRespondedEmail(assignment.user.name ?? assignment.user.handle, assignment.event.title, accept),
   });
 }
 
@@ -157,6 +179,20 @@ export async function openJudging(eventId: string, organizerId: string): Promise
     });
     await tx.event.update({ where: { id: eventId }, data: { status: "JUDGING" } });
   });
+
+  const activeJudges = await prisma.judgeAssignment.findMany({
+    where: { eventId, status: "ACTIVE" },
+    select: { user: { select: { id: true, email: true } } },
+  });
+  const judgeUrl = appUrl("/judge");
+  for (const assignment of activeJudges) {
+    await sendNotification({
+      userId: assignment.user.id,
+      to: assignment.user.email,
+      category: "judging",
+      template: judgingOpenEmail(event.title, judgeUrl),
+    });
+  }
 }
 
 // ── Scoring & feedback ───────────────────────────────────────────────────

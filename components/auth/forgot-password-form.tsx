@@ -17,13 +17,13 @@ export function ForgotPasswordForm() {
   if (state.message === "sent") {
     return (
       <Card className="text-center">
-        <h1 className="font-display text-2xl font-bold text-ink">Check your inbox</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Check Your Inbox</h1>
         <p className="mt-2 text-sm text-muted">
           If an account exists for that email, a reset link is on its way. The link expires in one
           hour.
         </p>
         <Link href="/signin" className="mt-6 inline-block">
-          <Button variant="secondary">Back to sign in</Button>
+          <Button variant="secondary">Back To Sign In</Button>
         </Link>
       </Card>
     );
@@ -31,7 +31,7 @@ export function ForgotPasswordForm() {
 
   return (
     <Card>
-      <h1 className="font-display text-2xl font-bold text-ink">Reset your password</h1>
+      <h1 className="font-display text-2xl font-bold text-ink">Reset Your Password</h1>
       <p className="mt-1 text-sm text-muted">
         Enter your email and we&apos;ll send a reset link.
       </p>
@@ -44,7 +44,7 @@ export function ForgotPasswordForm() {
         <FormError message={state.error} />
         <FormSuccess message={state.message === "sent" ? undefined : state.message} />
         <Button type="submit" className="w-full" loading={pending}>
-          Send reset link
+          Send Reset Link
         </Button>
       </form>
 

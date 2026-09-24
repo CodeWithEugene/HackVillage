@@ -8,6 +8,9 @@ import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 import { submissionWindowOpen } from "@/lib/events/lifecycle";
 import { validateSplit, validRepoUrl, type SplitEntry } from "@/lib/events/submission";
+import { sendNotification } from "@/lib/notifications/send";
+import { submissionSavedEmail } from "@/lib/notifications/templates/teams";
+import { appUrl } from "@/lib/url";
 
 export interface SubmissionActionState {
   error?: string;
@@ -60,7 +63,15 @@ export async function saveSubmissionAction(
 
   const membership = await prisma.teamMember.findFirst({
     where: { teamId, userId: user.id, status: "JOINED" },
-    include: { team: { include: { event: true, members: true, submission: true } } },
+    include: {
+      team: {
+        include: {
+          event: true,
+          members: { include: { user: { select: { id: true, email: true } } } },
+          submission: true,
+        },
+      },
+    },
   });
   if (!membership) return { error: "Only team members can submit for this team." };
 
@@ -96,6 +107,16 @@ export async function saveSubmissionAction(
         description,
         splitDeclaration: split as unknown as Prisma.InputJsonValue,
       },
+    });
+  }
+
+  const workspaceUrl = appUrl(`/events/${team.event.slug}/workspace`);
+  for (const member of team.members.filter((m) => m.status === "JOINED")) {
+    await sendNotification({
+      userId: member.user.id,
+      to: member.user.email,
+      category: "teamActivity",
+      template: submissionSavedEmail(team.name, team.event.title, workspaceUrl),
     });
   }
 

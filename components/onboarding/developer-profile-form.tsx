@@ -117,7 +117,7 @@ export function DeveloperProfileForm({
           <FormError message={state.error} />
 
           <Button type="submit" className="w-full" loading={pending}>
-            {editing ? "Save changes" : "Finish setup"}
+            {editing ? "Save Changes" : "Finish Setup"}
           </Button>
         </form>
       </Card>

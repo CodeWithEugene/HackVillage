@@ -75,7 +75,7 @@ export function WinnersAnnouncer({
 
       <Card>
         <CardTitle className="flex items-center gap-2">
-          <Trophy aria-hidden className="size-5" /> Announce winners &amp; pay 50%
+          <Trophy aria-hidden className="size-5" /> Announce Winners &amp; Pay 50%
         </CardTitle>
         <CardDescription>
           Announcing creates the instant payout records and starts the transfers immediately —
@@ -146,7 +146,7 @@ export function WinnersAnnouncer({
         <FormSuccess message={state.message} />
 
         <Button type="submit" className="mt-5" loading={pending} disabled={!ready}>
-          Announce winners &amp; trigger instant payouts
+          Announce Winners &amp; Trigger Instant Payouts
         </Button>
       </Card>
     </form>

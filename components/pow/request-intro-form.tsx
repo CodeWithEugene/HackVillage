@@ -26,7 +26,7 @@ export function RequestIntroForm({
   return (
     <Card>
       <CardTitle className="flex items-center gap-2">
-        <Handshake aria-hidden className="size-5" /> Request an introduction to @{handle}
+        <Handshake aria-hidden className="size-5" /> Request An Introduction To @{handle}
       </CardTitle>
       <CardDescription>
         One click sends your message — if they accept, contact details are exchanged both ways.
@@ -45,7 +45,7 @@ export function RequestIntroForm({
         <FormError message={state.error} />
         <FormSuccess message={state.message} />
         <Button type="submit" loading={pending}>
-          Send intro request
+          Send Intro Request
         </Button>
       </form>
     </Card>

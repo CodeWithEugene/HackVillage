@@ -101,7 +101,7 @@ export default async function EventWinnersPage({
       {announced ? (
         <>
           <Card>
-            <CardTitle>Winners &amp; payouts</CardTitle>
+            <CardTitle>Winners &amp; Payouts</CardTitle>
             <ul className="mt-4 space-y-4">
               {event.winners
                 .slice()
@@ -189,7 +189,7 @@ export default async function EventWinnersPage({
             </ul>
           </Card>
           <Card>
-            <CardTitle>Milestone dues</CardTitle>
+            <CardTitle>Milestone Dues</CardTitle>
             <CardDescription>
               The final 50% releases when you confirm each winner&apos;s handover. Confirming
               triggers the milestone payout immediately.
@@ -200,7 +200,7 @@ export default async function EventWinnersPage({
 
       {!announced && event.status !== "JUDGING" ? (
         <Card>
-          <CardTitle>Winners aren&apos;t open yet</CardTitle>
+          <CardTitle>Winners Aren&apos;t Open Yet</CardTitle>
           <CardDescription>
             Announcement unlocks when judging opens and every submitted team has a finalized
             review. Current status: {STATUS_LABELS[event.status]}.

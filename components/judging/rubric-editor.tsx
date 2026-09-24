@@ -145,7 +145,7 @@ export function RubricEditor({
         <FormSuccess message={state.message} />
         {!locked ? (
           <Button type="submit" loading={pending}>
-            Save rubric
+            Save Rubric
           </Button>
         ) : null}
       </form>

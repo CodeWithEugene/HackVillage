@@ -6,7 +6,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Endorse winners" };
+export const metadata: Metadata = { title: "Endorse Winners" };
 
 export default async function JudgeEndorsePage({
   params,
@@ -52,18 +52,18 @@ export default async function JudgeEndorsePage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-2xl font-bold text-ink">Endorse winners</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Endorse Winners</h1>
         <p className="mt-1 text-sm text-muted">{event.title}</p>
       </header>
 
       {event.winners.length === 0 ? (
         <Card>
-          <CardTitle>No winners yet</CardTitle>
+          <CardTitle>No Winners Yet</CardTitle>
           <CardDescription>Endorsements unlock once winners are announced.</CardDescription>
         </Card>
       ) : winners.length === 0 ? (
         <Card>
-          <CardTitle>All endorsements written</CardTitle>
+          <CardTitle>All Endorsements Written</CardTitle>
           <CardDescription>
             You&apos;ve endorsed every winner of this event — they&apos;re live on their profiles.
           </CardDescription>

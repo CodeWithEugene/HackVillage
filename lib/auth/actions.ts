@@ -10,10 +10,10 @@ import { signIn, signOut } from "@/lib/auth";
 import { passwordResetEmail, verificationEmail } from "@/lib/auth/mail-templates";
 import { candidateHandles, firstAvailableHandle, validateHandle } from "@/lib/auth/handles";
 import { passwordSchema } from "@/lib/auth/password-policy";
-import { getEnv } from "@/lib/env";
 import { sendMail } from "@/lib/ports/mail";
 import { prisma } from "@/lib/db";
 import { rateLimit } from "@/lib/rate-limit";
+import { appUrl } from "@/lib/url";
 
 /**
  * Auth server actions (Phase 1). Every mutation is zod-validated and
@@ -37,10 +37,6 @@ function newRawToken(): string {
 
 function tokenHash(raw: string): string {
   return createHash("sha256").update(raw).digest("hex");
-}
-
-function appUrl(path: string): string {
-  return `${getEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}${path}`;
 }
 
 async function issueToken(email: string, ttlMs: number): Promise<string> {

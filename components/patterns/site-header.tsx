@@ -53,7 +53,7 @@ export async function SiteHeader({ className }: { className?: string }) {
             <Github aria-hidden className="size-5" />
           </a>
           <Link href={destination}>
-            <Button size="sm">{user ? "Go to app" : "Sign in"}</Button>
+            <Button size="sm">{user ? "Go To App" : "Sign In"}</Button>
           </Link>
         </nav>
       </div>

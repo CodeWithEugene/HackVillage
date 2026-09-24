@@ -1,6 +1,22 @@
 import { prisma } from "@/lib/db";
 import { getPaystackPort, type PayoutMethod, type RecipientInput } from "@/lib/ports/paystack";
 import { enqueue } from "@/lib/queue";
+import { sendMail } from "@/lib/ports/mail";
+import { sendNotification } from "@/lib/notifications/send";
+import { alertAdmins } from "@/lib/notifications/admin-alert";
+import {
+  resultsAnnouncedEmail,
+  winnerAnnouncedEmail,
+} from "@/lib/notifications/templates/judging";
+import {
+  instantPayoutPaidEmail,
+  milestoneConfirmedEmail,
+  milestonePayoutPaidEmail,
+  payoutManuallyPaidEmail,
+  payoutManualReviewAdminEmail,
+  payoutMethodSavedEmail,
+} from "@/lib/notifications/templates/payouts";
+import { appUrl } from "@/lib/url";
 import {
   payoutIdempotencyKey,
   retryDecision,
@@ -66,6 +82,8 @@ export async function savePayoutRecipient(
     },
     update: { payoutRecipientCode: recipientCode, payoutMethod: input.type },
   });
+
+  await sendMail({ to: user.email, ...payoutMethodSavedEmail() });
 
   return { recipientCode };
 }
@@ -158,7 +176,7 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
   );
   const leaderUsers = await prisma.user.findMany({
     where: { id: { in: leaderIds } },
-    select: { id: true, handle: true },
+    select: { id: true, handle: true, email: true },
   });
   const leaderHandles = new Map(leaderUsers.map((u) => [u.id, u.handle]));
   const missingRecipients = leaderIds.filter((id) => !recipients.has(id));
@@ -234,6 +252,52 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
   // submission of this event, not just the winners.
   const { scheduleLegacyCheckins } = await import("@/services/legacy/service");
   await scheduleLegacyCheckins(event.id);
+
+  // Best-effort winner/results notifications, never allowed to block payout flow.
+  await notifyResults(event.id, event.title, input.placements, teamById, prizesByPlace, leaderUsers).catch(
+    (error: unknown) => console.error("[payout] results notification failed", error)
+  );
+}
+
+async function notifyResults(
+  eventId: string,
+  eventTitle: string,
+  placements: { place: number; teamId: string }[],
+  teamById: Map<string, { id: string; leaderId: string }>,
+  prizesByPlace: Map<number, { amountKes: number }>,
+  leaderUsers: { id: string; handle: string; email: string }[]
+): Promise<void> {
+  const leaderById = new Map(leaderUsers.map((u) => [u.id, u]));
+  const eventUrl = appUrl(`/events/${eventId}`);
+  const winningTeamIds = new Set(placements.map((p) => p.teamId));
+
+  for (const placement of placements) {
+    const team = teamById.get(placement.teamId)!;
+    const prize = prizesByPlace.get(placement.place)!;
+    const leader = leaderById.get(team.leaderId);
+    if (!leader) continue;
+    await sendNotification({
+      userId: leader.id,
+      to: leader.email,
+      category: "judging",
+      template: winnerAnnouncedEmail(eventTitle, placement.place, prize.amountKes, eventUrl),
+    });
+  }
+
+  const otherTeams = await prisma.team.findMany({
+    where: { eventId, id: { notIn: Array.from(winningTeamIds) }, status: { not: "DISBANDED" } },
+    select: { members: { where: { status: "JOINED" }, select: { user: { select: { id: true, email: true } } } } },
+  });
+  for (const team of otherTeams) {
+    for (const member of team.members) {
+      await sendNotification({
+        userId: member.user.id,
+        to: member.user.email,
+        category: "judging",
+        template: resultsAnnouncedEmail(eventTitle, eventUrl),
+      });
+    }
+  }
 }
 
 // ── Payout execution (the job — plan §10.4 STEP 4) ──────────────────────
@@ -306,7 +370,14 @@ export async function executePayout(payoutId: string): Promise<ExecuteResult> {
 export async function confirmTransferSuccess(payoutId: string, reference: string): Promise<void> {
   const payout = await prisma.payout.findUnique({
     where: { id: payoutId },
-    include: { winner: true },
+    include: {
+      winner: {
+        include: {
+          user: { select: { id: true, email: true } },
+          event: { select: { id: true, title: true, slug: true } },
+        },
+      },
+    },
   });
   if (!payout || payout.status === "SUCCEEDED") return; // idempotent
 
@@ -323,6 +394,18 @@ export async function confirmTransferSuccess(payoutId: string, reference: string
     amountKes: payout.amountKes,
     txRef: reference,
   });
+
+  const trustUrl = appUrl("/trust");
+  const template =
+    payout.tranche === "INSTANT"
+      ? instantPayoutPaidEmail(payout.winner.event.title, payout.amountKes, trustUrl)
+      : milestonePayoutPaidEmail(payout.winner.event.title, payout.amountKes, trustUrl);
+  await sendNotification({
+    userId: payout.winner.user.id,
+    to: payout.winner.user.email,
+    category: "judging",
+    template,
+  }).catch((error: unknown) => console.error("[payout] paid notification failed", error));
 }
 
 /** Failure → fail-closed retry policy (never releases funds). */
@@ -346,6 +429,14 @@ async function handleTransferFailure(payoutId: string, reference: string, error:
     data: { status: "MANUAL_REVIEW", lastError: error.slice(0, 400) },
   });
   console.error(`[payout] MANUAL_REVIEW payout=${payoutId} attempts=${payout.attemptCount} error=${error}`);
+
+  const winner = await prisma.winner.findUnique({
+    where: { id: payout.winnerId },
+    select: { event: { select: { title: true } } },
+  });
+  await alertAdmins(
+    payoutManualReviewAdminEmail(payoutId, winner?.event.title ?? "Unknown event", payout.attemptCount + 1, appUrl("/admin/payments"))
+  ).catch((alertError: unknown) => console.error("[payout] admin alert failed", alertError));
 }
 
 // ── Vault advancement (after confirmed payouts only) ────────────────────
@@ -461,6 +552,13 @@ export async function confirmMilestone(
   });
   if (created) await enqueue("payout.execute", { payoutId: created.id });
 
+  await sendNotification({
+    userId: winner.userId,
+    to: winner.user.email,
+    category: "judging",
+    template: milestoneConfirmedEmail(winner.event.title, appUrl("/trust")),
+  }).catch((error: unknown) => console.error("[payout] milestone notification failed", error));
+
   return { outcome: "queued" };
 }
 
@@ -503,7 +601,15 @@ export async function adminMarkManuallyPaid(
 
   const payout = await prisma.payout.findUnique({
     where: { id: payoutId },
-    include: { winner: { select: { eventId: true } } },
+    include: {
+      winner: {
+        select: {
+          eventId: true,
+          user: { select: { id: true, email: true } },
+          event: { select: { title: true } },
+        },
+      },
+    },
   });
   if (!payout) throw new PayoutError("Payout not found.", "NOT_FOUND");
 
@@ -524,6 +630,13 @@ export async function adminMarkManuallyPaid(
   ]);
 
   await advanceVaultAfter(payout.winner.eventId);
+
+  await sendNotification({
+    userId: payout.winner.user.id,
+    to: payout.winner.user.email,
+    category: "judging",
+    template: payoutManuallyPaidEmail(payout.winner.event.title, payout.amountKes),
+  }).catch((error: unknown) => console.error("[payout] manual paid notification failed", error));
 }
 
 // ── Recovery sweep (cron: re-drive stuck payouts — plan §12) ────────────

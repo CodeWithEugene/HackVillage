@@ -24,14 +24,14 @@ export function AcceptInvitationClient({
   if (invalid) {
     return (
       <Card className="text-center">
-        <h1 className="font-display text-2xl font-bold text-ink">Invite unavailable</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Invite Unavailable</h1>
         <p className="mt-2 text-sm text-muted">
           {orgName
             ? `${orgName}'s invite link is expired or already used. Ask for a fresh one.`
             : "This invite doesn't exist. Double-check the link, or ask the organizer to resend it."}
         </p>
         <LinkNext href="/dashboard" className="mt-6 inline-block">
-          <Button variant="secondary">Go to dashboard</Button>
+          <Button variant="secondary">Go To Dashboard</Button>
         </LinkNext>
       </Card>
     );
@@ -54,7 +54,7 @@ export function AcceptInvitationClient({
         loading={pending}
         onClick={() => startTransition(() => void acceptInvitationTokenAction(token ?? ""))}
       >
-        Accept invitation
+        Accept Invitation
       </Button>
       <p className="mt-4 text-xs text-muted">
         Not you?{" "}

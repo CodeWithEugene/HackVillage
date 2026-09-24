@@ -16,7 +16,7 @@ export default async function AdminHomePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-bold text-ink">Platform snapshot</h1>
+      <h1 className="font-display text-2xl font-bold text-ink">Platform Snapshot</h1>
       <div className="grid gap-4 sm:grid-cols-4">
         <Card>
           <p className="text-xs font-semibold uppercase text-muted">Users</p>
@@ -51,19 +51,19 @@ export default async function AdminHomePage() {
         </Link>
         <Link href="/admin/kyb">
           <Card className="transition-shadow hover:shadow-lg">
-            <CardTitle>KYB review</CardTitle>
+            <CardTitle>KYB Review</CardTitle>
             <CardDescription>Business verification queue — gates first deposits.</CardDescription>
           </Card>
         </Link>
         <Link href="/admin/payments">
           <Card className="transition-shadow hover:shadow-lg">
-            <CardTitle>Payment ops</CardTitle>
+            <CardTitle>Payment Ops</CardTitle>
             <CardDescription>Failed payouts, retries, and manual receipts.</CardDescription>
           </Card>
         </Link>
         <Link href="/admin/trust">
           <Card className="transition-shadow hover:shadow-lg">
-            <CardTitle>Trust ledger</CardTitle>
+            <CardTitle>Trust Ledger</CardTitle>
             <CardDescription>Penalties, appeals, and manual adjustments.</CardDescription>
           </Card>
         </Link>

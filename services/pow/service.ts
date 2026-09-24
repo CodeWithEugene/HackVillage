@@ -1,4 +1,13 @@
 import { prisma } from "@/lib/db";
+import { sendNotification } from "@/lib/notifications/send";
+import {
+  endorsementReceivedEmail,
+  introductionAcceptedDeveloperEmail,
+  introductionAcceptedPartnerEmail,
+  introductionDeclinedPartnerEmail,
+  introductionRequestedEmail,
+} from "@/lib/notifications/templates/hiring";
+import { appUrl } from "@/lib/url";
 
 /**
  * Proof-of-Work service (Phase 6). Every metric derives from platform-
@@ -103,6 +112,19 @@ export async function createEndorsement(input: {
       quote: input.quote,
     },
   });
+
+  const [developer, event] = await Promise.all([
+    prisma.user.findUnique({ where: { id: input.developerId }, select: { handle: true, email: true } }),
+    prisma.event.findUnique({ where: { id: input.eventId }, select: { title: true } }),
+  ]);
+  if (developer && event) {
+    await sendNotification({
+      userId: input.developerId,
+      to: developer.email,
+      category: "hiring",
+      template: endorsementReceivedEmail(event.title, appUrl(`/developers/${developer.handle}`)),
+    }).catch((error: unknown) => console.error("[pow] endorsement notification failed", error));
+  }
 }
 
 export async function setEndorsementVisibility(
@@ -223,6 +245,20 @@ export async function requestIntroduction(input: {
       message: input.message,
     },
   });
+
+  const [partner, developer, event] = await Promise.all([
+    prisma.user.findUnique({ where: { id: input.partnerId }, select: { name: true, email: true } }),
+    prisma.user.findUnique({ where: { id: input.developerId }, select: { email: true } }),
+    prisma.event.findUnique({ where: { id: input.eventId }, select: { title: true } }),
+  ]);
+  if (partner && developer && event) {
+    await sendNotification({
+      userId: input.developerId,
+      to: developer.email,
+      category: "hiring",
+      template: introductionRequestedEmail(partner.name ?? "A hiring partner", event.title, appUrl("/dashboard/intros")),
+    }).catch((error: unknown) => console.error("[pow] introduction notification failed", error));
+  }
 }
 
 export async function respondToIntroduction(
@@ -232,6 +268,11 @@ export async function respondToIntroduction(
 ): Promise<void> {
   const introduction = await prisma.introduction.findUnique({
     where: { id: introductionId },
+    include: {
+      hiringPartner: { select: { id: true, name: true, email: true } },
+      developer: { select: { name: true, handle: true } },
+      event: { select: { title: true } },
+    },
   });
   if (!introduction || introduction.developerId !== developerId) {
     throw new PowError("Introduction not found.", "NOT_FOUND");
@@ -247,6 +288,40 @@ export async function respondToIntroduction(
       respondedAt: new Date(),
     },
   });
+
+  const developerName = introduction.developer.name ?? introduction.developer.handle;
+  if (accept) {
+    const developerContact = await prisma.user.findUnique({
+      where: { id: developerId },
+      select: { email: true },
+    });
+    if (!developerContact) return;
+
+    await sendNotification({
+      userId: developerId,
+      to: developerContact.email,
+      category: "hiring",
+      template: introductionAcceptedDeveloperEmail(
+        introduction.hiringPartner.name ?? "The hiring partner",
+        introduction.hiringPartner.email,
+        introduction.event.title
+      ),
+    }).catch((error: unknown) => console.error("[pow] intro accepted developer email failed", error));
+
+    await sendNotification({
+      userId: introduction.hiringPartner.id,
+      to: introduction.hiringPartner.email,
+      category: "hiring",
+      template: introductionAcceptedPartnerEmail(developerName, developerContact.email, introduction.event.title),
+    }).catch((error: unknown) => console.error("[pow] intro accepted partner email failed", error));
+  } else {
+    await sendNotification({
+      userId: introduction.hiringPartner.id,
+      to: introduction.hiringPartner.email,
+      category: "hiring",
+      template: introductionDeclinedPartnerEmail(developerName),
+    }).catch((error: unknown) => console.error("[pow] intro declined email failed", error));
+  }
 }
 
 /** Contact exchange happens on acceptance — emails flow both ways. */

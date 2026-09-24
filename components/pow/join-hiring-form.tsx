@@ -15,7 +15,7 @@ export function JoinHiringForm() {
 
   return (
     <Card className="mx-auto max-w-xl">
-      <CardTitle>Become a hiring partner</CardTitle>
+      <CardTitle>Become A Hiring Partner</CardTitle>
       <CardDescription>
         Free for partners and developers. You get verified winners with receipts — win records,
         real payouts, and judge endorsements — and one-click introductions.
@@ -28,7 +28,7 @@ export function JoinHiringForm() {
         <FormError message={state.error} />
         <FormSuccess message={state.message} />
         <Button type="submit" loading={pending}>
-          Join as hiring partner
+          Join As Hiring Partner
         </Button>
       </form>
     </Card>

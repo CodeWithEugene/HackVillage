@@ -8,6 +8,18 @@ import { currentUser, requireUser } from "@/lib/auth/guards";
 import { validateHandle } from "@/lib/auth/handles";
 import { generateInviteCode, inviteExpiryFrom } from "@/lib/organizations/invitations";
 import { prisma } from "@/lib/db";
+import { sendMail } from "@/lib/ports/mail";
+import { orgInviteEmail, orgMemberJoinedEmail } from "@/lib/notifications/templates/organizations";
+import { appUrl } from "@/lib/url";
+
+async function notifyOwnerOfNewMember(orgId: string, memberName: string): Promise<void> {
+  const org = await prisma.organization.findUnique({
+    where: { id: orgId },
+    select: { name: true, owner: { select: { email: true } } },
+  });
+  if (!org) return;
+  await sendMail({ to: org.owner.email, ...orgMemberJoinedEmail(memberName, org.name) });
+}
 
 /**
  * Onboarding server actions (Phase 1). All actions verify the session and
@@ -243,11 +255,17 @@ export async function joinOrganizationAction(
     });
   });
 
+  await notifyOwnerOfNewMember(invitation.orgId, user.name ?? user.email);
+
   redirect("/organizer");
 }
 
-/** Organizer-side: generate a fresh invite code for their org. */
-export async function createOrgInviteAction(): Promise<void> {
+/**
+ * Organizer-side: generate a fresh invite code for their org. When an
+ * invitee email is given, the invite is emailed to them directly; left
+ * blank, the code is still created for the organizer to share by hand.
+ */
+export async function createOrgInviteAction(inviteeEmail?: string): Promise<void> {
   const user = await currentUser();
   if (!user?.roles.includes("ORGANIZER")) return;
 
@@ -257,15 +275,28 @@ export async function createOrgInviteAction(): Promise<void> {
   });
   if (!membership || membership.role === "MEMBER") return;
 
-  await prisma.orgInvitation.create({
-    data: {
-      orgId: membership.orgId,
-      email: user.email,
-      role: "MEMBER",
-      token: generateInviteCode(),
-      expiresAt: inviteExpiryFrom(),
-    },
-  });
+  const trimmedEmail = inviteeEmail?.trim();
+  const token = generateInviteCode();
+
+  const [org] = await prisma.$transaction([
+    prisma.organization.findUnique({ where: { id: membership.orgId }, select: { name: true } }),
+    prisma.orgInvitation.create({
+      data: {
+        orgId: membership.orgId,
+        email: trimmedEmail || user.email,
+        role: "MEMBER",
+        token,
+        expiresAt: inviteExpiryFrom(),
+      },
+    }),
+  ]);
+
+  if (trimmedEmail && org) {
+    await sendMail({
+      to: trimmedEmail,
+      ...orgInviteEmail(org.name, appUrl(`/invites/${token}`)),
+    });
+  }
 
   revalidatePath("/organizer");
 }
@@ -303,6 +334,8 @@ export async function acceptInvitationTokenAction(token: string): Promise<void> 
       update: {},
     });
   });
+
+  await notifyOwnerOfNewMember(invitation.orgId, user.name ?? user.email);
 
   redirect("/organizer");
 }

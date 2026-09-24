@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { SignInForm } from "@/components/auth/signin-form";
 
-export const metadata: Metadata = { title: "Sign in" };
+export const metadata: Metadata = { title: "Sign In" };
 
 const NOTICES: Record<string, string> = {
   registered: "Account created — check your email for the verification link.",

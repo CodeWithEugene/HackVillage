@@ -9,7 +9,7 @@ import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 import { STATUS_LABELS } from "@/lib/events/lifecycle";
 
-export const metadata: Metadata = { title: "Team queue" };
+export const metadata: Metadata = { title: "Team Queue" };
 
 export default async function JudgeEventPage({
   params,
@@ -104,7 +104,7 @@ export default async function JudgeEventPage({
                   </div>
                   <Link href={`/judge/events/${event.slug}/teams/${team.id}`}>
                     <Button size="sm" variant={finalized ? "secondary" : "primary"}>
-                      {finalized ? "Review" : "Score team"}
+                      {finalized ? "Review" : "Score Team"}
                     </Button>
                   </Link>
                 </Card>

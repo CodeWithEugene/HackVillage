@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
+import { sendMail } from "@/lib/ports/mail";
+import { kybSubmittedEmail } from "@/lib/notifications/templates/organizations";
 import { DepositError, initiateDeposit } from "@/services/escrow/deposits";
 
 export interface EscrowActionState {
@@ -69,6 +71,8 @@ export async function requestKybAction(
       entityId: orgId,
     },
   });
+
+  await sendMail({ to: user.email, ...kybSubmittedEmail(org.name) });
 
   revalidatePath("/organizer");
   return { message: "Request sent — platform staff review within 48 hours." };

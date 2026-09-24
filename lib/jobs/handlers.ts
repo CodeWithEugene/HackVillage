@@ -153,6 +153,17 @@ export async function registerJobs(): Promise<void> {
         for (const finding of result.findings) {
           console.error(`  - ${finding.kind}: ${finding.detail}`);
         }
+        const { alertAdmins } = await import("@/lib/notifications/admin-alert");
+        const { ledgerReconciliationDigestEmail } = await import("@/lib/notifications/templates/admin");
+        const { appUrl } = await import("@/lib/url");
+        await alertAdmins(
+          ledgerReconciliationDigestEmail(
+            result.findings.length,
+            result.checkedEvents,
+            result.findings,
+            appUrl("/trust")
+          )
+        ).catch((error: unknown) => console.error("[cron] reconciliation digest failed", error));
       }
     }
   });

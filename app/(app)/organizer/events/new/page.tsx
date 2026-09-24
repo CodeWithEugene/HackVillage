@@ -6,7 +6,7 @@ import { requireSurface } from "@/lib/auth/guards";
 import { getEnv } from "@/lib/env";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Create event" };
+export const metadata: Metadata = { title: "Create Event" };
 
 export default async function NewEventPage() {
   const user = await requireSurface("organizer");
@@ -22,7 +22,7 @@ export default async function NewEventPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-2xl font-bold text-ink">Create an event</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Create An Event</h1>
         <p className="mt-1 text-sm text-muted">
           Five steps to a draft. Publishing declares the prize pool — the event goes live only
           after it&apos;s locked in the Prize Vault.

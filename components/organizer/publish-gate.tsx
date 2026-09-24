@@ -19,7 +19,7 @@ export function PublishGate({ eventId }: { eventId: string }) {
   return (
     <Card className="border-brand">
       <CardTitle className="flex items-center gap-2">
-        <Rocket aria-hidden className="size-5" /> Ready to publish?
+        <Rocket aria-hidden className="size-5" /> Ready To Publish?
       </CardTitle>
       <CardDescription>
         Publishing makes the event publicly visible as <strong>pending deposit</strong>. The
