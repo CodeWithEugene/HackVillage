@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Lock } from "lucide-react";
 
 import { PublishGate } from "@/components/organizer/publish-gate";
+import { JudgingSection } from "@/components/judging/judging-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
@@ -124,6 +125,13 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
           </Link>
         </Card>
       ) : null}
+
+      {/* Judging section — LIVE events past their end, and JUDGING events */}
+      {(event.status === "LIVE" ||
+        event.status === "IN_PROGRESS" ||
+        event.status === "JUDGING") && (
+        <JudgingSection eventId={event.id} slug={event.slug} endsAt={event.endsAt} status={event.status} />
+      )}
 
       <Card>
         <CardTitle>Problem statement</CardTitle>

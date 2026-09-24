@@ -52,9 +52,23 @@ provider — sessions re-verify against the DB on every request (revocation
 preserved). Local dev: Postgres on 5432 (db: hackvillage_dev), demo login
 `organizer@hackvillage.dev` / `demopass123`, `npm run dev:fund -- <slug>`.
 
+**Phase 4 (Judging) is complete and verified**: judging data model (migration
+5 tables), pure domain (D4 rubric template validation, the structured
+feedback gate — one strength + one improvement + one next step, weighted
+results with dense tie ranking), judge management (invite by handle with
+participation exclusion, accept/decline), rubric editor that locks when
+judging opens, the open-judging gate (LIVE → JUDGING after the event ends),
+scoring screen (0–10 sliders per weighted criterion, feedback editor),
+**server-enforced finalization** — a forged client cannot finalize without
+complete scores AND the full feedback gate (proven by integration tests),
+post-finalize locks on scores and feedback, and live standings in the
+organizer command center counting finalized reviews only. Verified: lint,
+typecheck, 104 unit+integration tests, production build, plus a live HTTP
+smoke: credentials login as the seeded judge → /judge → team queue.
+
 Everything else is planned per the build plan phases — build features **in
-phase order** (Phase 4 = Judging next: rubrics, scoring, 3-point feedback
-gate, results computation).
+phase order** (Phase 5 = Payouts & Winners next: recipients, instant 50%,
+milestones, manual-review ops).
 
 ## Tech Stack (live)
 | Layer | Technology |

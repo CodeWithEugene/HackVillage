@@ -221,8 +221,47 @@ async function main(): Promise<void> {
     });
   }
 
-  console.log("Seeded: Technetium Kenya org, 1 organizer, 5 developers, 2 events, 2 teams, 1 submission.");
-  console.log("Demo login: organizer@hackvillage.dev / wanjiku@hackvillage.dev … password: demopass123");
+  // ── Judge for the live event (Phase 4 demo) ──────────────────────────
+  const judge = await prisma.user.upsert({
+    where: { email: "judge@hackvillage.dev" },
+    create: {
+      email: "judge@hackvillage.dev",
+      name: "Njeri Wambui",
+      handle: "njeri-judge",
+      passwordHash: await hash("demopass123"),
+      emailVerified: new Date(),
+      primaryRole: "DEVELOPER",
+      onboardingCompletedAt: new Date(now - 25 * DAY),
+    },
+    update: {},
+  });
+  await prisma.roleGrant.upsert({
+    where: { userId_role: { userId: judge.id, role: "JUDGE" } },
+    create: { userId: judge.id, role: "JUDGE" },
+    update: {},
+  });
+  await prisma.judgeAssignment.upsert({
+    where: { eventId_userId: { eventId: liveEvent.id, userId: judge.id } },
+    create: { eventId: liveEvent.id, userId: judge.id, status: "ACTIVE" },
+    update: {},
+  });
+  await prisma.rubric.upsert({
+    where: { eventId: liveEvent.id },
+    create: {
+      eventId: liveEvent.id,
+      criteria: [
+        { id: "innovation", label: "Innovation", weight: 25 },
+        { id: "execution", label: "Execution & completeness", weight: 25 },
+        { id: "impact", label: "Impact on the problem", weight: 20 },
+        { id: "presentation", label: "Presentation & demo", weight: 15 },
+        { id: "quality", label: "Code quality & repo", weight: 15 },
+      ],
+    },
+    update: {},
+  });
+
+  console.log("Seeded: Technetium Kenya org, 1 organizer, 5 developers, 1 judge, 2 events, 2 teams, 1 submission.");
+  console.log("Demo login: organizer@hackvillage.dev / wanjiku@hackvillage.dev / judge@hackvillage.dev … password: demopass123");
 }
 
 main()
