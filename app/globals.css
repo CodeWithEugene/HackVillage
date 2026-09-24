@@ -33,21 +33,6 @@
   --shadow-card: 0 1px 2px rgb(0 0 146 / 0.06), 0 4px 12px rgb(0 0 146 / 0.08);
 }
 
-@keyframes hv-circuit-trace {
-  0% {
-    stroke-dashoffset: 0;
-    opacity: 0;
-  }
-  5%,
-  95% {
-    opacity: 1;
-  }
-  100% {
-    stroke-dashoffset: -100;
-    opacity: 0;
-  }
-}
-
 /* Blue badges, icons and selected controls retain navy foregrounds in both themes. */
 @layer utilities {
   [data-theme="dark"] .bg-brand,
@@ -564,35 +549,6 @@
   .hero-action-secondary:hover {
     color: var(--color-ink-soft);
   }
-  .hero-circuit {
-    position: absolute;
-    width: 23%;
-    color: #000092;
-    overflow: visible;
-    pointer-events: none;
-  }
-  .hero-circuit-dot {
-    stroke: var(--color-brand);
-    stroke-width: 5;
-    stroke-linecap: round;
-    stroke-dasharray: 0.01 99.99;
-    filter: drop-shadow(0 0 3px var(--color-brand-soft));
-    animation: hv-circuit-trace 5s linear infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hero-circuit-dot {
-      animation: none;
-      display: none;
-    }
-  }
-  .hero-circuit-left {
-    left: 0;
-    top: 10%;
-  }
-  .hero-circuit-right {
-    right: 0;
-    bottom: 0;
-  }
   .hero-collage {
     display: grid;
     grid-template-columns: 0.7fr 1fr 1.13fr 1fr 0.7fr;
@@ -664,9 +620,6 @@
   }
 
   @media (max-width: 1023px) {
-    .hero-circuit {
-      width: 17%;
-    }
     .hero-copy {
       max-width: 70%;
     }
@@ -723,17 +676,6 @@
     .hero-action-secondary {
       min-height: 44px;
       font-size: 11px;
-    }
-    .hero-circuit {
-      width: 13%;
-      top: 30%;
-    }
-    .hero-circuit-left {
-      left: -8px;
-    }
-    .hero-circuit-right {
-      right: -8px;
-      top: 65%;
     }
     .hero-collage {
       gap: 7px;

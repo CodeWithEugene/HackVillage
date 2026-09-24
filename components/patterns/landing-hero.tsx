@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { CircuitLines } from "@/components/patterns/circuit-lines";
 
 function Photo({ name, alt, center = false }: { name: string; alt: string; center?: boolean }) {
   return (
@@ -22,9 +21,6 @@ export function LandingHero() {
   return (
     <section className="landing-hero font-display" aria-labelledby="hero-heading">
       <div className="hero-intro">
-        <CircuitLines className="hero-circuit hero-circuit-left" />
-        <CircuitLines className="hero-circuit hero-circuit-right" />
-
         <div className="hero-copy">
           <p className="hero-eyebrow">Open source. Real people. Real impact.</p>
           <h1 id="hero-heading" className="hero-heading">
