@@ -36,7 +36,8 @@ export function SignInForm({
 
       {(googleEnabled || githubEnabled) && (
         <>
-          <div className="mt-6 grid gap-2">
+          <p className="mt-6 text-sm font-semibold text-ink">Continue with:</p>
+          <div className={`mt-2 grid gap-2 ${googleEnabled && githubEnabled ? "grid-cols-2" : "grid-cols-1"}`}>
             {googleEnabled && (
               <Button
                 type="button"
@@ -48,7 +49,7 @@ export function SignInForm({
                   void signIn("google", { redirectTo: "/dashboard" });
                 }}
               >
-                {oauthLoading !== "google" && <GoogleIcon className="size-4" />} Continue with Google
+                {oauthLoading !== "google" && <GoogleIcon className="size-4" />} Google
               </Button>
             )}
             {githubEnabled && (
@@ -62,7 +63,7 @@ export function SignInForm({
                   void signIn("github", { redirectTo: "/dashboard" });
                 }}
               >
-                {oauthLoading !== "github" && <Github aria-hidden className="size-4" />} Continue with GitHub
+                {oauthLoading !== "github" && <Github aria-hidden className="size-4" />} GitHub
               </Button>
             )}
           </div>
