@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Github } from "lucide-react";
 
+import { NavDropdown } from "@/components/patterns/nav-dropdown";
 import { ThemeSwitcher } from "@/components/patterns/theme-switcher";
 import { cn } from "@/lib/utils";
 
@@ -10,8 +11,13 @@ interface NavLink {
 }
 
 const NAV_LINKS: NavLink[] = [
-  { href: "/events", label: "Events" },
+  { href: "/events", label: "Hackathons" },
   { href: "/developers", label: "Developers" },
+];
+
+const ORGANIZER_LINKS: NavLink[] = [
+  { href: "/onboarding/organizer", label: "Host A Hackathon" },
+  { href: "/#how-it-works", label: "How Escrow Works" },
 ];
 
 export function SiteHeader({ className }: { className?: string }) {
@@ -37,6 +43,10 @@ export function SiteHeader({ className }: { className?: string }) {
               {link.label}
             </Link>
           ))}
+          <NavDropdown label="Organizers" items={ORGANIZER_LINKS} />
+          <Link href="/trust" className="text-sm font-medium text-ink-soft hover:text-ink">
+            Trust
+          </Link>
         </nav>
         <div className="site-header-actions">
           <a

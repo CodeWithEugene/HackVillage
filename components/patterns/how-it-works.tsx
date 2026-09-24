@@ -41,7 +41,11 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section className="site-container how-it-works" aria-labelledby="how-it-works-heading">
+    <section
+      id="how-it-works"
+      className="site-container how-it-works"
+      aria-labelledby="how-it-works-heading"
+    >
       <header className="how-it-works-header">
         <div className="how-it-works-heading-block">
           <p className="how-it-works-eyebrow">How It Works</p>
