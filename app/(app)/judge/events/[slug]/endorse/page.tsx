@@ -52,7 +52,7 @@ export default async function JudgeEndorsePage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-2xl font-bold text-ink">Endorse winners</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Endorse Winners</h1>
         <p className="mt-1 text-sm text-muted">{event.title}</p>
       </header>
 

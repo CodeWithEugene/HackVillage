@@ -19,7 +19,7 @@ export default async function AdminKybPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="font-display text-2xl font-bold text-ink">KYB review queue</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">KYB Review Queue</h1>
         <Badge variant="success">{verified} verified</Badge>
       </div>
       <p className="max-w-2xl text-sm text-muted">

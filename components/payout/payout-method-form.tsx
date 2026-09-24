@@ -31,7 +31,7 @@ export function PayoutMethodForm({
 
   return (
     <Card>
-      <CardTitle>Payout method</CardTitle>
+      <CardTitle>Payout Method</CardTitle>
       <CardDescription>
         Where your winnings land. M-Pesa is instant; bank transfers take minutes to hours.
         {current?.recipientCode ? (

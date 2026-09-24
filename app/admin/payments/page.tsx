@@ -38,7 +38,7 @@ export default async function AdminPaymentsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-bold text-ink">Payment operations</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Payment Operations</h1>
         <Badge variant={kpi.trustScore >= 0.9 ? "success" : "warning"}>
           Trust KPI: {(kpi.trustScore * 100).toFixed(0)}% in 1h ({kpi.withinWindow}/{kpi.total})
         </Badge>

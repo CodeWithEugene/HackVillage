@@ -37,7 +37,7 @@ export default async function TrustPage() {
     <div className="mx-auto w-full max-w-4xl px-4 py-16">
       <header className="mb-10 text-center">
         <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">
-          The public ledger
+          The Public Ledger
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted">
           Radical transparency is the product: every prize deposit and payout on HackVillage is
@@ -107,7 +107,7 @@ export default async function TrustPage() {
       )}
 
       <section className="mt-14 rounded-card bg-ink p-8 text-paper">
-        <h2 className="font-display text-xl font-bold">How verification works</h2>
+        <h2 className="font-display text-xl font-bold">How Verification Works</h2>
         <ol className="mt-4 space-y-3 text-sm leading-6 text-paper/80">
           <li>
             <strong className="text-paper">1.</strong> The organizer deposits 100% of the declared

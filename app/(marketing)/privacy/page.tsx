@@ -25,7 +25,7 @@ export default function PrivacyPolicyPage() {
       </p>
 
       <h2>1. Information We Collect</h2>
-      <h3>Account information</h3>
+      <h3>Account Information</h3>
       <p>
         When you sign up, we collect your name, email address, and a password (stored as a
         salted hash — we never see or store it in plain text) or, if you sign in with Google or
@@ -45,7 +45,7 @@ export default function PrivacyPolicyPage() {
         introduction requests are stored to run the judging and payout workflow, and are shown
         to the relevant organizers, teammates, and judges for that event.
       </p>
-      <h3>Payment and payout data</h3>
+      <h3>Payment And Payout Data</h3>
       <p>
         HackVillage does not store your card, bank account, or M-Pesa number. Deposits and
         payouts are processed by <strong>Paystack</strong>, a licensed payment service provider,
@@ -53,7 +53,7 @@ export default function PrivacyPolicyPage() {
         (KYC) under its own privacy and compliance program. We store only the transaction
         references, amounts, and status needed to reconcile the ledger.
       </p>
-      <h3>Technical data</h3>
+      <h3>Technical Data</h3>
       <p>
         We use session cookies to keep you signed in (via Auth.js), and we log request metadata
         (IP address, user agent, timestamps) for security, rate-limiting, and abuse prevention.

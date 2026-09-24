@@ -23,7 +23,7 @@ export default function Error({
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 text-center">
       <div>
-        <h1 className="font-display text-2xl font-bold text-ink">Something went wrong</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Something Went Wrong</h1>
         <p className="mt-2 max-w-md text-muted">
           The page hit an unexpected error. Your data is safe — money operations
           fail closed on this platform. Try again, and if it persists, contact

@@ -118,9 +118,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How it works */}
+      {/* How It Works */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-20">
-        <h2 className="text-center font-display text-3xl font-bold text-ink">How it works</h2>
+        <h2 className="text-center font-display text-3xl font-bold text-ink">How It Works</h2>
         <p className="mx-auto mt-3 max-w-2xl text-center text-muted">
           A three-phase engine — from verified funds to verified outcomes.
         </p>

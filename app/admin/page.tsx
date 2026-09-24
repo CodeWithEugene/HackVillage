@@ -16,7 +16,7 @@ export default async function AdminHomePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-bold text-ink">Platform snapshot</h1>
+      <h1 className="font-display text-2xl font-bold text-ink">Platform Snapshot</h1>
       <div className="grid gap-4 sm:grid-cols-4">
         <Card>
           <p className="text-xs font-semibold uppercase text-muted">Users</p>

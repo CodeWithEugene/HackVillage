@@ -37,7 +37,7 @@ export default async function DashboardEventsPage() {
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-bold text-ink">My events</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">My Events</h1>
         <Link href="/events">
           <Button variant="secondary">Browse Events</Button>
         </Link>

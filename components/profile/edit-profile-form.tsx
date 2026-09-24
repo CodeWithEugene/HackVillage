@@ -27,7 +27,7 @@ export function EditProfileForm({ handle, defaults }: { handle: string; defaults
   return (
     <div className="mx-auto w-full max-w-xl space-y-4">
       <header>
-        <h1 className="font-display text-2xl font-bold text-ink">Your profile</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Your Profile</h1>
         <p className="mt-1 text-sm text-muted">
           Everything on your public profile is platform-verified — wins, contributions,
           endorsements. This form only sets your presentation.

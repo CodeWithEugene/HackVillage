@@ -34,7 +34,7 @@ export default async function EditEventPage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-2xl font-bold text-ink">Edit draft event</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Edit Draft Event</h1>
         <p className="mt-1 text-sm text-muted">
           Drafts stay editable. Once published, the event locks until the vault deposit flow
           arrives.

@@ -50,7 +50,7 @@ export default async function DashboardTeamsPage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-2xl font-bold text-ink">My teams</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">My Teams</h1>
         <p className="mt-1 text-sm text-muted">Invitations and the teams you build with.</p>
       </header>
 

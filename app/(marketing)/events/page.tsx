@@ -78,7 +78,7 @@ export default async function EventsPage({
     <div className="mx-auto w-full max-w-6xl px-4 py-16">
       <header className="mb-8 text-center">
         <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">
-          Prize Verified events
+          Prize Verified Events
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted">
           Every event here published with 100% of its prize pool declared — the

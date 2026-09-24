@@ -49,7 +49,7 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold text-ink">Welcome back, {firstName}</h1>
+          <h1 className="font-display text-2xl font-bold text-ink">Welcome Back, {firstName}</h1>
           <p className="mt-1 text-sm text-muted">
             Your events, teams, and payouts — {pendingInvites > 0 ? `${pendingInvites} invite${pendingInvites === 1 ? "" : "s"} waiting · ` : ""}
             {winningsInFlight > 0 ? `${winningsInFlight} payout${winningsInFlight === 1 ? "" : "s"} in flight` : "all settled"}
