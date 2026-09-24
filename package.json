@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate --schema db/schema.prisma && next build",
+    "build": "prisma generate --schema db/schema.prisma && node scripts/migrate-if-production.mjs && next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
