@@ -7,6 +7,9 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth/guards";
 import { getEnv } from "@/lib/env";
 import { prisma } from "@/lib/db";
+import { sendNotification } from "@/lib/notifications/send";
+import { eventPublishedEmail } from "@/lib/notifications/templates/events";
+import { appUrl } from "@/lib/url";
 import { canPublishDraft } from "@/lib/events/lifecycle";
 import {
   eventSlugCandidates,
@@ -214,6 +217,13 @@ export async function publishEventAction(eventId: string): Promise<EventActionSt
       // endsAt + 48h — enforced by the media job in Phase 7.
       mediaDeadlineAt: new Date(event.endsAt.getTime() + 48 * 60 * 60 * 1000),
     },
+  });
+
+  await sendNotification({
+    userId: guard.user.id,
+    to: guard.user.email,
+    category: "eventUpdates",
+    template: eventPublishedEmail(event.title, appUrl(`/organizer/events/${event.slug}`)),
   });
 
   revalidatePath("/events");

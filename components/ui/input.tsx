@@ -1,10 +1,15 @@
-import type { InputHTMLAttributes, LabelHTMLAttributes, TextareaHTMLAttributes } from "react";
+import type { InputHTMLAttributes, LabelHTMLAttributes, Ref, TextareaHTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils";
 
-export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
+export function Input({
+  className,
+  ref,
+  ...props
+}: InputHTMLAttributes<HTMLInputElement> & { ref?: Ref<HTMLInputElement> }) {
   return (
     <input
+      ref={ref}
       className={cn(
         "h-11 w-full rounded-control border border-ink/15 bg-white px-3 text-ink placeholder:text-muted/60 focus-visible:border-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50",
         className

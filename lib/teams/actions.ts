@@ -8,6 +8,14 @@ import { requireUser } from "@/lib/auth/guards";
 import { generateInviteCode } from "@/lib/organizations/invitations";
 import { prisma } from "@/lib/db";
 import { registrationOpen } from "@/lib/events/lifecycle";
+import { sendNotification } from "@/lib/notifications/send";
+import {
+  teamInviteAcceptedEmail,
+  teamInviteDeclinedEmail,
+  teamInviteEmail,
+  teamMemberLeftEmail,
+} from "@/lib/notifications/templates/teams";
+import { appUrl } from "@/lib/url";
 import { canJoinTeam, MAX_TEAM_MEMBERS, validTeamName, type TeamSnapshot } from "@/lib/teams/policy";
 
 export interface TeamActionState {
@@ -92,7 +100,7 @@ export async function inviteMemberAction(
 
   const team = await prisma.team.findUnique({
     where: { id: teamId.data },
-    include: { event: { select: { id: true, slug: true } }, members: true },
+    include: { event: { select: { id: true, slug: true, title: true } }, members: true },
   });
   if (!team || team.leaderId !== user.id) {
     return { error: "Only the team leader can invite members." };
@@ -100,7 +108,7 @@ export async function inviteMemberAction(
 
   const invitee = await prisma.user.findFirst({
     where: { handle: { equals: handle.data, mode: "insensitive" }, deletedAt: null },
-    select: { id: true },
+    select: { id: true, email: true },
   });
   if (!invitee) return { error: "No HackVillage developer uses that handle." };
 
@@ -117,6 +125,13 @@ export async function inviteMemberAction(
     where: { teamId_userId: { teamId: team.id, userId: invitee.id } },
     create: { teamId: team.id, userId: invitee.id, status: "INVITED" },
     update: { status: "INVITED" },
+  });
+
+  await sendNotification({
+    userId: invitee.id,
+    to: invitee.email,
+    category: "teamActivity",
+    template: teamInviteEmail(team.name, team.event.title, appUrl("/dashboard/teams")),
   });
 
   revalidatePath(`/events/${team.event.slug}/workspace`);
@@ -179,7 +194,9 @@ export async function acceptTeamInviteAction(teamId: string): Promise<void> {
   const user = await requireUser();
   const membership = await prisma.teamMember.findFirst({
     where: { teamId, userId: user.id, status: "INVITED" },
-    include: { team: { include: { event: true, members: true } } },
+    include: {
+      team: { include: { event: true, members: true, leader: { select: { id: true, email: true } } } },
+    },
   });
   if (!membership) redirect("/dashboard/teams");
 
@@ -194,16 +211,38 @@ export async function acceptTeamInviteAction(teamId: string): Promise<void> {
 
   await prisma.teamMember.update({ where: { id: membership.id }, data: { status: "JOINED" } });
 
+  await sendNotification({
+    userId: team.leader.id,
+    to: team.leader.email,
+    category: "teamActivity",
+    template: teamInviteAcceptedEmail(user.name ?? user.handle, team.name),
+  });
+
   revalidatePath("/dashboard/teams");
   redirect(`/events/${team.event.slug}/workspace`);
 }
 
 export async function declineTeamInviteAction(teamId: string): Promise<void> {
   const user = await requireUser();
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
+    select: { name: true, leader: { select: { id: true, email: true } } },
+  });
+
   await prisma.teamMember.updateMany({
     where: { teamId, userId: user.id, status: "INVITED" },
     data: { status: "DECLINED" },
   });
+
+  if (team) {
+    await sendNotification({
+      userId: team.leader.id,
+      to: team.leader.email,
+      category: "teamActivity",
+      template: teamInviteDeclinedEmail(user.name ?? user.handle, team.name),
+    });
+  }
+
   revalidatePath("/dashboard/teams");
 }
 
@@ -211,7 +250,11 @@ export async function leaveTeamAction(teamId: string): Promise<void> {
   const user = await requireUser();
   const membership = await prisma.teamMember.findFirst({
     where: { teamId, userId: user.id, status: "JOINED" },
-    include: { team: { include: { event: { select: { slug: true } } } } },
+    include: {
+      team: {
+        include: { event: { select: { slug: true } }, leader: { select: { id: true, email: true } } },
+      },
+    },
   });
   if (!membership) redirect("/dashboard/teams");
   const { team } = membership;
@@ -223,6 +266,13 @@ export async function leaveTeamAction(teamId: string): Promise<void> {
   await prisma.teamMember.updateMany({
     where: { teamId, userId: user.id, status: "JOINED" },
     data: { status: "LEFT" },
+  });
+
+  await sendNotification({
+    userId: team.leader.id,
+    to: team.leader.email,
+    category: "teamActivity",
+    template: teamMemberLeftEmail(user.name ?? user.handle, team.name),
   });
 
   revalidatePath(`/events/${team.event.slug}/workspace`);

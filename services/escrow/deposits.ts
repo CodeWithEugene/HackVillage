@@ -3,6 +3,14 @@ import { randomBytes } from "node:crypto";
 import { getEnv } from "@/lib/env";
 import { prisma } from "@/lib/db";
 import { getPaystackPort } from "@/lib/ports/paystack";
+import { sendNotification } from "@/lib/notifications/send";
+import { sendMail } from "@/lib/ports/mail";
+import {
+  depositFailedEmail,
+  eventLiveDeveloperEmail,
+  eventLiveOrganizerEmail,
+} from "@/lib/notifications/templates/events";
+import { appUrl } from "@/lib/url";
 import {
   depositPlanForPool,
   depositReference,
@@ -176,18 +184,72 @@ export async function recordChargeSuccess(input: {
     await enqueue("escrow.attest-vault-locked", { eventId: event.id }, {
       singletonKey: `vault-locked:${event.id}`,
     });
+
+    // Best-effort notifications, never allowed to affect the money outcome.
+    await notifyEventLive(event.id).catch((error: unknown) => {
+      console.error("[escrow] event live notification failed", error);
+    });
   }
 
   return { outcome: "recorded", vaultLocked: covered };
 }
 
+/** Notifies the organizer and registered developers once a vault locks. */
+async function notifyEventLive(eventId: string): Promise<void> {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: {
+      title: true,
+      slug: true,
+      org: { select: { owner: { select: { id: true, email: true } } } },
+      registrations: {
+        where: { status: "REGISTERED" },
+        select: { user: { select: { id: true, email: true } } },
+      },
+    },
+  });
+  if (!event) return;
+
+  const eventUrl = appUrl(`/events/${event.slug}`);
+  await sendMail({ to: event.org.owner.email, ...eventLiveOrganizerEmail(event.title, eventUrl) });
+
+  for (const registration of event.registrations) {
+    await sendNotification({
+      userId: registration.user.id,
+      to: registration.user.email,
+      category: "eventUpdates",
+      template: eventLiveDeveloperEmail(event.title, eventUrl),
+    });
+  }
+}
+
 /** Cron: INITIATED deposits expire after 24h — no orphan money states. */
 export async function expireStaleDeposits(): Promise<number> {
   const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const expired = await prisma.deposit.updateMany({
+
+  const stale = await prisma.deposit.findMany({
     where: { status: "INITIATED", createdAt: { lt: cutoff } },
+    select: {
+      id: true,
+      event: {
+        select: { title: true, slug: true, org: { select: { owner: { select: { email: true } } } } },
+      },
+    },
+  });
+  if (stale.length === 0) return 0;
+
+  const expired = await prisma.deposit.updateMany({
+    where: { id: { in: stale.map((deposit) => deposit.id) } },
     data: { status: "FAILED" },
   });
+
+  for (const deposit of stale) {
+    await sendMail({
+      to: deposit.event.org.owner.email,
+      ...depositFailedEmail(deposit.event.title, appUrl(`/organizer/events/${deposit.event.slug}`)),
+    }).catch((error: unknown) => console.error("[escrow] deposit expired notification failed", error));
+  }
+
   return expired.count;
 }
 

@@ -155,6 +155,23 @@ model User {
   introRequestsSent Introduction[] @relation("IntroRequests")
   introRequestsReceived Introduction[] @relation("IntroDeveloper")
   notifications Notification[]
+  notificationPreference NotificationPreference?
+}
+
+/// Per user email opt outs (plan: notification system). Security and money
+/// critical mail (verification, password resets, payouts, KYB, disputes)
+/// always sends and has no column here; only the non essential categories
+/// below can be turned off, each defaulting to on.
+model NotificationPreference {
+  userId        String   @id
+  eventUpdates  Boolean  @default(true)
+  teamActivity  Boolean  @default(true)
+  judging       Boolean  @default(true)
+  reminders     Boolean  @default(true)
+  hiring        Boolean  @default(true)
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {

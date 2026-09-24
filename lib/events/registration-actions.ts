@@ -6,6 +6,9 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 import { registrationOpen } from "@/lib/events/lifecycle";
+import { sendNotification } from "@/lib/notifications/send";
+import { registrationCancelledEmail, registrationConfirmedEmail } from "@/lib/notifications/templates/events";
+import { appUrl } from "@/lib/url";
 
 export interface RegistrationActionState {
   error?: string;
@@ -24,6 +27,13 @@ export async function registerForEventAction(eventSlug: string): Promise<void> {
     where: { eventId_userId: { eventId: event.id, userId: user.id } },
     create: { eventId: event.id, userId: user.id, status: "REGISTERED" },
     update: { status: "REGISTERED" },
+  });
+
+  await sendNotification({
+    userId: user.id,
+    to: user.email,
+    category: "eventUpdates",
+    template: registrationConfirmedEmail(event.title, appUrl(`/events/${eventSlug}`)),
   });
 
   revalidatePath(`/events/${eventSlug}`);
@@ -52,6 +62,13 @@ export async function cancelRegistrationAction(eventSlug: string): Promise<void>
   await prisma.registration.updateMany({
     where: { eventId: event.id, userId: user.id },
     data: { status: "CANCELLED" },
+  });
+
+  await sendNotification({
+    userId: user.id,
+    to: user.email,
+    category: "eventUpdates",
+    template: registrationCancelledEmail(event.title),
   });
 
   revalidatePath(`/events/${eventSlug}`);

@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 import { getPaystackPort } from "@/lib/ports/paystack";
+import { alertAdmins } from "@/lib/notifications/admin-alert";
+import { transferReversedAdminEmail } from "@/lib/notifications/templates/payouts";
+import { appUrl } from "@/lib/url";
 import { recordChargeSuccess } from "@/services/escrow/deposits";
 
 /**
@@ -94,7 +97,7 @@ export async function processPaystackWebhook(
     // stay locked; a human decides (P4 fail-closed).
     const payout = await prisma.payout.findFirst({
       where: { paystackReference: reference },
-      select: { id: true },
+      select: { id: true, winner: { select: { event: { select: { title: true } } } } },
     });
     if (payout) {
       await prisma.payout.updateMany({
@@ -104,6 +107,9 @@ export async function processPaystackWebhook(
           lastError: `Provider reported ${eventType}.`,
         },
       });
+      await alertAdmins(
+        transferReversedAdminEmail(payout.winner.event.title, reference, appUrl("/admin/payments"))
+      ).catch((error: unknown) => console.error("[webhook] admin alert failed", error));
     } else {
       console.error(`[webhook] ${eventType} with unknown reference: ${reference}`);
     }

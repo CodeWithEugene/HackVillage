@@ -1,5 +1,19 @@
 import { prisma } from "@/lib/db";
+import { sendMail } from "@/lib/ports/mail";
+import { sendNotification } from "@/lib/notifications/send";
 import { notify } from "@/services/media/notify";
+import { alertAdmins } from "@/lib/notifications/admin-alert";
+import {
+  disputeOpenedAdminEmail,
+  disputeOpenedOrganizerEmail,
+  disputeResolvedEmail,
+} from "@/lib/notifications/templates/admin";
+import {
+  legacyCheckinReminderEmail,
+  legacyUnresponsiveEmail,
+  milestoneReminderEmail,
+} from "@/lib/notifications/templates/legacy";
+import { appUrl } from "@/lib/url";
 
 /**
  * Legacy Tracker (Phase 8 — plan §10.7): 3-month check-ins on every
@@ -83,13 +97,16 @@ export async function runLegacySweep(now: Date = new Date()): Promise<{
             eventTitle: checkin.submission.team.event.title,
             submissionId: checkin.submissionId,
           },
-          email: {
-            to: member.user.email,
-            subject: `What happened to your ${checkin.submission.team.event.title} project?`,
-            text: `Three months ago you built something at ${checkin.submission.team.event.title}. Did it become a product? One tap updates your portfolio: STILL_DEMO, IN_PRODUCTION, PIVOTED, or ABANDONED.`,
-            html: `<p>Three months ago you built something at <strong>${checkin.submission.team.event.title}</strong>.</p><p>Did it become a product? One tap updates your portfolio — your project's real-world trajectory is part of your Proof-of-Work record.</p>`,
-          },
         });
+        await sendNotification({
+          userId: member.user.id,
+          to: member.user.email,
+          category: "reminders",
+          template: legacyCheckinReminderEmail(
+            checkin.submission.team.event.title,
+            appUrl(`/dashboard/profile`)
+          ),
+        }).catch((error: unknown) => console.error("[legacy] checkin notification failed", error));
       }
       await prisma.legacyCheckin.update({
         where: { id: checkin.id },
@@ -104,6 +121,14 @@ export async function runLegacySweep(now: Date = new Date()): Promise<{
         where: { id: checkin.id },
         data: { outcome: "UNRESPONSIVE", completedAt: now },
       });
+      for (const member of checkin.submission.team.members) {
+        await sendNotification({
+          userId: member.user.id,
+          to: member.user.email,
+          category: "reminders",
+          template: legacyUnresponsiveEmail(checkin.submission.team.event.title, appUrl("/dashboard/profile")),
+        }).catch((error: unknown) => console.error("[legacy] unresponsive notification failed", error));
+      }
       unresponsive += 1;
     }
   }
@@ -210,13 +235,13 @@ export async function runMilestoneReminders(now: Date = new Date()): Promise<num
           eventTitle: milestone.winner.event.title,
           overdueDays,
         },
-        email: {
-          to: owner.user.email,
-          subject: `Milestone pending: ${milestone.title}`,
-          text: `The final 50% for a winner of ${milestone.winner.event.title} is waiting on your milestone confirmation (${overdueDays} day${overdueDays === 1 ? "" : "s"} past due). Confirm the handover from your winners console when it's delivered.`,
-          html: `<p>The final 50% for a winner of <strong>${milestone.winner.event.title}</strong> awaits your milestone confirmation (${overdueDays} days past due).</p><p>Confirm the handover from your winners console when it's delivered.</p>`,
-        },
       });
+      await sendNotification({
+        userId: owner.user.id,
+        to: owner.user.email,
+        category: "reminders",
+        template: milestoneReminderEmail(milestone.winner.event.title, overdueDays, appUrl("/organizer")),
+      }).catch((error: unknown) => console.error("[legacy] milestone reminder failed", error));
       reminded += 1;
     }
   }
@@ -233,7 +258,10 @@ export async function openMilestoneDispute(input: {
 }): Promise<void> {
   const winner = await prisma.winner.findUnique({
     where: { id: input.winnerId },
-    include: { milestone: true },
+    include: {
+      milestone: true,
+      event: { select: { title: true, org: { select: { owner: { select: { id: true, email: true } } } } } },
+    },
   });
   if (!winner) throw new LegacyError("Win not found.", "NOT_FOUND");
   if (winner.userId !== input.userId) {
@@ -259,6 +287,14 @@ export async function openMilestoneDispute(input: {
       evidenceUrl: input.evidenceUrl ?? null,
     },
   });
+
+  await alertAdmins(
+    disputeOpenedAdminEmail(winner.event.title, input.claim, appUrl("/admin/disputes"))
+  ).catch((error: unknown) => console.error("[legacy] dispute admin alert failed", error));
+  await sendMail({
+    to: winner.event.org.owner.email,
+    ...disputeOpenedOrganizerEmail(winner.event.title),
+  }).catch((error: unknown) => console.error("[legacy] dispute organizer notice failed", error));
 }
 
 /** Admin resolution: release (audited override — the payout engine takes over) or reject. */
@@ -271,7 +307,11 @@ export async function resolveDispute(input: {
   const [dispute, adminGrant] = await Promise.all([
     prisma.dispute.findUnique({
       where: { id: input.disputeId },
-      include: { winner: { include: { event: true } } },
+      include: {
+        winner: {
+          include: { event: { include: { org: { select: { owner: { select: { email: true } } } } } } },
+        },
+      },
     }),
     prisma.roleGrant.findFirst({ where: { userId: input.adminId, role: "ADMIN" } }),
   ]);
@@ -280,6 +320,13 @@ export async function resolveDispute(input: {
   if (dispute.status !== "OPEN") {
     throw new LegacyError("This dispute is already resolved.", "WRONG_STATE");
   }
+
+  const opener = await prisma.user.findUnique({ where: { id: dispute.openedBy }, select: { email: true } });
+  const notifyDisputeResolved = async (released: boolean): Promise<void> => {
+    const template = disputeResolvedEmail(dispute.winner.event.title, released, input.note);
+    if (opener) await sendMail({ to: opener.email, ...template }).catch(() => undefined);
+    await sendMail({ to: dispute.winner.event.org.owner.email, ...template }).catch(() => undefined);
+  };
 
   if (input.resolution === "REJECT") {
     await prisma.$transaction([
@@ -302,6 +349,7 @@ export async function resolveDispute(input: {
         },
       }),
     ]);
+    await notifyDisputeResolved(false);
     return { outcome: "rejected" };
   }
 
@@ -328,6 +376,8 @@ export async function resolveDispute(input: {
       },
     }),
   ]);
+
+  await notifyDisputeResolved(true);
 
   // confirmMilestone requires an org admin; the dispute release grants the
   // admin the right to stand in. We pass the dispute opener's organizer

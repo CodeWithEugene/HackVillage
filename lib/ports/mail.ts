@@ -11,6 +11,7 @@ export interface MailMessage {
   subject: string;
   html: string;
   text: string;
+  headers?: Record<string, string>;
 }
 
 export interface MailResult {
@@ -58,6 +59,7 @@ export async function sendMail(message: MailMessage): Promise<MailResult> {
       subject: message.subject,
       htmlContent: message.html,
       textContent: message.text,
+      headers: message.headers,
     }),
   });
 

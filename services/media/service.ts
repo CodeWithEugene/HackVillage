@@ -1,6 +1,12 @@
 import { prisma } from "@/lib/db";
 import { getStoragePort, validateMediaUpload } from "@/lib/ports/storage";
-import { sendMail } from "@/lib/ports/mail";
+import { sendNotification } from "@/lib/notifications/send";
+import {
+  manualTrustAdjustmentEmail,
+  mediaAppealGrantedEmail,
+  mediaPenaltyEmail,
+} from "@/lib/notifications/templates/trust";
+import { appUrl } from "@/lib/url";
 import { trustScoreFrom } from "@/services/media/trust";
 
 /**
@@ -175,13 +181,12 @@ export async function enforceMediaDeadlines(now: Date = new Date()): Promise<Dea
       }),
     ]);
 
-    const ownerEmail = owner?.user.email;
-    if (ownerEmail) {
-      await sendMail({
-        to: ownerEmail,
-        subject: `Trust penalty: 48-hour media deadline missed (${event.title})`,
-        text: `Your event "${event.title}" passed its 48-hour media deadline with no approved gallery. A -10 trust penalty was applied to ${event.org.name}. Upload and approve the gallery to serve your community — the penalty stands, but future events are watching.`,
-        html: `<p>Your event <strong>${event.title}</strong> passed its 48-hour media deadline with no approved gallery.</p><p>A <strong>-10 trust penalty</strong> was applied to ${event.org.name}. You can appeal from your organizer page.</p>`,
+    if (owner) {
+      await sendNotification({
+        userId: owner.user.id,
+        to: owner.user.email,
+        category: "eventUpdates",
+        template: mediaPenaltyEmail(event.title, event.org.name, appUrl("/organizer")),
       }).catch(() => undefined);
     }
     penalized += 1;
@@ -206,7 +211,10 @@ export async function applyManualTrustAdjustment(input: {
     throw new MediaError("Manual adjustments are capped at ±50.", "WRONG_STATE");
   }
 
-  const org = await prisma.organization.findUnique({ where: { id: input.orgId } });
+  const org = await prisma.organization.findUnique({
+    where: { id: input.orgId },
+    include: { owner: { select: { id: true, email: true } } },
+  });
   if (!org) throw new MediaError("Organization not found.", "NOT_FOUND");
 
   await prisma.$transaction([
@@ -233,6 +241,13 @@ export async function applyManualTrustAdjustment(input: {
       },
     }),
   ]);
+
+  await sendNotification({
+    userId: org.owner.id,
+    to: org.owner.email,
+    category: "eventUpdates",
+    template: manualTrustAdjustmentEmail(org.name, input.delta, input.reason),
+  }).catch((error: unknown) => console.error("[media] trust adjustment notification failed", error));
 }
 
 export async function grantMediaAppeal(input: {
@@ -246,7 +261,10 @@ export async function grantMediaAppeal(input: {
   });
   if (!admin) throw new MediaError("Admins only.", "FORBIDDEN");
 
-  const org = await prisma.organization.findUnique({ where: { id: input.orgId } });
+  const org = await prisma.organization.findUnique({
+    where: { id: input.orgId },
+    include: { owner: { select: { id: true, email: true } } },
+  });
   if (!org) throw new MediaError("Organization not found.", "NOT_FOUND");
 
   await prisma.$transaction([
@@ -273,4 +291,11 @@ export async function grantMediaAppeal(input: {
       },
     }),
   ]);
+
+  await sendNotification({
+    userId: org.owner.id,
+    to: org.owner.email,
+    category: "eventUpdates",
+    template: mediaAppealGrantedEmail(org.name, input.note),
+  }).catch((error: unknown) => console.error("[media] appeal notification failed", error));
 }

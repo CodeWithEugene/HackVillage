@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { signOut } from "@/lib/auth";
+import { accountDeactivatedEmail, passwordChangedEmail } from "@/lib/auth/mail-templates";
 import { passwordSchema } from "@/lib/auth/password-policy";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
+import { sendMail } from "@/lib/ports/mail";
 import { rateLimit } from "@/lib/rate-limit";
 
 export interface AccountActionState {
@@ -46,6 +48,8 @@ export async function changePasswordAction(
     data: { passwordHash: await hash(parsed.data.newPassword) },
   });
 
+  await sendMail({ to: record.email, ...passwordChangedEmail() });
+
   return { message: "Password updated." };
 }
 
@@ -64,6 +68,9 @@ export async function deactivateAccountAction(
     return { error: 'Type "DEACTIVATE" to confirm this irreversible step.' };
   }
 
+  // Captured before the transaction anonymizes it below.
+  const record = await prisma.user.findUnique({ where: { id: user.id }, select: { email: true } });
+
   await prisma.$transaction(async (tx) => {
     await tx.user.update({
       where: { id: user.id },
@@ -77,6 +84,10 @@ export async function deactivateAccountAction(
     await tx.session.deleteMany({ where: { userId: user.id } });
     await tx.roleGrant.deleteMany({ where: { userId: user.id } });
   });
+
+  if (record?.email) {
+    await sendMail({ to: record.email, ...accountDeactivatedEmail() });
+  }
 
   await signOut({ redirectTo: "/" });
   redirect("/"); // belt-and-braces: signOut already redirects

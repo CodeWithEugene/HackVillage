@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
+import { sendMail } from "@/lib/ports/mail";
+import { kybApprovedEmail, kybRejectedEmail } from "@/lib/notifications/templates/organizations";
+import { appUrl } from "@/lib/url";
 
 export interface KybDecisionState {
   error?: string;
@@ -32,7 +35,10 @@ export async function decideKybAction(
     return { error: "A rejection needs a reason the organizer can act on." };
   }
 
-  const org = await prisma.organization.findUnique({ where: { id: orgId } });
+  const org = await prisma.organization.findUnique({
+    where: { id: orgId },
+    include: { owner: { select: { email: true } } },
+  });
   if (!org) return { error: "Organization not found." };
 
   await prisma.$transaction([
@@ -50,6 +56,12 @@ export async function decideKybAction(
       },
     }),
   ]);
+
+  if (decision === "APPROVE") {
+    await sendMail({ to: org.owner.email, ...kybApprovedEmail(org.name, appUrl("/organizer")) });
+  } else {
+    await sendMail({ to: org.owner.email, ...kybRejectedEmail(org.name, reason) });
+  }
 
   revalidatePath("/admin/kyb");
   return {};

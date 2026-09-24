@@ -1,83 +1,80 @@
 /**
- * Branded transactional email templates (Phase 1: verification + password
- * reset). Kept dependency-free: tables/inline styles, navy-on-paper, one
- * brand-blue button. Values are interpolated by the callers.
+ * Auth email templates: verification, password reset, password changed, and
+ * the account deactivation notice. These are security critical, so they
+ * always send and never carry an unsubscribe link.
  */
+import { renderEmail, renderText, type EmailTemplate } from "@/lib/notifications/layout";
 
-export interface EmailTemplate {
-  subject: string;
-  html: string;
-  text: string;
-}
-
-function layout(preheader: string, bodyHtml: string): string {
-  return `<!doctype html>
-<html lang="en">
-  <body style="margin:0;padding:0;background-color:#fafbf7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-    <div style="display:none;max-height:0;overflow:hidden;">${preheader}</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fafbf7;padding:32px 16px;">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#ffffff;border:1px solid #e5e5e0;border-radius:12px;overflow:hidden;">
-            <tr>
-              <td style="background-color:#000092;padding:24px 32px;color:#ffffff;font-size:18px;font-weight:700;">
-                Hack<span style="color:#04a1f1;">Village</span>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:32px;color:#000092;font-size:15px;line-height:24px;">
-                ${bodyHtml}
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:0 32px 32px;">
-                <p style="margin:0;color:#6b6b6b;font-size:12px;line-height:18px;">
-                  You received this email because an account exists on
-                  <a href="https://hackvillage.app" style="color:#000092;">HackVillage</a>.
-                  If this wasn't you, you can safely ignore it.
-                </p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>`;
-}
-
-function button(url: string, label: string): string {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
-    <tr>
-      <td style="background-color:#04a1f1;border-radius:8px;">
-        <a href="${url}" style="display:inline-block;padding:12px 28px;color:#000092;font-weight:700;text-decoration:none;">${label}</a>
-      </td>
-    </tr>
-  </table>
-  <p style="margin:0 0 8px;color:#6b6b6b;font-size:12px;">Or paste this link into your browser:<br><a href="${url}" style="color:#000092;word-break:break-all;">${url}</a></p>`;
-}
+export type { EmailTemplate };
 
 export function verificationEmail(url: string): EmailTemplate {
   return {
-    subject: "Verify your HackVillage email",
-    html: layout(
-      "One click to verify your email.",
-      `<p style="margin:0 0 8px;">Welcome aboard 👋</p>
-       <p style="margin:0;">Confirm your email address to finish creating your HackVillage account.</p>
-       ${button(url, "Verify my email")}`
-    ),
-    text: `Welcome aboard. Confirm your email address: ${url}`,
+    subject: "Verify Your HackVillage Email",
+    html: renderEmail({
+      preheader: "One click to verify your email.",
+      section: {
+        heading: "Welcome To HackVillage",
+        bodyHtml: `<p style="margin:0;">Confirm your email address to finish creating your account.</p>`,
+        ctaUrl: url,
+        ctaLabel: "Verify My Email",
+      },
+    }),
+    text: renderText(["Welcome to HackVillage.", `Confirm your email address: ${url}`]),
   };
 }
 
 export function passwordResetEmail(url: string): EmailTemplate {
   return {
-    subject: "Reset your HackVillage password",
-    html: layout(
-      "A password reset was requested for your account.",
-      `<p style="margin:0;">We received a request to reset your password. This link expires in 1 hour.</p>
-       ${button(url, "Choose a new password")}`
-    ),
-    text: `We received a request to reset your password (expires in 1 hour): ${url}`,
+    subject: "Reset Your HackVillage Password",
+    html: renderEmail({
+      preheader: "A password reset was requested for your account.",
+      section: {
+        heading: "Reset Your Password",
+        bodyHtml: `<p style="margin:0;">We got a request to reset your password. This link expires in one hour.</p>`,
+        ctaUrl: url,
+        ctaLabel: "Choose A New Password",
+      },
+    }),
+    text: renderText([
+      "We got a request to reset your password. This link expires in one hour.",
+      url,
+    ]),
+  };
+}
+
+export function passwordChangedEmail(): EmailTemplate {
+  return {
+    subject: "Your HackVillage Password Was Changed",
+    html: renderEmail({
+      preheader: "Your password was just changed.",
+      section: {
+        heading: "Password Changed",
+        bodyHtml: `<p style="margin:0;">Your HackVillage password was just changed. If this was you, there is nothing else to do.</p>
+          <p style="margin:12px 0 0;">If you did not make this change, reset your password right away and contact us at info@hackvillage.xyz.</p>`,
+      },
+    }),
+    text: renderText([
+      "Your HackVillage password was just changed.",
+      "If this was not you, reset your password right away and contact info@hackvillage.xyz.",
+    ]),
+  };
+}
+
+export function accountDeactivatedEmail(): EmailTemplate {
+  return {
+    subject: "Your HackVillage Account Was Deactivated",
+    html: renderEmail({
+      preheader: "Your account has been deactivated.",
+      section: {
+        heading: "Account Deactivated",
+        bodyHtml: `<p style="margin:0;">Your HackVillage account has been deactivated, as you asked.</p>
+          <p style="margin:12px 0 0;">Any payout you are still owed remains protected and will still be paid out on schedule. If you did not request this, contact us right away at info@hackvillage.xyz.</p>`,
+      },
+    }),
+    text: renderText([
+      "Your HackVillage account has been deactivated, as you asked.",
+      "Any payout you are still owed remains protected and will still be paid out on schedule.",
+      "If you did not request this, contact info@hackvillage.xyz right away.",
+    ]),
   };
 }
