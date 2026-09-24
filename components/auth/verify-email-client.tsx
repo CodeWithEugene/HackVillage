@@ -25,7 +25,7 @@ export function VerifyEmailClient({ token }: { token: string }) {
   if (!token) {
     return (
       <Card className="text-center">
-        <h1 className="font-display text-2xl font-bold text-ink">Verify your email</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Verify Your Email</h1>
         <p className="mt-2 text-sm text-muted">
           This page needs the link from your verification email. Open the newest email from
           HackVillage and click the button inside.
@@ -49,10 +49,10 @@ export function VerifyEmailClient({ token }: { token: string }) {
         <span className="inline-flex size-14 items-center justify-center rounded-full bg-success/15">
           <span aria-hidden className="text-3xl">✓</span>
         </span>
-        <h1 className="mt-4 font-display text-2xl font-bold text-ink">Email verified</h1>
+        <h1 className="mt-4 font-display text-2xl font-bold text-ink">Email Verified</h1>
         <p className="mt-2 text-sm text-muted">Your account is ready. Sign in to continue.</p>
         <Link href="/signin" className="mt-6 inline-block">
-          <Button>Go to sign in</Button>
+          <Button>Go To Sign In</Button>
         </Link>
       </Card>
     );
@@ -60,7 +60,7 @@ export function VerifyEmailClient({ token }: { token: string }) {
 
   return (
     <Card>
-      <h1 className="font-display text-2xl font-bold text-ink">Couldn&apos;t verify</h1>
+      <h1 className="font-display text-2xl font-bold text-ink">Couldn&apos;t Verify</h1>
       <p className="mt-2 text-sm text-danger">{verifyState.error}</p>
       <form action={resend} className="mt-6 space-y-4">
         <div>
@@ -75,7 +75,7 @@ export function VerifyEmailClient({ token }: { token: string }) {
           />
         </div>
         <Button type="submit" variant="secondary" className="w-full" loading={resending}>
-          Send a fresh verification email
+          Send A Fresh Verification Email
         </Button>
       </form>
       {resendState.message === "sent" ? (

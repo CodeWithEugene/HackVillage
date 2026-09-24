@@ -120,7 +120,7 @@ export function EditProfileForm({ handle, defaults }: { handle: string; defaults
           <FormSuccess message={state.message} />
 
           <Button type="submit" loading={pending}>
-            Save profile
+            Save Profile
           </Button>
         </form>
       </Card>

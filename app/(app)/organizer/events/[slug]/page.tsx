@@ -13,7 +13,7 @@ import { prisma } from "@/lib/db";
 import { STATUS_LABELS } from "@/lib/events/lifecycle";
 import { formatKes } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Event command center" };
+export const metadata: Metadata = { title: "Event Command Center" };
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -78,7 +78,7 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
         </div>
         {isDraft ? (
           <Link href={`/organizer/events/${event.slug}/edit`}>
-            <Button variant="secondary">Edit draft</Button>
+            <Button variant="secondary">Edit Draft</Button>
           </Link>
         ) : null}
       </header>
@@ -113,7 +113,7 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
       ) : event.status === "PENDING_DEPOSIT" ? (
         <Card className="border-warning/40">
           <CardTitle className="flex items-center gap-2">
-            <Lock aria-hidden className="size-5 text-warning" /> Waiting on the Prize Vault
+            <Lock aria-hidden className="size-5 text-warning" /> Waiting On The Prize Vault
           </CardTitle>
           <CardDescription>
             This event is public as <strong>pending deposit</strong> — visible but not live.
@@ -121,7 +121,7 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
             Prize Verified badge the moment the deposit confirms.
           </CardDescription>
           <Link href={`/organizer/events/${event.slug}/vault`} className="mt-4 inline-block">
-            <Button>Open the Prize Vault</Button>
+            <Button>Open The Prize Vault</Button>
           </Link>
         </Card>
       ) : null}
@@ -136,7 +136,7 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
       {/* Winners & payouts — after announcement */}
       {(event.status === "WINNERS_ANNOUNCED" || event.status === "SETTLED") && (
         <Card>
-          <CardTitle>Winners &amp; payouts</CardTitle>
+          <CardTitle>Winners &amp; Payouts</CardTitle>
           <CardDescription>
             Winners announced — the instant 50% paid on the day, the final 50% releasing per
             milestone confirmation. Track every payout and confirm handovers in the winners
@@ -144,17 +144,17 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
           </CardDescription>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link href={`/organizer/events/${event.slug}/winners`}>
-              <Button>Open winners console</Button>
+              <Button>Open Winners Console</Button>
             </Link>
             <Link href={`/organizer/events/${event.slug}/media`}>
-              <Button variant="secondary">Media vault (48h)</Button>
+              <Button variant="secondary">Media Vault (48h)</Button>
             </Link>
           </div>
         </Card>
       )}
 
       <Card>
-        <CardTitle>Problem statement</CardTitle>
+        <CardTitle>Problem Statement</CardTitle>
         <p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted">
           {event.problemStatement}
         </p>
@@ -192,7 +192,7 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
       </Card>
 
       <Card>
-        <CardTitle>Teams &amp; submissions ({event.teams.length})</CardTitle>
+        <CardTitle>Teams &amp; Submissions ({event.teams.length})</CardTitle>
         {event.teams.length === 0 ? (
           <CardDescription>Teams form once registration opens.</CardDescription>
         ) : (

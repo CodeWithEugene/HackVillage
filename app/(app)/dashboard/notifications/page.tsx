@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Notifications" };
 
 const TYPE_LABELS: Record<string, { title: string; detail: (payload: Record<string, unknown>) => string }> = {
   "media.penalty": {
-    title: "Trust penalty — media deadline",
+    title: "Trust Penalty — Media Deadline",
     detail: (p) =>
       `−10 for missing the 48-hour gallery on ${String(p.eventTitle ?? "an event")}.`,
   },

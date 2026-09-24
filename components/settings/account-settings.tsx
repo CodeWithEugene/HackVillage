@@ -67,7 +67,7 @@ export function AccountSettings({
       </Card>
 
       <Card>
-        <CardTitle>Change password</CardTitle>
+        <CardTitle>Change Password</CardTitle>
         <CardDescription>At least 10 characters, with a letter and a number.</CardDescription>
         <form action={changePassword} className="mt-4 space-y-4">
           <div>
@@ -94,13 +94,13 @@ export function AccountSettings({
           <FormError message={passwordState.error} />
           <FormSuccess message={passwordState.message} />
           <Button type="submit" loading={changing}>
-            Update password
+            Update Password
           </Button>
         </form>
       </Card>
 
       <Card className="border-danger/30">
-        <CardTitle className="text-danger">Danger zone</CardTitle>
+        <CardTitle className="text-danger">Danger Zone</CardTitle>
         <CardDescription>
           Deactivating anonymizes your account immediately. If you have winnings awaiting payout,
           those obligations are still honored — funds are never forfeited.
@@ -116,7 +116,7 @@ export function AccountSettings({
             <FormError message={deactivateState.error} />
             <div className="flex gap-2">
               <Button type="submit" variant="danger" loading={deactivating}>
-                Deactivate my account
+                Deactivate My Account
               </Button>
               <Button type="button" variant="secondary" onClick={() => setConfirming(false)}>
                 Cancel
@@ -125,7 +125,7 @@ export function AccountSettings({
           </form>
         ) : (
           <Button variant="danger" className="mt-4" onClick={() => setConfirming(true)}>
-            Deactivate account
+            Deactivate Account
           </Button>
         )}
       </Card>

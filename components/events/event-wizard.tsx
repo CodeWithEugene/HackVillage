@@ -287,7 +287,7 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
             </Button>
           ) : (
             <Button type="submit" loading={pending}>
-              {defaults?.eventId ? "Save draft" : "Create draft event"}
+              {defaults?.eventId ? "Save Draft" : "Create Draft Event"}
             </Button>
           )}
         </div>

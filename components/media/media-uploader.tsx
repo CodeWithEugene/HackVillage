@@ -60,7 +60,7 @@ export function MediaUploader({ eventId }: { eventId: string }) {
   return (
     <Card>
       <CardTitle className="flex items-center gap-2">
-        <Upload aria-hidden className="size-5" /> Upload event media
+        <Upload aria-hidden className="size-5" /> Upload Event Media
       </CardTitle>
       <CardDescription>
         High-resolution photos and clips — the gallery developers and the community see.
@@ -101,7 +101,7 @@ export function MediaUploader({ eventId }: { eventId: string }) {
         </label>
         <FormError message={state.error} />
         <Button type="submit" className="mt-4" loading={pending || uploading != null}>
-          Upload to the vault
+          Upload To The Vault
         </Button>
       </form>
     </Card>

@@ -8,7 +8,7 @@ import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 import type { Criterion, FeedbackKind } from "@/lib/judging/compute";
 
-export const metadata: Metadata = { title: "Score team" };
+export const metadata: Metadata = { title: "Score Team" };
 
 export default async function JudgeTeamPage({
   params,

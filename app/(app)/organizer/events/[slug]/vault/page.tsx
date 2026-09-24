@@ -109,7 +109,7 @@ export default async function VaultPage({
       {!vaultLive && event.status === "PENDING_DEPOSIT" ? (
         <Card>
           <CardTitle className="flex items-center gap-2">
-            <Lock aria-hidden className="size-5" /> Fund the vault to go live
+            <Lock aria-hidden className="size-5" /> Fund The Vault To Go Live
           </CardTitle>
           <CardDescription>
             The deposit covers the remaining pool plus the platform fee. The event flips LIVE the
@@ -176,7 +176,7 @@ export default async function VaultPage({
 
       {event.ledgerEntries.length > 0 ? (
         <Card>
-          <CardTitle>On-chain attestations</CardTitle>
+          <CardTitle>On Chain Attestations</CardTitle>
           <ul className="mt-3 space-y-2 text-sm">
             {event.ledgerEntries.map((entry) => (
               <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2">

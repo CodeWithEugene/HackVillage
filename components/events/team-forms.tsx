@@ -22,7 +22,7 @@ export function TeamForms({ eventId }: { eventId: string }) {
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardTitle className="flex items-center gap-2">
-          <UsersRound aria-hidden className="size-5" /> Create a team
+          <UsersRound aria-hidden className="size-5" /> Create A Team
         </CardTitle>
         <CardDescription>
           You become the leader. Share the team code with teammates, or invite them by handle.
@@ -35,14 +35,14 @@ export function TeamForms({ eventId }: { eventId: string }) {
           </div>
           <FormError message={createState.error} />
           <Button type="submit" loading={creating}>
-            Create team
+            Create Team
           </Button>
         </form>
       </Card>
 
       <Card>
         <CardTitle className="flex items-center gap-2">
-          <UserPlus aria-hidden className="size-5" /> Join with a team code
+          <UserPlus aria-hidden className="size-5" /> Join With A Team Code
         </CardTitle>
         <CardDescription>
           Got a code from a team leader? Drop it here to join their team.
@@ -54,7 +54,7 @@ export function TeamForms({ eventId }: { eventId: string }) {
           </div>
           <FormError message={joinState.error} />
           <Button type="submit" variant="secondary" loading={joining}>
-            Join team
+            Join Team
           </Button>
         </form>
       </Card>

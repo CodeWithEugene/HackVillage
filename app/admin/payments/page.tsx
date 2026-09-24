@@ -45,7 +45,7 @@ export default async function AdminPaymentsPage() {
       </div>
 
       <Card>
-        <CardTitle>Open payout queue ({payouts.length})</CardTitle>
+        <CardTitle>Open Payout Queue ({payouts.length})</CardTitle>
         <p className="mt-2 text-sm text-muted">
           Failed payouts retry automatically with backoff until the attempt cap, then land here.
           Funds stay locked the whole time — nothing is ever lost. &ldquo;Mark paid&rdquo; requires

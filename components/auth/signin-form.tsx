@@ -25,7 +25,7 @@ export function SignInForm({
 
   return (
     <Card>
-      <h1 className="font-display text-2xl font-bold text-ink">Welcome back</h1>
+      <h1 className="font-display text-2xl font-bold text-ink">Welcome Back</h1>
       <p className="mt-1 text-sm text-muted">Sign in to your HackVillage account.</p>
 
       {notice ? <FormSuccess message={notice} /> : null}
@@ -90,7 +90,7 @@ export function SignInForm({
         )}
 
         <Button type="submit" className="w-full" loading={pending}>
-          Sign in
+          Sign In
         </Button>
       </form>
 

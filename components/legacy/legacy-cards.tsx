@@ -24,7 +24,7 @@ export function LegacyCheckinCard({
 
   return (
     <Card>
-      <CardTitle>What happened to your {eventTitle} project?</CardTitle>
+      <CardTitle>What Happened To Your {eventTitle} Project?</CardTitle>
       <CardDescription>
         Three months on — did it become a product? {dueLabel} Your answer updates the lifecycle
         badge on your Proof-of-Work portfolio (real-world trajectory is part of the record).
@@ -57,7 +57,7 @@ export function LegacyCheckinCard({
         <FormError message={state.error} />
         <FormSuccess message={state.message} />
         <Button type="submit" loading={pending}>
-          Record outcome
+          Record Outcome
         </Button>
       </form>
     </Card>
@@ -73,7 +73,7 @@ export function DisputeForm({ winnerId }: { winnerId: string }) {
 
   return (
     <Card className="border-warning/40">
-      <CardTitle>Milestone not confirmed?</CardTitle>
+      <CardTitle>Milestone Not Confirmed?</CardTitle>
       <CardDescription>
         If you delivered and the organizer isn&apos;t confirming, open a dispute. Funds stay locked
         until platform staff review both sides — nothing is ever lost.
@@ -90,7 +90,7 @@ export function DisputeForm({ winnerId }: { winnerId: string }) {
         <FormError message={state.error} />
         <FormSuccess message={state.message} />
         <Button type="submit" variant="secondary" loading={pending}>
-          Open dispute
+          Open Dispute
         </Button>
       </form>
     </Card>

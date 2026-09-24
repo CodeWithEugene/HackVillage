@@ -6,7 +6,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { getEnv } from "@/lib/env";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Edit event" };
+export const metadata: Metadata = { title: "Edit Event" };
 
 export default async function EditEventPage({
   params,

@@ -18,7 +18,7 @@ export default function TermsOfServicePage() {
         you don&apos;t agree, please don&apos;t use the platform.
       </p>
 
-      <h2>1. What HackVillage is</h2>
+      <h2>1. What HackVillage Is</h2>
       <p>
         HackVillage is open-source infrastructure for high-impact tech events: organizers host
         Prize Verified hackathons with escrowed prize pools, developers register, form teams,
@@ -32,7 +32,7 @@ export default function TermsOfServicePage() {
         payment service provider. We do not hold, transmit, or have custody of funds ourselves.
       </p>
 
-      <h2>2. Eligibility and accounts</h2>
+      <h2>2. Eligibility And Accounts</h2>
       <ul>
         <li>You must be at least 18 years old, or have a parent/guardian&apos;s consent and involvement, to create an account.</li>
         <li>You&apos;re responsible for keeping your login credentials secure and for all activity under your account.</li>
@@ -40,7 +40,7 @@ export default function TermsOfServicePage() {
         <li>One account per person. Organization accounts may have multiple authorized members.</li>
       </ul>
 
-      <h2>3. Organizer obligations</h2>
+      <h2>3. Organizer Obligations</h2>
       <ul>
         <li>
           An event may only display the &ldquo;Prize Verified&rdquo; badge once 100% of its
@@ -60,7 +60,7 @@ export default function TermsOfServicePage() {
         </li>
       </ul>
 
-      <h2>4. Developer and participant conduct</h2>
+      <h2>4. Developer And Participant Conduct</h2>
       <ul>
         <li>Submissions must be your own or your team&apos;s original work, built within the event&apos;s rules and timeframe, unless an event&apos;s own rules state otherwise.</li>
         <li>Plagiarism, impersonation, vote manipulation, and collusion with judges are prohibited and grounds for disqualification and account suspension.</li>
@@ -68,7 +68,7 @@ export default function TermsOfServicePage() {
         <li>Winning-team payout splits, when a team has multiple members, are the team&apos;s own responsibility to agree on before requesting payout.</li>
       </ul>
 
-      <h2>5. Public data and Proof-of-Work profiles</h2>
+      <h2>5. Public Data And Proof-of-Work Profiles</h2>
       <p>
         By participating in events, you consent to your verified participation, results,
         endorsements, and (if connected) public GitHub activity being displayed on your public
@@ -77,7 +77,7 @@ export default function TermsOfServicePage() {
         <a href="/privacy">Privacy Policy</a> for exactly what&apos;s public versus private.
       </p>
 
-      <h2>6. Fees and payments</h2>
+      <h2>6. Fees And Payments</h2>
       <p>
         HackVillage charges organizers a platform fee (a percentage of the declared prize pool,
         shown before deposit) to fund the escrow attestation, judging tooling, and payout
@@ -86,7 +86,7 @@ export default function TermsOfServicePage() {
         separately and are disclosed at checkout.
       </p>
 
-      <h2>7. Open source</h2>
+      <h2>7. Open Source</h2>
       <p>
         HackVillage&apos;s platform code is open source under the Apache License 2.0, available
         at{" "}
@@ -97,7 +97,7 @@ export default function TermsOfServicePage() {
         name, logo, hosted data, or any specific event&apos;s content.
       </p>
 
-      <h2>8. Prohibited conduct</h2>
+      <h2>8. Prohibited Conduct</h2>
       <ul>
         <li>Attempting to defraud the escrow, payout, or judging systems.</li>
         <li>Uploading malware, or content that is unlawful, infringing, or harassing.</li>
@@ -115,7 +115,7 @@ export default function TermsOfServicePage() {
         acting outside our control.
       </p>
 
-      <h2>10. Limitation of liability</h2>
+      <h2>10. Limitation Of Liability</h2>
       <p>
         To the maximum extent permitted by law, HackVillage and Technetium Kenya are not liable
         for indirect, incidental, or consequential damages arising from your use of the
@@ -131,7 +131,7 @@ export default function TermsOfServicePage() {
         refund rules — never left in an ambiguous or partially-paid state.
       </p>
 
-      <h2>12. Governing law</h2>
+      <h2>12. Governing Law</h2>
       <p>
         These Terms are governed by the laws of Kenya. Disputes will first be attempted to
         resolve informally by contacting{" "}
@@ -139,7 +139,7 @@ export default function TermsOfServicePage() {
         under the jurisdiction of the courts of Kenya.
       </p>
 
-      <h2>13. Changes to these Terms</h2>
+      <h2>13. Changes To These Terms</h2>
       <p>
         We&apos;ll update the &ldquo;Last updated&rdquo; date above when these Terms change, and
         post material changes prominently before they take effect. Continued use of HackVillage

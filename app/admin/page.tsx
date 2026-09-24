@@ -51,19 +51,19 @@ export default async function AdminHomePage() {
         </Link>
         <Link href="/admin/kyb">
           <Card className="transition-shadow hover:shadow-lg">
-            <CardTitle>KYB review</CardTitle>
+            <CardTitle>KYB Review</CardTitle>
             <CardDescription>Business verification queue — gates first deposits.</CardDescription>
           </Card>
         </Link>
         <Link href="/admin/payments">
           <Card className="transition-shadow hover:shadow-lg">
-            <CardTitle>Payment ops</CardTitle>
+            <CardTitle>Payment Ops</CardTitle>
             <CardDescription>Failed payouts, retries, and manual receipts.</CardDescription>
           </Card>
         </Link>
         <Link href="/admin/trust">
           <Card className="transition-shadow hover:shadow-lg">
-            <CardTitle>Trust ledger</CardTitle>
+            <CardTitle>Trust Ledger</CardTitle>
             <CardDescription>Penalties, appeals, and manual adjustments.</CardDescription>
           </Card>
         </Link>

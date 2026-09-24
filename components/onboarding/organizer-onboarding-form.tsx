@@ -98,7 +98,7 @@ export function OrganizerOnboardingForm({
             </div>
             <FormError message={createState.error} />
             <Button type="submit" className="w-full" loading={creating}>
-              Create organization
+              Create Organization
             </Button>
           </form>
         ) : (
@@ -121,7 +121,7 @@ export function OrganizerOnboardingForm({
             </div>
             <FormError message={joinState.error} />
             <Button type="submit" className="w-full" loading={joining}>
-              Join organization
+              Join Organization
             </Button>
           </form>
         )}

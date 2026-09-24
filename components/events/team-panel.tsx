@@ -102,7 +102,7 @@ export function TeamPanel({
             </div>
             <FormError message={inviteState.error} />
             <Button type="submit" size="sm" variant="secondary" loading={inviting}>
-              <UserPlus aria-hidden className="size-4" /> Send invite
+              <UserPlus aria-hidden className="size-4" /> Send Invite
             </Button>
           </form>
 

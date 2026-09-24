@@ -43,7 +43,7 @@ export function FundVaultForm({
         <FormError message={state.error} />
       )}
       <Button type="submit" loading={pending} disabled={Boolean(disabled)}>
-        Fund the Prize Vault
+        Fund The Prize Vault
       </Button>
     </form>
   );
@@ -68,7 +68,7 @@ export function KybRequestForm({ orgId }: { orgId: string }) {
       <FormError message={state.error} />
       <FormSuccess message={state.message} />
       <Button type="submit" variant="secondary" loading={pending}>
-        Request KYB review
+        Request KYB Review
       </Button>
     </form>
   );

@@ -41,7 +41,7 @@ export default async function AdminDisputesPage() {
 
       {disputes.length === 0 ? (
         <Card>
-          <CardTitle>No disputes</CardTitle>
+          <CardTitle>No Disputes</CardTitle>
           <p className="mt-2 text-sm text-muted">
             The queue is clear — no milestones are being disputed.
           </p>

@@ -38,7 +38,7 @@ export function SignUpForm({
 
   return (
     <Card>
-      <h1 className="font-display text-2xl font-bold text-ink">Create your account</h1>
+      <h1 className="font-display text-2xl font-bold text-ink">Create Your Account</h1>
       <p className="mt-1 text-sm text-muted">
         One account, many roles — you can add organizer or judge access later.
       </p>
@@ -132,7 +132,7 @@ export function SignUpForm({
         <FormError message={state.error} />
 
         <Button type="submit" className="w-full" loading={pending}>
-          Create account
+          Create Account
         </Button>
       </form>
 

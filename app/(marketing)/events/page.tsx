@@ -107,7 +107,7 @@ export default async function EventsPage({
           description="Events land here as organizers publish them. The first Prize Verified pilot lands with the platform launch."
           action={
             <Link href="/onboarding/organizer">
-              <Button>Host the first event</Button>
+              <Button>Host The First Event</Button>
             </Link>
           }
         />

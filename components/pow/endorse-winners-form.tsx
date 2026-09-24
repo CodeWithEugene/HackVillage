@@ -26,7 +26,7 @@ export function EndorseWinnersForm({
   return (
     <Card>
       <CardTitle className="flex items-center gap-2">
-        <Quote aria-hidden className="size-5" /> Endorse the winners
+        <Quote aria-hidden className="size-5" /> Endorse The Winners
       </CardTitle>
       <CardDescription>
         Your endorsement is permanent proof on the winner&apos;s Proof-of-Work profile — one line
@@ -58,7 +58,7 @@ export function EndorseWinnersForm({
               placeholder={`What makes ${winner.name.split(" ")[0]}'s work stand out?`}
             />
             <Button type="submit" size="sm" variant="secondary" className="mt-2" loading={pending}>
-              Publish endorsement
+              Publish Endorsement
             </Button>
           </form>
         ))}

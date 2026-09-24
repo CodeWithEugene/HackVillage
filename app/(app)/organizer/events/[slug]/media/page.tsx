@@ -10,7 +10,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Media vault" };
+export const metadata: Metadata = { title: "Media Vault" };
 
 export default async function EventMediaPage({
   params,
@@ -62,7 +62,7 @@ export default async function EventMediaPage({
 
       {pastDeadline && approvedCount === 0 ? (
         <Card className="border-danger/40">
-          <CardTitle className="text-danger">The 48-hour window has closed</CardTitle>
+          <CardTitle className="text-danger">The 48 Hour Window Has Closed</CardTitle>
           <CardDescription>
             A −10 trust penalty applies to {event.org.name} for missing the media deadline. You can
             still upload the gallery — late is far better than never — and appeal from your
@@ -74,7 +74,7 @@ export default async function EventMediaPage({
       {!pastDeadline && approvedCount === 0 ? (
         <Card className="border-warning/40">
           <CardTitle className="flex items-center gap-2">
-            <Camera aria-hidden className="size-5" /> The 48-hour promise
+            <Camera aria-hidden className="size-5" /> The 48 Hour Promise
           </CardTitle>
           <CardDescription>
             High-res photos land within 48 hours of the event — that&apos;s the HackVillage

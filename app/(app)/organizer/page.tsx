@@ -29,7 +29,7 @@ export default async function OrganizerPage() {
         description="Organizations hold escrowed prize pools and run events. Create one to start organizing — it takes a minute."
         action={
           <Link href="/onboarding/organizer">
-            <Button>Create organization</Button>
+            <Button>Create Organization</Button>
           </Link>
         }
       />
@@ -73,7 +73,7 @@ export default async function OrganizerPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Plus aria-hidden className="size-5" /> Run an event
+              <Plus aria-hidden className="size-5" /> Run An Event
             </CardTitle>
             <CardDescription>
               Five steps to a draft; publishing declares the prize pool. The vault deposit flow
@@ -81,7 +81,7 @@ export default async function OrganizerPage() {
             </CardDescription>
           </div>
           <Link href="/organizer/events/new">
-            <Button>Create event</Button>
+            <Button>Create Event</Button>
           </Link>
         </div>
       </Card>

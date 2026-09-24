@@ -58,7 +58,7 @@ export function TrustAdjustForm({
             <Input id={`appeal-note-${orgId}`} name="reason" required minLength={6} maxLength={300} placeholder="Why should this penalty be reversed?" />
           </div>
           <Button type="submit" size="sm" variant="secondary" loading={pending}>
-            Grant appeal
+            Grant Appeal
           </Button>
         </div>
       )}

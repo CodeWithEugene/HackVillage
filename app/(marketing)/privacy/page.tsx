@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
         private.
       </p>
 
-      <h2>1. Information we collect</h2>
+      <h2>1. Information We Collect</h2>
       <h3>Account information</h3>
       <p>
         When you sign up, we collect your name, email address, and a password (stored as a
@@ -32,14 +32,14 @@ export default function PrivacyPolicyPage() {
         GitHub, the profile information those providers share with us (name, email, and public
         profile photo).
       </p>
-      <h3>Profile and Proof-of-Work data</h3>
+      <h3>Profile And Proof-of-Work Data</h3>
       <p>
         Developer accounts have a public handle and profile page showing verified event
         participation, win/loss record, judge endorsements, and — where you connect it — public
         GitHub contribution activity. We do not accept self-reported stats; profile metrics are
         derived only from verified platform activity.
       </p>
-      <h3>Event, team, and submission data</h3>
+      <h3>Event, Team, And Submission Data</h3>
       <p>
         Event details, team rosters, project submissions, judge scores and feedback, and hiring
         introduction requests are stored to run the judging and payout workflow, and are shown
@@ -61,7 +61,7 @@ export default function PrivacyPolicyPage() {
         use cookies or track individuals across sites.
       </p>
 
-      <h2>2. What&apos;s public vs. private</h2>
+      <h2>2. What&apos;s Public Vs. Private</h2>
       <p>
         Because trust is the product, some data is intentionally public once you opt in to it:
       </p>
@@ -79,7 +79,7 @@ export default function PrivacyPolicyPage() {
         and judges, and HackVillage staff where necessary to operate the service.
       </p>
 
-      <h2>3. How we use your information</h2>
+      <h2>3. How We Use Your Information</h2>
       <ul>
         <li>To create and secure your account, and authenticate you on future visits.</li>
         <li>To run events: registration, team formation, judging, results, and payouts.</li>
@@ -91,7 +91,7 @@ export default function PrivacyPolicyPage() {
       </ul>
       <p>We do not sell your personal data, and we do not run third-party advertising.</p>
 
-      <h2>4. Who we share data with</h2>
+      <h2>4. Who We Share Data With</h2>
       <p>
         We share the minimum data necessary with the following processors, each bound by their
         own data protection obligations:
@@ -126,7 +126,7 @@ export default function PrivacyPolicyPage() {
         never share your data with third parties for their own marketing purposes.
       </p>
 
-      <h2>5. A note on blockchain data</h2>
+      <h2>5. A Note On Blockchain Data</h2>
       <p>
         Escrow deposits and payouts are attested to the Polygon blockchain so anyone can verify
         that prize money was real. Entries on a public blockchain are <strong>immutable</strong>{" "}
@@ -135,7 +135,7 @@ export default function PrivacyPolicyPage() {
         identifiers.
       </p>
 
-      <h2>6. Data retention</h2>
+      <h2>6. Data Retention</h2>
       <p>
         We keep payout and financial records for at least seven years to meet financial
         record-keeping norms. Account and profile data is kept for as long as your account is
@@ -144,7 +144,7 @@ export default function PrivacyPolicyPage() {
         deleted, but are no longer linked to your private contact information.
       </p>
 
-      <h2>7. Your rights</h2>
+      <h2>7. Your Rights</h2>
       <p>
         Under Kenya&apos;s Data Protection Act, 2019 (and equivalent laws where you live), you
         have the right to:
@@ -172,13 +172,13 @@ export default function PrivacyPolicyPage() {
         lapses.
       </p>
 
-      <h2>9. Children&apos;s privacy</h2>
+      <h2>9. Children&apos;s Privacy</h2>
       <p>
         HackVillage is not directed at children under 18. If you believe a minor has created an
         account, contact us and we&apos;ll remove it.
       </p>
 
-      <h2>10. International data transfers</h2>
+      <h2>10. International Data Transfers</h2>
       <p>
         Our infrastructure providers (Vercel, Neon, Cloudflare) operate global networks, which
         means your data may be processed outside Kenya. Each provider maintains its own
@@ -193,7 +193,7 @@ export default function PrivacyPolicyPage() {
         operate the platform.
       </p>
 
-      <h2>12. Changes to this policy</h2>
+      <h2>12. Changes To This Policy</h2>
       <p>
         We&apos;ll update the &ldquo;Last updated&rdquo; date above whenever this policy changes,
         and post material changes prominently on the site before they take effect.

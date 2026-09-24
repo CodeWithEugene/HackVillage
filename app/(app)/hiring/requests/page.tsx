@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Intro requests" };
+export const metadata: Metadata = { title: "Intro Requests" };
 
 export default async function HiringRequestsPage() {
   const user = await requireOnboardedUser();

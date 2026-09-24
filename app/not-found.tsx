@@ -16,10 +16,10 @@ export default function NotFound() {
       </div>
       <div className="flex gap-3">
         <Link href="/">
-          <Button>Back home</Button>
+          <Button>Back Home</Button>
         </Link>
         <Link href="/events">
-          <Button variant="secondary">Browse events</Button>
+          <Button variant="secondary">Browse Events</Button>
         </Link>
       </div>
     </div>

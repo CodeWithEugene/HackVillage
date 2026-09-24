@@ -8,7 +8,7 @@ import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 import { formatKes } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Request introduction" };
+export const metadata: Metadata = { title: "Request Introduction" };
 
 export default async function RequestIntroPage({
   params,

@@ -10,7 +10,7 @@ import { prisma } from "@/lib/db";
 import { getEnv } from "@/lib/env";
 
 export const metadata: Metadata = {
-  title: "Trust — public ledger",
+  title: "Trust — Public Ledger",
   description:
     "Every Prize Vault deposit and payout, attested on-chain. Verify that a hackathon's money was real before it went live.",
 };

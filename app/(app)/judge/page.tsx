@@ -98,7 +98,7 @@ export default async function JudgeHomePage() {
                   </div>
                 ) : (
                   <Link href={`/judge/events/${assignment.event.slug}`}>
-                    <Button size="sm">Open team queue</Button>
+                    <Button size="sm">Open Team Queue</Button>
                   </Link>
                 )}
               </Card>

@@ -8,7 +8,7 @@ import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 import { formatKes } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Talent directory" };
+export const metadata: Metadata = { title: "Talent Directory" };
 
 export default async function HiringPage() {
   const user = await requireOnboardedUser();
@@ -51,7 +51,7 @@ export default async function HiringPage() {
       {!isPartner ? (
         <Card className="border-brand">
           <CardTitle className="flex items-center gap-2">
-            <Briefcase aria-hidden className="size-5" /> Hiring here?
+            <Briefcase aria-hidden className="size-5" /> Hiring Here?
           </CardTitle>
           <CardDescription>
             Join as a hiring partner to request verified introductions. It&apos;s free — you pay
@@ -65,7 +65,7 @@ export default async function HiringPage() {
         </Card>
       ) : (
         <Card>
-          <CardTitle>Partner mode active</CardTitle>
+          <CardTitle>Partner Mode Active</CardTitle>
           <CardDescription>
             Request introductions from any verified winner&apos;s profile — track them in{" "}
             <Link href="/hiring/requests" className="underline hover:text-ink">

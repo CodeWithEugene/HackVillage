@@ -72,11 +72,11 @@ export default function LandingPage() {
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link href="/events">
-            <Button size="lg">Browse events</Button>
+            <Button size="lg">Browse Events</Button>
           </Link>
           <a href="https://github.com/CodeWithEugene/HackVillage">
             <Button size="lg" variant="secondary">
-              Host a Prize Verified event
+              Host A Prize Verified Event
             </Button>
           </a>
         </div>
@@ -150,11 +150,11 @@ export default function LandingPage() {
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/events">
-              <Button size="lg">Browse events</Button>
+              <Button size="lg">Browse Events</Button>
             </Link>
             <a href="https://github.com/CodeWithEugene/HackVillage">
               <Button size="lg" variant="secondary" className="border-paper/30 text-paper hover:bg-paper/10">
-                Read the build plan
+                Read The Build Plan
               </Button>
             </a>
           </div>

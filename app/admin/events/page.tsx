@@ -25,7 +25,7 @@ export default async function AdminEventsPage() {
       <h1 className="font-display text-2xl font-bold text-ink">Events</h1>
 
       <Card>
-        <CardTitle>All events ({events.length})</CardTitle>
+        <CardTitle>All Events ({events.length})</CardTitle>
         <ul className="mt-3 divide-y divide-ink/5">
           {events.map((event) => (
             <li key={event.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">

@@ -89,7 +89,7 @@ export default async function WinningsPage() {
 
       {!profile?.payoutRecipientCode ? (
         <Card className="border-warning/40">
-          <CardTitle className="text-base">Add a payout method</CardTitle>
+          <CardTitle className="text-base">Add A Payout Method</CardTitle>
           <CardDescription>
             You have no M-Pesa or bank destination on file — winnings can&apos;t flow until you do.
             It takes a minute.

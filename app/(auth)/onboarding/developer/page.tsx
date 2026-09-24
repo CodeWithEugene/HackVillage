@@ -5,7 +5,7 @@ import { DeveloperProfileForm } from "@/components/onboarding/developer-profile-
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Developer onboarding" };
+export const metadata: Metadata = { title: "Developer Onboarding" };
 
 export default async function DeveloperOnboardingPage() {
   const user = await requireUser();

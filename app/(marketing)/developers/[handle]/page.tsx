@@ -216,7 +216,7 @@ export default async function DeveloperProfilePage({ params }: ProfilePageProps)
 
       {endorsements.length > 0 ? (
         <Card className="mt-6">
-          <CardTitle>Judge endorsements</CardTitle>
+          <CardTitle>Judge Endorsements</CardTitle>
           <ul className="mt-3 space-y-4">
             {endorsements.map((endorsement) => (
               <li key={endorsement.id} className="border-l-4 border-brand pl-4">

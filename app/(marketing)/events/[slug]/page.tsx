@@ -155,7 +155,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
       </div>
 
       <Card className="mt-6">
-        <CardTitle>Problem statement</CardTitle>
+        <CardTitle>Problem Statement</CardTitle>
         <p className="mt-3 whitespace-pre-line leading-7 text-ink-soft">
           {event.problemStatement}
         </p>
@@ -176,7 +176,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Card>
-          <CardTitle>Prize breakdown</CardTitle>
+          <CardTitle>Prize Breakdown</CardTitle>
           <table className="mt-3 w-full text-sm">
             <tbody>
               {event.prizes.map((prize) => {
@@ -233,7 +233,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
       {/* Public gallery — 48-hour media vault */}
       {gallery.length > 0 ? (
         <Card className="mt-6">
-          <CardTitle>Event gallery</CardTitle>
+          <CardTitle>Event Gallery</CardTitle>
           <ul className="mt-4 grid gap-3 sm:grid-cols-3">
             {gallery.map((asset) => (
               <li key={asset.id} className="overflow-hidden rounded-card border border-ink/10">
@@ -258,24 +258,24 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           <div className="flex flex-wrap items-center gap-3">
             <Badge variant="success">Registered ✓</Badge>
             <Link href={`/events/${event.slug}/workspace`}>
-              <Button>Open team workspace</Button>
+              <Button>Open Team Workspace</Button>
             </Link>
           </div>
         ) : open ? (
           viewer ? (
             <form action={`/api/events/${event.slug}/register`} method="post">
               <Button type="submit" size="lg">
-                Register for this event
+                Register For This Event
               </Button>
             </form>
           ) : (
             <Link href="/signin">
-              <Button size="lg">Sign in to register</Button>
+              <Button size="lg">Sign In To Register</Button>
             </Link>
           )
         ) : (
           <Button size="lg" disabled>
-            Registration closed
+            Registration Closed
           </Button>
         )}
       </div>

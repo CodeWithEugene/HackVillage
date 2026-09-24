@@ -30,7 +30,7 @@ export default async function AdminKybPage() {
 
       {orgs.length === 0 ? (
         <Card>
-          <CardTitle>Queue is clear</CardTitle>
+          <CardTitle>Queue Is Clear</CardTitle>
           <p className="mt-2 text-sm text-muted">No organizations are waiting for review.</p>
         </Card>
       ) : (

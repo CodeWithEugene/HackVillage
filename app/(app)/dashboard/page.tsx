@@ -82,7 +82,7 @@ export default async function DashboardPage() {
         action={
           dueCheckins.length > 0 ? undefined : (
             <Link href="/events">
-              <Button>Browse events</Button>
+              <Button>Browse Events</Button>
             </Link>
           )
         }
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
       {dueCheckins.length === 0 ? (
         <Card>
           <CardTitle className="flex items-center gap-2">
-            <Rocket aria-hidden className="size-5" /> The full loop is live
+            <Rocket aria-hidden className="size-5" /> The Full Loop Is Live
           </CardTitle>
           <CardDescription>
             Escrowed prize pools, 50/50 payouts, structured judge feedback, verified Proof-of-Work

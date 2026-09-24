@@ -33,7 +33,7 @@ export default function Error({
           <p className="mt-2 font-mono text-xs text-muted">Ref: {error.digest}</p>
         ) : null}
       </div>
-      <Button onClick={reset}>Try again</Button>
+      <Button onClick={reset}>Try Again</Button>
     </div>
   );
 }

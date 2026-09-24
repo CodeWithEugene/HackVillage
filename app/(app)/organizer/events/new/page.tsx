@@ -6,7 +6,7 @@ import { requireSurface } from "@/lib/auth/guards";
 import { getEnv } from "@/lib/env";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Create event" };
+export const metadata: Metadata = { title: "Create Event" };
 
 export default async function NewEventPage() {
   const user = await requireSurface("organizer");

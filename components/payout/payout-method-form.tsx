@@ -108,7 +108,7 @@ export function PayoutMethodForm({
         <FormError message={state.error} />
         <FormSuccess message={state.message} />
         <Button type="submit" loading={pending}>
-          Save payout method
+          Save Payout Method
         </Button>
       </form>
     </Card>
