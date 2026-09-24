@@ -36,6 +36,9 @@ yarn-error.log*
 /contracts/cache
 /contracts/artifacts
 
+# dev media uploads (local storage mode)
+/public/uploads
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

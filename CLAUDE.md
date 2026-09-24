@@ -96,9 +96,22 @@ join + requests pages, and the developer intro inbox. Verified: lint,
 typecheck, 132 tests, production build, plus the live cycle now proving
 announcement → portfolio → endorsement end to end (`npm run dev:cycle`).
 
+**Phase 7 (Media Vault & Trust Scores) is complete and verified**: data
+model (migration 8 — MediaAsset, TrustEvent, Notification), the storage port
+(R2 SigV4 presigned PUTs in production — hand-rolled, zero SDK; local
+directory + dev upload route in development; 15MB/type validation), the
+media vault service (48-hour deadline enforcement via the 15-minute cron —
+mechanical, idempotent −10 MEDIA_PENALTY that never touches payouts, owner
+email + notification, admin appeals granting +10, manual adjustments capped
+at ±50 with audit logs), trust math (floor 0, cap 150, pure + unit-tested),
+and all surfaces (organizer vault with countdown/overdue banners and
+approve/hide gallery, public event gallery, admin trust ledger with penalty
+appeals, the notifications inbox with auto-mark-read). Verified: lint,
+typecheck, 145 tests, production build.
+
 Everything else is planned per the build plan phases — build features **in
-phase order** (Phase 7 = Media Vault & Trust Scores next: storage, 48h
-deadline enforcement, notifications).
+phase order** (Phase 8 = Legacy & Polish next: 3-month check-ins, milestone
+reminders, disputes queue, system-state/a11y/perf polish).
 
 ## Tech Stack (live)
 | Layer | Technology |
