@@ -10,17 +10,33 @@ import { getEnv } from "@/lib/env";
  * no separate queue infrastructure to run.
  */
 let boss: PgBoss | null = null;
+let starting: Promise<PgBoss> | null = null;
 
 export async function getQueue(): Promise<PgBoss> {
-  if (!boss) {
-    boss = new PgBoss({ connectionString: getEnv().DATABASE_URL });
-    boss.on("error", (error) => {
+  if (boss) return boss;
+  // Concurrent callers await the same in-flight start instead of racing to
+  // create separate PgBoss instances.
+  if (starting) return starting;
+
+  starting = (async () => {
+    const instance = new PgBoss({ connectionString: getEnv().DATABASE_URL });
+    instance.on("error", (error) => {
       // Queue errors must be visible but never crash the request path.
       console.error("[pg-boss]", error);
     });
-    await boss.start();
+    await instance.start();
+    // Only cache the instance once it's actually started — if start() throws
+    // (e.g. a transient connection reset), the next call retries cleanly
+    // instead of reusing a never-started, permanently broken instance.
+    boss = instance;
+    return instance;
+  })();
+
+  try {
+    return await starting;
+  } finally {
+    starting = null;
   }
-  return boss;
 }
 
 /**
