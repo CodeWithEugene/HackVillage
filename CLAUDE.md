@@ -83,9 +83,22 @@ full live cycle via `npm run dev:cycle` — judging → winners → instant 50%
 paid → milestone 50% paid → event + vault SETTLED, with winner strips and
 ledger entries visible over HTTP.
 
+**Phase 6 (Proof of Work & Career) is complete and verified**: PoW data
+model (migration 7 — Endorsement, PortfolioItem with lifecycle tags,
+InternshipTag, Introduction), the PoW service (portfolio items materialize
+automatically from winning submissions at announcement, judge endorsements
+gated to verified winners, platform-derived metrics — events/wins/win
+rate/earnings/endorsements, never self-reported), hiring partners (join
+flow), one-click introductions anchored on verified wins with accept/decline
+and contact exchange. Surfaces: verified metrics + portfolio + endorsements
+on public profiles, the judge endorse console, the talent directory, partner
+join + requests pages, and the developer intro inbox. Verified: lint,
+typecheck, 132 tests, production build, plus the live cycle now proving
+announcement → portfolio → endorsement end to end (`npm run dev:cycle`).
+
 Everything else is planned per the build plan phases — build features **in
-phase order** (Phase 6 = Proof of Work & Career next: endorsements,
-portfolio, hiring partners, intros).
+phase order** (Phase 7 = Media Vault & Trust Scores next: storage, 48h
+deadline enforcement, notifications).
 
 ## Tech Stack (live)
 | Layer | Technology |

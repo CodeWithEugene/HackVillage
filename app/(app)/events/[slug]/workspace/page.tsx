@@ -202,11 +202,14 @@ export default async function WorkspacePage({
       ) : null}
 
       <Card>
-        <CardTitle>What happens after submission</CardTitle>
+        <CardTitle>What happens after announcement</CardTitle>
         <CardDescription>
-          Judges score against the rubric and must leave at least three structured feedback points
-          per team (Phase 4). Winners are announced by the organizer — 50% of the prize pays out
-          instantly, the rest when milestones complete (Phase 5).
+          Endorse the winners you judged —{" "}
+          <a href={`/judge/events/${event.slug}/endorse`} className="underline hover:text-ink">
+            write endorsements
+          </a>{" "}
+          once results are announced. Your one-liner becomes permanent proof on their
+          Proof-of-Work profiles.
         </CardDescription>
       </Card>
     </div>

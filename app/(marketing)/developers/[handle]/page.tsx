@@ -4,7 +4,10 @@ import { BadgeCheck, MapPin } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { currentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
+import { computePowMetrics } from "@/services/pow/service";
+import { formatKes } from "@/lib/utils";
 
 interface ProfilePageProps {
   params: Promise<{ handle: string }>;
@@ -20,28 +23,51 @@ export async function generateMetadata({ params }: ProfilePageProps): Promise<Me
 
 export default async function DeveloperProfilePage({ params }: ProfilePageProps) {
   const { handle } = await params;
-  const user = await prisma.user.findFirst({
-    where: { handle: { equals: handle, mode: "insensitive" }, deletedAt: null },
-    select: {
-      name: true,
-      handle: true,
-      createdAt: true,
-      profile: {
-        select: {
-          headline: true,
-          bio: true,
-          location: true,
-          skills: true,
-          githubLogin: true,
-          linkedinUrl: true,
+  const [user, viewer] = await Promise.all([
+    prisma.user.findFirst({
+      where: { handle: { equals: handle, mode: "insensitive" }, deletedAt: null },
+      select: {
+        id: true,
+        name: true,
+        handle: true,
+        createdAt: true,
+        profile: {
+          select: {
+            headline: true,
+            bio: true,
+            location: true,
+            skills: true,
+            githubLogin: true,
+            linkedinUrl: true,
+          },
         },
       },
-    },
-  });
+    }),
+    currentUser(),
+  ]);
+  const viewerIsHiring = Boolean(viewer?.roles.includes("HIRING"));
 
   if (!user?.profile) notFound();
 
   const profile = user.profile;
+
+  const [metrics, endorsements, portfolio] = await Promise.all([
+    computePowMetrics(user.id),
+    prisma.endorsement.findMany({
+      where: { developerId: user.id, visibility: "PUBLISHED" },
+      include: {
+        judge: { select: { name: true, handle: true } },
+        event: { select: { title: true, slug: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
+    prisma.portfolioItem.findMany({
+      where: { developerId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 12,
+    }),
+  ]);
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-16">
@@ -108,16 +134,128 @@ export default async function DeveloperProfilePage({ params }: ProfilePageProps)
         ) : null}
       </Card>
 
+      {/* Verified record — platform-derived numbers only (§6.6) */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-5">
+        <Card>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Events</p>
+          <p className="mt-1 font-display text-2xl font-bold text-ink">{metrics.eventsParticipated}</p>
+        </Card>
+        <Card>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Wins</p>
+          <p className="mt-1 font-display text-2xl font-bold text-ink">{metrics.wins}</p>
+        </Card>
+        <Card>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Win rate</p>
+          <p className="mt-1 font-display text-2xl font-bold text-ink">
+            {metrics.winRate != null ? `${metrics.winRate}%` : "—"}
+          </p>
+        </Card>
+        <Card>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Earned</p>
+          <p className="mt-1 font-display text-lg font-bold text-ink">{formatKes(metrics.totalWonKes)}</p>
+        </Card>
+        <Card>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Endorsed</p>
+          <p className="mt-1 font-display text-2xl font-bold text-ink">{metrics.endorsementCount}</p>
+        </Card>
+      </div>
+
+      {portfolio.length > 0 ? (
+        <Card className="mt-6">
+          <CardTitle>Portfolio</CardTitle>
+          <ul className="mt-3 space-y-3">
+            {portfolio.map((item) => (
+              <li key={item.id} className="rounded-card border border-ink/10 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-semibold text-ink">{item.title}</p>
+                  <Badge
+                    variant={
+                      item.lifecycle === "IN_PRODUCTION"
+                        ? "success"
+                        : item.lifecycle === "PIVOTED"
+                          ? "brand"
+                          : "neutral"
+                    }
+                  >
+                    {item.lifecycle === "IN_PRODUCTION"
+                      ? "in production"
+                      : item.lifecycle === "PIVOTED"
+                        ? "pivoted"
+                        : item.lifecycle === "ARCHIVED"
+                          ? "archived"
+                          : "demo"}
+                  </Badge>
+                </div>
+                <p className="mt-1 text-sm leading-6 text-muted">{item.summary}</p>
+                <a
+                  href={item.repoUrl}
+                  className="mt-2 inline-block text-sm font-semibold text-ink underline"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Repository ↗
+                </a>
+                {item.demoUrl ? (
+                  <>
+                    {" · "}
+                    <a
+                      href={item.demoUrl}
+                      className="inline-block text-sm font-semibold text-ink underline"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Demo ↗
+                    </a>
+                  </>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
+
+      {endorsements.length > 0 ? (
+        <Card className="mt-6">
+          <CardTitle>Judge endorsements</CardTitle>
+          <ul className="mt-3 space-y-4">
+            {endorsements.map((endorsement) => (
+              <li key={endorsement.id} className="border-l-4 border-brand pl-4">
+                <p className="leading-7 text-ink-soft">&ldquo;{endorsement.quote}&rdquo;</p>
+                <p className="mt-1 text-xs text-muted">
+                  {endorsement.judge.name ?? `@${endorsement.judge.handle}`} — judge,{" "}
+                  <a href={`/events/${endorsement.event.slug}`} className="underline">
+                    {endorsement.event.title}
+                  </a>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
+
       <Card className="mt-6">
-        <CardTitle>Verified record</CardTitle>
+        <CardTitle>Hiring?</CardTitle>
         <CardDescription>
-          Event history, win rates, GitHub contributions per event, and judge endorsements appear
-          here as soon as the first Prize Verified events conclude.
+          Every metric above is derived from platform-verified events — wins, payouts, and judge
+          endorsements, never self-reported.{" "}
+          {viewerIsHiring ? (
+            <>
+              Request a verified introduction on the{" "}
+              <a href={`/hiring/request/${user.handle}`} className="font-semibold underline hover:text-ink">
+                intro page
+              </a>
+              .
+            </>
+          ) : (
+            <>
+              Hiring partners can request a verified introduction from the{" "}
+              <a href="/hiring" className="underline hover:text-ink">
+                talent directory
+              </a>
+              .
+            </>
+          )}
         </CardDescription>
-        <p className="mt-4 rounded-control border border-dashed border-ink/15 bg-paper p-4 text-center text-sm text-muted">
-          First events are on the runway — this profile starts writing its record the day judging
-          closes.
-        </p>
       </Card>
     </div>
   );

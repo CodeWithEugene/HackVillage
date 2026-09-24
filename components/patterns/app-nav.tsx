@@ -18,6 +18,7 @@ export default function AppTopNav({
     { href: "/dashboard/events", label: "My events" },
     { href: "/dashboard/teams", label: "Teams" },
     { href: "/dashboard/winnings", label: "Winnings" },
+    { href: "/dashboard/intros", label: "Intros" },
   ];
 
   if (user.roles.includes("ORGANIZER")) {
@@ -25,6 +26,9 @@ export default function AppTopNav({
   }
   if (user.roles.includes("JUDGE")) {
     links.push({ href: "/judge", label: "Judge" });
+  }
+  if (user.roles.includes("HIRING")) {
+    links.push({ href: "/hiring", label: "Talent" });
   }
   links.push(
     { href: "/dashboard/profile", label: "Profile" },

@@ -103,13 +103,28 @@ async function main(): Promise<void> {
     }
   }
 
+  // 6b. Proof-of-Work (Phase 6): endorsements from every judge.
+  const { createEndorsement } = await import("@/services/pow/service");
+  for (const winner of winners) {
+    for (const judge of event.judges) {
+      await createEndorsement({
+        judgeId: judge.userId,
+        developerId: winner.userId,
+        eventId: event.id,
+        quote: "Complete offline-first delivery under deadline pressure — recommended.",
+      }).catch(() => undefined);
+    }
+  }
+  console.log(`✓ endorsements written for ${winners.length} winner(s)`);
+
   // 7. Final state.
-  const [finalEvent, vault] = await Promise.all([
+  const [finalEvent, vault, portfolioCount] = await Promise.all([
     prisma.event.findUnique({ where: { id: event.id } }),
     prisma.vaultState.findUnique({ where: { eventId: event.id } }),
+    prisma.portfolioItem.count({ where: { developerId: { in: event.teams.map((t) => t.leaderId) } } }),
   ]);
   console.log(
-    `FINAL: event=${finalEvent?.status} vault=${vault?.chainState} paid=${await prisma.payout.count({ where: { winner: { eventId: event.id }, status: "SUCCEEDED" } })}`
+    `FINAL: event=${finalEvent?.status} vault=${vault?.chainState} paid=${await prisma.payout.count({ where: { winner: { eventId: event.id }, status: "SUCCEEDED" } })} portfolio=${portfolioCount}`
   );
   await prisma.$disconnect();
   process.exit(0);
