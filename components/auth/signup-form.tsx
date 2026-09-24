@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { Building2, Code2, Github } from "lucide-react";
 import { signIn } from "next-auth/react";
 
+import { GoogleIcon } from "@/components/icons/google-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormError, Input, Label } from "@/components/ui/input";
@@ -51,7 +52,7 @@ export function SignUpForm({
                 variant="secondary"
                 onClick={() => signIn("google", { redirectTo: "/dashboard" })}
               >
-                Continue with Google
+                <GoogleIcon className="size-4" /> Continue with Google
               </Button>
             )}
             {githubEnabled && (
