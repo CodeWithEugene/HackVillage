@@ -25,19 +25,17 @@ export default async function DevelopersPage() {
     take: 48,
   });
 
-  const visible = developers.filter(
-    (developer) => developer.profile && developer.profile.visible
-  );
+  const visible = developers.filter((developer) => developer.profile && developer.profile.visible);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-16">
+    <div className="site-container py-16">
       <header className="mb-10 text-center">
         <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">
           Proof-of-Work Profiles
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted">
-          Every metric on these profiles is verified by platform events — wins, contributions,
-          judge endorsements. No self-reported stats, ever.
+          Every metric on these profiles is verified by platform events — wins, contributions, judge
+          endorsements. No self-reported stats, ever.
         </p>
       </header>
 

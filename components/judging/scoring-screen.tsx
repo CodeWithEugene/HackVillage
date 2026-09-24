@@ -154,7 +154,7 @@ export function ScoringScreen({
                 <select
                   id="kind"
                   name="kind"
-                  className="h-11 w-full rounded-control border border-ink/15 bg-white px-3 text-ink"
+                  className="h-11 w-full rounded-control border border-ink/15 bg-surface px-3 text-ink"
                   required
                 >
                   {FEEDBACK_KINDS.map((kind) => (

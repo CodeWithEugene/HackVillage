@@ -106,21 +106,21 @@ export default async function TrustPage() {
         </ul>
       )}
 
-      <section className="mt-14 rounded-card bg-ink p-8 text-paper">
+      <section className="mt-14 rounded-card bg-inverse p-8 text-on-inverse">
         <h2 className="font-display text-xl font-bold">How Verification Works</h2>
-        <ol className="mt-4 space-y-3 text-sm leading-6 text-paper/80">
+        <ol className="mt-4 space-y-3 text-sm leading-6 text-on-inverse/80">
           <li>
-            <strong className="text-paper">1.</strong> The organizer deposits 100% of the declared
+            <strong className="text-on-inverse">1.</strong> The organizer deposits 100% of the declared
             pool through our licensed payment provider. Only the pool portion enters the vault —
             platform fees never touch prize money.
           </li>
           <li>
-            <strong className="text-paper">2.</strong> The payment confirmation triggers an on-chain
+            <strong className="text-on-inverse">2.</strong> The payment confirmation triggers an on-chain
             attestation. The vault <span className="text-brand">locks</span>, the event goes live,
             and the deposit lands here with its payment reference.
           </li>
           <li>
-            <strong className="text-paper">3.</strong> Winnings pay 50% instantly and 50% on
+            <strong className="text-on-inverse">3.</strong> Winnings pay 50% instantly and 50% on
             milestones — each payout attested here too. Cross-check any entry against the
             transaction hash on a block explorer.
           </li>

@@ -99,7 +99,7 @@ export function SignUpForm({
                 className={`rounded-card border-2 p-4 text-left transition-colors ${
                   role === option.value
                     ? "border-brand bg-brand/10"
-                    : "border-ink/10 bg-white hover:border-ink/25"
+                    : "border-ink/10 bg-surface hover:border-ink/25"
                 }`}
               >
                 <option.icon aria-hidden className="size-5 text-ink" />

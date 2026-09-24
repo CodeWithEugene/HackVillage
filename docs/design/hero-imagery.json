@@ -1,0 +1,55 @@
+{
+  "generator": "Built-in image_gen",
+  "note": "AI-generated editorial imagery depicting Kenyan engineers; not photographs of actual HackVillage attendees.",
+  "images": [
+    {
+      "name": "center-developer",
+      "prompt": "Use case: photorealistic-natural. Asset type: individual editorial photograph for HackVillage's website hero collage. Realistic Black Kenyan software engineers at a contemporary Nairobi tech event, natural skin texture and authentic candid energy, premium documentary photography, navy and bright blue accents, warm daylight, real modern Nairobi coworking interior. No graphics, watermarks, legible text or logos. This is ONE full-bleed photo, not a collage or website. Portrait aspect ratio 1:2, ideally 768x1536. A confident young Black Kenyan female software engineer with neat natural braids, wearing a cobalt blue overshirt and white t-shirt, holding a closed laptop at her waist, looking just off-camera with a warm smile. Three-quarter body portrait, centered with head in upper third, Nairobi glass office windows softly out of focus behind her.",
+      "width": 768,
+      "height": 1536,
+      "path": "public/marketing/hero/kenya/center-developer.webp"
+    },
+    {
+      "name": "coding-focus",
+      "prompt": "Use case: photorealistic-natural. Asset type: individual editorial photograph for HackVillage's website hero collage. Realistic Black Kenyan software engineers at a contemporary Nairobi tech event, natural skin texture and authentic candid energy, premium documentary photography, navy and bright blue accents, warm daylight, real modern Nairobi coworking interior. No graphics, watermarks, legible text or logos. This is ONE full-bleed photo, not a collage or website. Portrait aspect ratio 4:5, ideally 1024x1280. Candid close-up side view of a young Black Kenyan woman with short natural hair and thin round glasses, focused on coding at a laptop, navy t-shirt, sunlit coworking space. Frame head and shoulders and laptop, subject centered.",
+      "width": 480,
+      "height": 600,
+      "path": "public/marketing/hero/kenya/coding-focus.webp"
+    },
+    {
+      "name": "team-build",
+      "prompt": "Use case: photorealistic-natural. Asset type: individual editorial photograph for HackVillage's website hero collage. Realistic Black Kenyan software engineers at a contemporary Nairobi tech event, natural skin texture and authentic candid energy, premium documentary photography, navy and bright blue accents, warm daylight, real modern Nairobi coworking interior. No graphics, watermarks, legible text or logos. This is ONE full-bleed photo, not a collage or website. Landscape aspect ratio 6:5, ideally 1200x1000. Two young Black Kenyan engineers, a woman with braids and a man with short hair, leaning together over a laptop at a hackathon table, excited discussion, blue and cream casual clothing, genuine expressions. Medium shot faces in middle upper half.",
+      "width": 640,
+      "height": 534,
+      "path": "public/marketing/hero/kenya/team-build.webp"
+    },
+    {
+      "name": "speaker",
+      "prompt": "Use case: photorealistic-natural. Asset type: individual editorial photograph for HackVillage's website hero collage. Realistic Black Kenyan software engineers at a contemporary Nairobi tech event, natural skin texture and authentic candid energy, premium documentary photography, navy and bright blue accents, warm daylight, real modern Nairobi coworking interior. No graphics, watermarks, legible text or logos. This is ONE full-bleed photo, not a collage or website. Landscape aspect ratio 6:5, ideally 1200x1000. Black Kenyan female tech event speaker with natural afro hair in a sky blue blazer, speaking into a handheld microphone, animated and confident, softly blurred dark navy conference backdrop. Waist-up candid shot with subject centered.",
+      "width": 640,
+      "height": 534,
+      "path": "public/marketing/hero/kenya/speaker.webp"
+    },
+    {
+      "name": "hackathon-pair",
+      "prompt": "Use case: photorealistic-natural. Asset type: individual editorial photograph for HackVillage's website hero collage. Realistic Black Kenyan software engineers at a contemporary Nairobi tech event, natural skin texture and authentic candid energy, premium documentary photography, navy and bright blue accents, warm daylight, real modern Nairobi coworking interior. No graphics, watermarks, legible text or logos. This is ONE full-bleed photo, not a collage or website. Landscape aspect ratio 6:5, ideally 1200x1000. Two young Black Kenyan male developers, one in navy hoodie one in cobalt blue t-shirt, seated at a desk at a Nairobi hackathon, sharing a laugh over laptop code, candid eye-level medium close-up, warm sunlit office.",
+      "width": 640,
+      "height": 534,
+      "path": "public/marketing/hero/kenya/hackathon-pair.webp"
+    },
+    {
+      "name": "community",
+      "prompt": "Use case: photorealistic-natural. Asset type: individual editorial photograph for HackVillage's website hero collage. Realistic Black Kenyan software engineers at a contemporary Nairobi tech event, natural skin texture and authentic candid energy, premium documentary photography, navy and bright blue accents, warm daylight, real modern Nairobi coworking interior. No graphics, watermarks, legible text or logos. This is ONE full-bleed photo, not a collage or website. Landscape aspect ratio 6:5, ideally 1200x1000. Small group of Black Kenyan software engineers, men and women in their twenties and thirties, gathered at a coworking table at a Nairobi tech event, smiling in a collaborative conversation, open laptops and notebooks, window daylight, casual navy and white clothes. Authentic candid photo.",
+      "width": 640,
+      "height": 534,
+      "path": "public/marketing/hero/kenya/community.webp"
+    },
+    {
+      "name": "event-arrival",
+      "prompt": "Use case: photorealistic-natural. Asset type: individual editorial photograph for HackVillage's website hero collage. Realistic Black Kenyan software engineers at a contemporary Nairobi tech event, natural skin texture and authentic candid energy, premium documentary photography, navy and bright blue accents, warm daylight, real modern Nairobi coworking interior. No graphics, watermarks, legible text or logos. This is ONE full-bleed photo, not a collage or website. Portrait aspect ratio 4:5, ideally 1024x1280. A young Black Kenyan male software engineer with short twists and glasses, wearing a navy overshirt and a plain blue event lanyard, carrying his laptop walking through a bright Nairobi tech venue, casual smiling candid portrait from waist up, blurred attendees behind.",
+      "width": 480,
+      "height": 600,
+      "path": "public/marketing/hero/kenya/event-arrival.webp"
+    }
+  ]
+}
