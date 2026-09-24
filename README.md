@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./app/icon.png" alt="HackVillage" height="72" />
+  <img src="./public/branding/HackVillage-Logo.gif" alt="HackVillage" height="72" />
   &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="./public/images/salamander-logo-yellow.svg" alt="salamander · HackVillage" height="56" />
   &nbsp;&nbsp;&nbsp;&nbsp;
