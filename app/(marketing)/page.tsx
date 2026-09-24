@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BuilderJourney } from "@/components/patterns/builder-journey";
 import { HowItWorks } from "@/components/patterns/how-it-works";
 import { LandingHero } from "@/components/patterns/landing-hero";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,8 @@ export default function LandingPage() {
   return (
     <div className="font-display">
       <LandingHero />
+
+      <BuilderJourney />
 
       <HowItWorks />
 

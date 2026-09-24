@@ -1,0 +1,112 @@
+import Image from "next/image";
+import Link from "next/link";
+
+const ARC_TEXT = "Verified. Paid. Proven.";
+
+interface PillPhotoProps {
+  name: string;
+  alt: string;
+  className?: string;
+}
+
+function PillPhoto({ name, alt, className }: PillPhotoProps) {
+  return (
+    <div className={className ? `journey-pill ${className}` : "journey-pill"}>
+      <Image
+        src={`/marketing/hero/kenya/${name}.webp`}
+        alt={alt}
+        fill
+        sizes="(max-width: 1023px) 45vw, 14vw"
+        className="object-cover"
+      />
+    </div>
+  );
+}
+
+function Sparkle({ className }: { className: string }) {
+  return (
+    <svg className={`journey-star ${className}`} viewBox="0 0 80 80" aria-hidden="true">
+      <path d="M40 0C42 26 54 38 80 40C54 42 42 54 40 80C38 54 26 42 0 40C26 38 38 26 40 0Z" />
+    </svg>
+  );
+}
+
+export function BuilderJourney() {
+  return (
+    <section className="site-container builder-journey" aria-labelledby="builder-journey-heading">
+      <div className="journey-column journey-column-left">
+        <div className="journey-copy">
+          <Sparkle className="journey-star-left" />
+          <h2 id="builder-journey-heading" className="journey-display">
+            Build
+            <br />
+            Ship
+            <br />
+            Win
+          </h2>
+          <p className="journey-text">
+            Every prize is fully deposited before the first line of code, so builders across
+            Africa compete for money that is already there.
+          </p>
+          <Link href="/onboarding/organizer" className="journey-action">
+            Host An Event
+          </Link>
+        </div>
+        <div className="journey-pair journey-pair-left">
+          <PillPhoto name="speaker" alt="Kenyan tech speaker sharing ideas at a developer event" />
+          <PillPhoto
+            name="community"
+            alt="Developers exchanging ideas around a table at a Nairobi tech gathering"
+          />
+        </div>
+      </div>
+
+      <div className="journey-center">
+        <svg className="journey-arc" viewBox="0 0 416 709" aria-hidden="true">
+          <path id="journey-arc-path" d="M 0 141 A 257 257 0 0 1 416 141" fill="none" />
+          <text textAnchor="middle">
+            <textPath href="#journey-arc-path" startOffset="50%">
+              {ARC_TEXT}
+            </textPath>
+          </text>
+        </svg>
+        <div className="journey-pill journey-pill-center">
+          <Image
+            src="/marketing/hero/kenya/center-developer.webp"
+            alt="Kenyan software engineer in a blue overshirt holding her laptop"
+            fill
+            sizes="(max-width: 1023px) 80vw, 26vw"
+            className="object-cover"
+          />
+        </div>
+      </div>
+
+      <div className="journey-column journey-column-right">
+        <div className="journey-pair journey-pair-right">
+          <PillPhoto
+            name="event-arrival"
+            alt="Kenyan developer arriving at a tech event with his laptop"
+          />
+          <PillPhoto
+            name="coding-focus"
+            alt="Kenyan software engineer concentrating on her laptop in a sunlit workspace"
+          />
+        </div>
+        <div className="journey-copy journey-copy-right">
+          <Sparkle className="journey-star-right" />
+          <p className="journey-text">
+            Half your prize lands the moment you win. Ship your milestone and the rest follows —
+            every payout recorded on a public ledger.
+          </p>
+          <p className="journey-display">
+            Get Paid
+            <br />
+            Get Seen
+            <br />
+            Get Hired
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
