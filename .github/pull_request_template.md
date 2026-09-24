@@ -18,7 +18,7 @@
 ## Checklist
 
 - [ ] Code follows the style guidelines in `CONTRIBUTING.md`
-- [ ] New and changed code is covered by tests (`npm test` passes)
+- [ ] New and changed code is covered by tests (`pnpm test` passes)
 - [ ] No secrets, credentials, or `.env` files are included
 - [ ] Changes to `services/escrow/`, `services/payout/`, or `contracts/`:
       manually tested against the Paystack test environment, and this PR has

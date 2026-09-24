@@ -24,10 +24,10 @@ function page(title: string, body: string): Response {
     `<!doctype html><html lang="en"><head><meta charset="utf-8"/><title>${title}</title>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <style>
-      body{font-family:-apple-system,system-ui,sans-serif;background:#fafbf7;color:#222;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}
+      body{font-family:-apple-system,system-ui,sans-serif;background:#fafbf7;color:#000092;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}
       .card{background:#fff;border:1px solid #e5e5e0;border-radius:12px;max-width:420px;width:100%;padding:32px;text-align:center}
       .brand{font-weight:800;font-size:20px;margin-bottom:16px}
-      .sim{background:#ffed00;display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700}
+      .sim{background:#04a1f1;color:#000092;display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700}
       .amount{font-size:36px;font-weight:800;margin:12px 0}
       form{margin-top:24px}button{font:inherit;border:0;border-radius:8px;padding:12px 28px;font-weight:700;cursor:pointer;width:100%}
       .pay{background:#0ba4db;color:#fff}.cancel{background:transparent;color:#6b6b6b;text-decoration:underline;font-weight:400;margin-top:8px}

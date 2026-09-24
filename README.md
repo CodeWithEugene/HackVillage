@@ -246,6 +246,7 @@ Paystack API ──── Final transfer ──── Public Ledger entry record
 ### Prerequisites
 
 - Node.js >= 18.18 (Next.js 15 requirement)
+- pnpm >= 9 (`corepack enable` or `npm install -g pnpm`)
 - PostgreSQL >= 15
 - A Paystack account (test keys sufficient for local development)
 
@@ -254,7 +255,7 @@ Paystack API ──── Final transfer ──── Public Ledger entry record
 ```bash
 git clone https://github.com/CodeWithEugene/HackVillage.git
 cd HackVillage
-npm install
+pnpm install
 ```
 
 ### Environment Variables
@@ -272,7 +273,7 @@ RPC_URL=https://...
 ### Development
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -280,8 +281,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Database
 
 ```bash
-npm run db:migrate
-npm run db:seed   # optional — seeds demo events and profiles
+pnpm run db:migrate
+pnpm run db:seed   # optional — seeds demo events and profiles
 ```
 
 ---

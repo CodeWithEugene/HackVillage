@@ -5,8 +5,8 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Primary button = brand yellow with ink text (contrast rule §13.1: yellow
- * surfaces always carry ink text — never white on yellow).
+ * Primary button = brand blue with ink (navy) text (contrast rule §13.1:
+ * brand surfaces always carry ink text — never white on brand).
  */
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 rounded-control font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",

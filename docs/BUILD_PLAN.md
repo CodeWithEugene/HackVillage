@@ -116,7 +116,7 @@ React Server Components everywhere possible; `"use client"` only for interactivi
 Loading (skeletons), empty (illustration + one CTA), error (human text + retry + support link), success (confirmation with receipt). No spinners without explanation; no silent polling.
 
 ### P8 — Accessibility is a feature, not a pass.
-WCAG 2.1 AA: keyboard-first navigation, visible focus (brand yellow ring), ARIA live regions for money-state toasts, color contrast checked (yellow `#FFED00` always carries `#222` ink text — never white on yellow).
+WCAG 2.1 AA: keyboard-first navigation, visible focus (brand blue ring), ARIA live regions for money-state toasts, color contrast checked (brand `#04A1F1` always carries `#000092` ink text — never white on brand).
 
 ### P9 — Type safety is the contract.
 Strict TypeScript end to end; Prisma-generated DB types; zod-validated boundaries (server actions, webhooks, env); `unknown` + narrowing over `any` (CONTRIBUTING rule).
@@ -251,7 +251,7 @@ Each ADR records context → decision → trade-offs. Revisit only with a supers
 
 ### ADR-003: PostgreSQL + Prisma
 **Context**: Structured Proof-of-Work records, transactional escrow state, migrations required by CONTRIBUTING.
-**Decision**: Postgres 16 (Neon serverless in prod, Docker locally) + Prisma ORM with migration workflow (`npm run db:migrate`), seeds for demo events.
+**Decision**: Postgres 16 (Neon serverless in prod, Docker locally) + Prisma ORM with migration workflow (`pnpm run db:migrate`), seeds for demo events.
 **Trade-offs**: ✅ typed client, migration history, single source of schema truth, prisma-level transactions for escrow atomicity. ❌ Prisma adds a codegen step and mild cold-start weight on serverless — acceptable; Neon handles pooling.
 
 ### ADR-004: pg-boss for background jobs
@@ -279,7 +279,7 @@ Each ADR records context → decision → trade-offs. Revisit only with a supers
 **Trade-offs**: ✅ zero wallet friction for users, tiny audit surface, immutable contract possible. ❌ trust in the platform signer until DAO/multi-sig (v2.0 roadmap) — mitigated by: contract events include the Paystack references so anyone can cross-verify; signer key in env-only access; every attestation corresponds 1:1 with a DB record and webhook receipt. README's "Polygon/Solana" choice resolved to Polygon: EVM tooling (Hardhat/OpenZeppelin), audit ecosystem, low fees.
 
 ### ADR-008: Tailwind CSS v4 + shadcn/ui, tokens from brand
-**Context**: Solo-friendly design system; brand = yellow `#FFED00` + ink `#222` (from logo).
+**Context**: Solo-friendly design system; brand = blue `#04A1F1` + ink `#000092` (from logo).
 **Decision**: Tailwind v4 with CSS-first config, shadcn/ui primitives restyled to tokens. See §13.
 **Trade-offs**: ✅ a11y-tested primitives in-repo (copy, not dependency), fast iteration. ❌ Tailwind class soup risk — mitigated by `components/patterns/` composition layer and class-variance-authority variants.
 
@@ -757,14 +757,16 @@ All jobs idempotent (safe to re-run); all carry actor/event correlation IDs into
 
 ## 13. Design System
 
-Brand identity from the existing salamander mark: **yellow `#FFED00` + ink `#222`**. Positioning: *optimistic, credible, African*. The vibe: "a trusted community ledger, not a fintech dashboard" — warm, confident, honest.
+Brand identity from the HackVillage logo lockup: **navy `#000092` ink, brand blue `#04A1F1`, brand-soft sky `#7FD0F8`, and ink-soft `#0272D4`**. The original salamander mark (yellow `#FFED00` + ink `#222`) is retired from the product UI and now appears only as a heritage credit in the site footer and the README. Positioning: *optimistic, credible, African*. The vibe: "a trusted community ledger, not a fintech dashboard" — warm, confident, honest.
 
 ### 13.1 Tokens
 
 | Token | Value | Use |
 |---|---|---|
-| `--color-brand` | `#FFED00` | CTAs, badges, highlights, focus rings |
-| `--color-ink` | `#222222` | Primary text, dark sections |
+| `--color-brand` | `#04A1F1` | CTAs, badges, highlights, focus rings |
+| `--color-brand-soft` | `#7FD0F8` | Hover/soft fills on brand surfaces |
+| `--color-ink` | `#000092` | Primary text, dark sections |
+| `--color-ink-soft` | `#0272D4` | Secondary text, links |
 | `--color-paper` | `#FAFAF7` | Page background (warm off-white) |
 | `--color-success` | `#0E9F6E` | Paid/verified states |
 | `--color-warning` | `#D97706` | Pending/deadline states |
@@ -776,13 +778,13 @@ Brand identity from the existing salamander mark: **yellow `#FFED00` + ink `#222
 | `--shadow` | 2-tier (rest/hover) | Soft, never heavy |
 | Spacing | 4px base grid, 8px rhythm | Section padding: 64–96px desktop / 32–48px mobile |
 
-**Contrast rule (hard)**: yellow backgrounds always get ink text; yellow text only on ink backgrounds. Focus ring = 2px brand + 2px offset.
+**Contrast rule (hard)**: brand backgrounds always get ink text; brand text only on ink backgrounds. Focus ring = 2px brand + 2px offset.
 
 ### 13.2 Core component inventory (components/ui + patterns)
 
 - **Primitives** (shadcn/ui restyled): Button (primary=brand, secondary=outline, danger, ghost; loading state with spinner-in-button), Input, Textarea, Select, Chips (skills/roles), Dialog, Sheet/drawer, Tabs, Table, Toast (sonner), Tooltip, Popover, Skeleton, Progress, Avatar, DropdownMenu, Alert, Badge, Command palette (post-v1).
 - **Patterns** (composed, project-specific):
-  - `PrizeVerifiedBadge` — brand-yellow pill + check icon; hover draws the check (delight cue); tooltip "100% of pool locked in escrow — view ledger".
+  - `PrizeVerifiedBadge` — brand-blue pill + check icon; hover draws the check (delight cue); tooltip "100% of pool locked in escrow — view ledger".
   - `EventCard` — cover, status chip, badge, pool amount (display font), team count, countdown chip, organizer mini-score.
   - `StatusTimeline` — horizontal stepper for event/vault/payout phases; used identically across event page, vault modal, winnings page (one mental model everywhere — P1).
   - `VaultPanel` — deposit stepper + ledger links.
@@ -791,7 +793,7 @@ Brand identity from the existing salamander mark: **yellow `#FFED00` + ink `#222
   - `EmptyState` — mascot illustration + copy + CTA slot.
   - `StatBand` — display-font numerals for KPIs.
   - `TrustScoreDial` — org score with event history sparkline.
-- **Iconography**: Lucide. **Illustration**: simple two-color (ink/yellow) line-art salamander scenes; no stock 3D people.
+- **Iconography**: Lucide. **Illustration**: simple two-color (ink/brand-blue) line art; no stock 3D people.
 
 ### 13.3 UX rules
 - Mobile-first breakpoints; bottom-tab nav on mobile app views (Home/Events/Teams/Me), sidebar ≥ lg.
@@ -830,7 +832,7 @@ Additional rules: ownership checks always join through org membership; admin ove
 - Secrets: `lib/env.ts` zod-validated; nothing client-exposed except `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`; `.env.example` documents all.
 - Headers: strict CSP (self + Paystack inline frame allowances), HSTS, frame-ancestors none.
 - File uploads: presigned PUT with content-type+size limits; images re-processed; no SVG user uploads (XSS).
-- Dependency security: `pnpm audit`/`npm audit` in CI weekly; lockfile-only installs.
+- Dependency security: `pnpm audit` in CI weekly; lockfile-only installs.
 
 ### 14.3 Compliance
 - **CBK / KYC-AML**: Paystack is the licensed PSP — deposits and transfers run through their KYB/KYC-verified rails. Organizer orgs complete KYB (Paystack verification) before first deposit; winners complete Paystack recipient verification before payouts (recipient creation = bank/M-Pesa ownership check). Manual-review queue for payouts > configurable threshold (default KES 500k) — SAR-style escalation documented in `SECURITY.md`.
@@ -878,7 +880,7 @@ Estimates assume one experienced full-time builder; halve with a second dev. Eac
 
 ### Phase 0 — Foundations (Week 1) · M0
 **Scope**: Next.js 15 + TS strict scaffold, Tailwind v4 + tokens + shadcn/ui base, Prisma + baseline schema (identity), pg-boss wiring, ESLint/Prettier/commitlint, GitHub Actions CI, `.env.example`, `.gitignore`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, repo housekeeping (fix README badge to 15 if desired), app shell layout (marketing + app), design-system primitives, deployed preview pipeline.
-**Exit criteria**: CI green on hello-world route · landing shell renders on mobile with brand tokens · `npm run dev/db:migrate/lint/typecheck` all work · PR template live.
+**Exit criteria**: CI green on hello-world route · landing shell renders on mobile with brand tokens · `pnpm run dev/db:migrate/lint/typecheck` all work · PR template live.
 
 ### Phase 1 — Identity & Profiles (Weeks 2–3) · M1
 **Scope**: Auth.js (credentials + Google + GitHub), email verification (Resend), sessions, role grants, developer onboarding wizard, org creation + members, profile CRUD + public profile page, settings.

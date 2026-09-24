@@ -26,9 +26,13 @@ export async function SiteHeader({ className }: { className?: string }) {
   return (
     <header className={cn("border-b border-ink/10 bg-paper/90 backdrop-blur", className)}>
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href="/" className="flex items-center gap-3" aria-label="HackVillage home">
-          {/* eslint-disable-next-line @next/next/no-img-element -- SVG wordmark, no raster source */}
-          <img src="/images/salamander-logo-yellow.svg" alt="HackVillage" className="h-8 w-auto" />
+        <Link href="/" className="flex shrink-0 items-center gap-3" aria-label="HackVillage home">
+          {/* eslint-disable-next-line @next/next/no-img-element -- animated brand lockup, no static/SVG source */}
+          <img
+            src="/branding/HackVillage-Logo.gif"
+            alt="HackVillage"
+            className="h-9 w-auto rounded-control"
+          />
         </Link>
 
         <nav aria-label="Primary" className="flex items-center gap-4 sm:gap-6">

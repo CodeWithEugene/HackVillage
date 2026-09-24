@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Github } from "lucide-react";
 
 const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -6,6 +7,8 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
     links: [
       { label: "Events", href: "/events" },
       { label: "Developers", href: "/developers" },
+      { label: "Trust & escrow", href: "/trust" },
+      { label: "Sign in", href: "/signin" },
     ],
   },
   {
@@ -21,20 +24,20 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
 ];
 
 export function SiteFooter() {
+  const year = new Date().getFullYear();
+
   return (
     <footer className="border-t border-ink/10 bg-ink text-paper">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div>
-          <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element -- brand PNG */}
-            <img src="/branding/icon-96.png" alt="" className="size-10 rounded-control" />
-            <p className="font-display text-lg font-bold">
-              Hack<span className="text-brand">Village</span>
-            </p>
-          </div>
-          <p className="mt-2 max-w-xs text-sm leading-6 text-paper/70">
-            The open-source infrastructure for high-impact tech events. Built with
-            intention for the African developer community.
+        <div className="lg:col-span-2">
+          {/* Heritage mark — Salamander Tech Hub's wordmark is retired from
+              the rest of the product UI but kept here as a nod to HackVillage's roots. */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- SVG wordmark, no raster source */}
+          <img src="/images/salamander-logo-yellow.svg" alt="Salamander Tech Hub" className="h-9 w-auto" />
+          <p className="mt-3 max-w-sm text-sm leading-6 text-paper/70">
+            The open-source infrastructure for high-impact tech events. 100% escrowed
+            prize pools, 50% instant payouts, verified Proof-of-Work developer
+            profiles — built with intention for the African developer community.
           </p>
           <p className="mt-4 text-xs text-paper/50">
             A Technetium Kenya initiative ·{" "}
@@ -66,6 +69,19 @@ export function SiteFooter() {
             </ul>
           </nav>
         ))}
+      </div>
+
+      <div className="border-t border-paper/10">
+        <div className="mx-auto flex w-full max-w-6xl flex-col-reverse items-center gap-3 px-4 py-6 text-xs text-paper/50 sm:flex-row sm:justify-between">
+          <p>© {year} HackVillage. Apache-2.0 licensed.</p>
+          <a
+            href="https://github.com/CodeWithEugene/HackVillage"
+            aria-label="HackVillage on GitHub"
+            className="flex size-8 items-center justify-center rounded-control text-paper/70 hover:bg-paper/10 hover:text-paper"
+          >
+            <Github aria-hidden className="size-4" />
+          </a>
+        </div>
       </div>
     </footer>
   );

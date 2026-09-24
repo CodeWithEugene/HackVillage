@@ -43,12 +43,9 @@ export default function AppTopNav({
       )}
     >
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href="/" aria-label="HackVillage home" className="flex items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element -- brand PNG */}
-          <img src="/branding/icon-96.png" alt="" className="size-8 rounded-control" />
-          <span className="font-display text-lg font-bold text-ink">
-            Hack<span className="text-ink/40">Village</span>
-          </span>
+        <Link href="/" aria-label="HackVillage home" className="flex shrink-0 items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element -- animated brand lockup, no static/SVG source */}
+          <img src="/branding/HackVillage-Logo.gif" alt="HackVillage" className="h-9 w-auto rounded-control" />
         </Link>
 
         <nav aria-label="App" className="flex items-center gap-1 sm:gap-4">

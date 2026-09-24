@@ -91,17 +91,22 @@ docs/
 - Never commit directly to `main`; always PR
 - Never commit `.env*` files or real credentials
 
+## Package Manager
+- This project uses **pnpm** exclusively — never `npm` or `yarn`
+- `pnpm-lock.yaml` is the committed lockfile; `package-lock.json`/`yarn.lock` must never reappear
+- CI installs with `pnpm install --frozen-lockfile`
+
 ## Testing
-- `npm test` — 156 tests (19 suites: unit + integration against live Postgres)
-- `npm run contracts:test` — 9 Hardhat tests (every contract transition)
-- `npm run load:test` — judging-rush load test (reads, auth burst, webhook rejects)
+- `pnpm test` — 156 tests (19 suites: unit + integration against live Postgres)
+- `pnpm run contracts:test` — 9 Hardhat tests (every contract transition)
+- `pnpm run load:test` — judging-rush load test (reads, auth burst, webhook rejects)
 - Escrow/payout coverage ≥90% lines (CONTRIBUTING gate)
 - All integration tests run against a real Postgres — no mocks on money paths
 
 ## Key Commands
-- `npm run dev` — local dev server
-- `npm run db:migrate` — apply Prisma migrations
-- `npm run db:seed` — seed demo data
-- `npm run dev:fund -- <slug>` — fund a pending event through the real escrow path
-- `npm run dev:cycle -- <slug>` — drive the full judging → winners → payout cycle
-- `npm run build` — production build
+- `pnpm dev` — local dev server
+- `pnpm run db:migrate` — apply Prisma migrations
+- `pnpm run db:seed` — seed demo data
+- `pnpm run dev:fund -- <slug>` — fund a pending event through the real escrow path
+- `pnpm run dev:cycle -- <slug>` — drive the full judging → winners → payout cycle
+- `pnpm run build` — production build

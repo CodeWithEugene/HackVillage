@@ -81,7 +81,7 @@ Large features (new escrow flows, DAO mechanics, cross-border payment rails) sho
 | Requirement | Minimum Version |
 |---|---|
 | Node.js | 18.x |
-| npm | 9.x |
+| pnpm | 9.x |
 | PostgreSQL | 15.x |
 | Git | 2.x |
 
@@ -101,7 +101,7 @@ cd HackVillage
 git remote add upstream https://github.com/CodeWithEugene/HackVillage.git
 
 # 3. Install dependencies
-npm install
+pnpm install
 
 # 4. Copy the environment template and fill in your values
 cp .env.example .env.local
@@ -125,13 +125,13 @@ Never commit `.env.local` or any file containing real credentials.
 
 ```bash
 # Start the development server
-npm run dev
+pnpm dev
 
 # Run database migrations
-npm run db:migrate
+pnpm run db:migrate
 
 # (Optional) Seed demo data
-npm run db:seed
+pnpm run db:seed
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -244,7 +244,7 @@ Before marking your PR ready for review, confirm:
 
 - [ ] Code follows the style guidelines in this document
 - [ ] New and changed code is covered by tests
-- [ ] All existing tests pass (`npm test`)
+- [ ] All existing tests pass (`pnpm test`)
 - [ ] No secrets, credentials, or `.env` files are included
 - [ ] The PR description explains the *why*, not just the *what*
 - [ ] Escrow/payout changes have been manually tested against the Paystack test environment
@@ -266,9 +266,9 @@ Before marking your PR ready for review, confirm:
 The project uses ESLint and Prettier. Run before committing:
 
 ```bash
-npm run lint        # ESLint
-npm run format      # Prettier
-npm run typecheck   # tsc --noEmit
+pnpm run lint        # ESLint
+pnpm run format      # Prettier
+pnpm run typecheck   # tsc --noEmit
 ```
 
 CI will fail on lint or type errors. Do not disable rules with `eslint-disable` without a comment explaining why.
@@ -292,9 +292,9 @@ CI will fail on lint or type errors. Do not disable rules with `eslint-disable` 
 Tests live in the `tests/` directory, mirroring the source structure.
 
 ```bash
-npm test              # Run all tests
-npm run test:unit     # Unit tests only
-npm run test:e2e      # End-to-end tests (requires running dev server)
+pnpm test              # Run all tests
+pnpm run test:unit     # Unit tests only
+pnpm run test:e2e      # End-to-end tests (requires running dev server)
 ```
 
 ### Requirements
