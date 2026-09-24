@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
@@ -33,7 +34,12 @@ export default function Error({
           <p className="mt-2 font-mono text-xs text-muted">Ref: {error.digest}</p>
         ) : null}
       </div>
-      <Button onClick={reset}>Try Again</Button>
+      <div className="flex gap-3">
+        <Button onClick={reset}>Try Again</Button>
+        <Link href="/">
+          <Button variant="secondary">Back Home</Button>
+        </Link>
+      </div>
     </div>
   );
 }
