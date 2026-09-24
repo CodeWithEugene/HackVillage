@@ -116,6 +116,7 @@
 @layer components {
   .how-it-works {
     padding-block: clamp(24px, 4vw, 64px) clamp(64px, 7vw, 112px);
+    scroll-margin-top: calc(var(--site-header-height) + 12px);
   }
   .how-it-works-header {
     display: flex;
@@ -276,6 +277,61 @@
     justify-content: center;
     gap: 28px;
   }
+  .nav-dropdown {
+    position: relative;
+  }
+  .nav-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: var(--color-ink-soft);
+    font-size: 14px;
+    font-weight: 500;
+    list-style: none;
+  }
+  .nav-dropdown-trigger::-webkit-details-marker {
+    display: none;
+  }
+  .nav-dropdown:hover .nav-dropdown-trigger,
+  .nav-dropdown[open] .nav-dropdown-trigger {
+    color: var(--color-ink);
+  }
+  .nav-dropdown-chevron {
+    transition: transform 150ms;
+  }
+  .nav-dropdown[open] .nav-dropdown-chevron {
+    transform: rotate(180deg);
+  }
+  .nav-dropdown-panel {
+    position: absolute;
+    z-index: 60;
+    top: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    width: max-content;
+    min-width: 200px;
+    padding: 6px;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+    border-radius: 12px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
+  .nav-dropdown-link {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding-inline: 12px;
+    border-radius: 7px;
+    color: var(--color-ink);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .nav-dropdown-link:hover {
+    background: color-mix(in srgb, var(--color-brand) 12%, transparent);
+  }
   .site-header-actions {
     justify-self: end;
     gap: 8px;
@@ -381,8 +437,14 @@
       grid-column: 1 / -1;
       grid-row: 2;
       align-self: start;
+      justify-content: flex-start;
+      gap: 18px;
+      flex-wrap: nowrap;
+      padding-inline: 4px;
     }
-    .site-header-links a {
+    .site-header-links a,
+    .nav-dropdown-trigger {
+      flex-shrink: 0;
       display: inline-flex;
       align-items: center;
       min-height: 36px;
@@ -399,6 +461,17 @@
     }
     .header-icon {
       width: 30px;
+    }
+  }
+
+  @media (max-width: 359px) {
+    .site-header-links {
+      gap: 6px;
+      padding-inline: 0;
+    }
+    .site-header-links a,
+    .nav-dropdown-trigger {
+      font-size: 11.5px;
     }
   }
 
