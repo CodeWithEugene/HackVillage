@@ -45,3 +45,6 @@ next-env.d.ts
 
 # claude-flow local tooling data
 .claude-flow/
+
+# production env (pulled from Vercel — contains real credentials)
+.env.production
