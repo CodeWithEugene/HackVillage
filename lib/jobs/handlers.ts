@@ -34,7 +34,6 @@ async function registerJob(
 
 export async function registerJobs(): Promise<void> {
   if (g.__hv_jobs_registered) return;
-  g.__hv_jobs_registered = true;
 
   const [{ getQueue: loadQueue }, attestations, deposits, payouts, payoutAttestations] =
     await Promise.all([
@@ -158,5 +157,9 @@ export async function registerJobs(): Promise<void> {
     }
   });
 
+  // Marked done only after every queue/worker registered successfully — a
+  // failure partway through (e.g. a dropped DB connection) must not block a
+  // retry on the next boot/request.
+  g.__hv_jobs_registered = true;
   console.log("[jobs] registered escrow + payout + media + legacy + reconcile handlers");
 }
