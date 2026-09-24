@@ -9,7 +9,11 @@ import { beforeAll, afterAll, describe, expect, it } from "vitest";
  * the full charge.success → vault-lock pipeline, and signature enforcement.
  */
 
-process.loadEnvFile?.();
+try {
+  process.loadEnvFile?.();
+} catch {
+  // No .env in CI — env comes from the workflow.
+}
 process.env.PAYSTACK_SECRET_KEY = "sk_test_webhook_integration";
 
 const TEST_KEY = `escrow-webhook-${Date.now().toString(36)}`;
