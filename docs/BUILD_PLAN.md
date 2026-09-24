@@ -180,7 +180,7 @@ No screen ships with placeholder content. Empty states, error states, and edge c
         │  · submission files   │                confirmations)
         └──────────────────────┘
         ┌──────────────────────┐   ┌──────────────────────────┐
-        │  RESEND (email)      │   │  SENTRY (errors, traces) │
+        │  BREVO (email)       │   │  SENTRY (errors, traces) │
         └──────────────────────┘   └──────────────────────────┘
 ```
 
@@ -749,7 +749,7 @@ Local Hardhat tests cover every legal/illegal transition + access control (unkno
 | `legacy.checkin` | cron daily | 3-month check-in due/reminder | Idempotent by (submission, dueAt) |
 | `milestone.reminder` | cron daily | 30/60/90-day organizer nudges | — |
 | `deposit.expire` | cron hourly | Expire INITIATED deposits >24h | — |
-| `notifications.dispatch` | on-enqueue | Email (Resend) fan-out with templates | Retry ×3, dead-letter table |
+| `notifications.dispatch` | on-enqueue | Email (Brevo) fan-out with templates | Retry ×3, dead-letter table |
 
 All jobs idempotent (safe to re-run); all carry actor/event correlation IDs into structured logs.
 
@@ -836,7 +836,7 @@ Additional rules: ownership checks always join through org membership; admin ove
 
 ### 14.3 Compliance
 - **CBK / KYC-AML**: Paystack is the licensed PSP — deposits and transfers run through their KYB/KYC-verified rails. Organizer orgs complete KYB (Paystack verification) before first deposit; winners complete Paystack recipient verification before payouts (recipient creation = bank/M-Pesa ownership check). Manual-review queue for payouts > configurable threshold (default KES 500k) — SAR-style escalation documented in `SECURITY.md`.
-- **Kenya Data Protection Act 2019**: consent-based onboarding, export-my-data + delete-my-account (with payout obligations preserved), data-retention policy (payout records 7y per financial-records norms; marketing data deleted on request), privacy policy page listing processors (Vercel, Neon, Paystack, Cloudflare, Resend, Polygon).
+- **Kenya Data Protection Act 2019**: consent-based onboarding, export-my-data + delete-my-account (with payout obligations preserved), data-retention policy (payout records 7y per financial-records norms; marketing data deleted on request), privacy policy page listing processors (Vercel, Neon, Paystack, Cloudflare, Brevo, Polygon).
 - **Financial product honesty**: copy everywhere says *escrow-attested, Paystack-custodied* — no "blockchain-secured funds" ambiguity.
 
 ---
@@ -864,7 +864,7 @@ Fixtures strategy: record real Paystack test-mode webhook payloads once (Phase 3
 | DB | Neon Postgres (prod, branching for staging) · Docker for local/CI |
 | Jobs | pg-boss on the same Postgres (see ADR-004) |
 | Storage | Cloudflare R2 + custom domain |
-| Email | Resend + react-email templates |
+| Email | Brevo transactional email API |
 | Monitoring | Sentry (errors + traces) · Vercel Analytics · `health` endpoint (DB, queue, chain RPC) |
 | Environments | `local` → `preview` (per-PR, Amoy testnet, Paystack test keys) → `production` (main only, Paystack live, mainnet post-audit) |
 | CI (GitHub Actions) | PR: lint (eslint+prettier) → typecheck → unit → integration → build. main-merge: + e2e vs preview + Lighthouse. Nightly: dependency audit + contract soak |
@@ -883,7 +883,7 @@ Estimates assume one experienced full-time builder; halve with a second dev. Eac
 **Exit criteria**: CI green on hello-world route · landing shell renders on mobile with brand tokens · `pnpm run dev/db:migrate/lint/typecheck` all work · PR template live.
 
 ### Phase 1 — Identity & Profiles (Weeks 2–3) · M1
-**Scope**: Auth.js (credentials + Google + GitHub), email verification (Resend), sessions, role grants, developer onboarding wizard, org creation + members, profile CRUD + public profile page, settings.
+**Scope**: Auth.js (credentials + Google + GitHub), email verification (Brevo), sessions, role grants, developer onboarding wizard, org creation + members, profile CRUD + public profile page, settings.
 **Exit criteria**: sign up both roles end-to-end · roles re-checked server-side (test: forged role fails) · profile pages publicly shareable.
 
 ### Phase 2 — Events & Teams (Weeks 4–5) · M2
@@ -1011,9 +1011,11 @@ RPC_URL=https://rpc.amoy.polygonscan.com
 ATTESTER_PRIVATE_KEY=0x...           # platform signer (env-only, never in repo)
 POLYGONSCAN_URL=https://amoy.polygonscan.com
 
-# Storage / Email
+# Storage
 R2_ACCOUNT_ID=... R2_ACCESS_KEY_ID=... R2_SECRET_ACCESS_KEY=... R2_BUCKET=hackvillage-media
-RESEND_API_KEY=...
+
+# Email
+BREVO_API_KEY=...
 
 # Ops
 SENTRY_DSN=...

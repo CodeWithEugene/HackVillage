@@ -7,7 +7,7 @@ The gate before the first production event. Every box is verified in a real envi
 - [ ] Paystack **live** account verified (business KYB on the Paystack side) — test keys swapped for live in all environments.
 - [ ] Legal review of the escrow model complete (R5, plan §19): funds custodied by the licensed PSP; platform never holds float. Sign-off recorded.
 - [ ] Paystack KYB on the platform org (Technetium Kenya — D7) — the org row flipped to `VERIFIED` through the real KYB review, not a manual DB edit.
-- [ ] Kenya DPA 2019: privacy policy page live listing processors (Vercel, Neon, Paystack, Cloudflare, Resend, Polygon); data-export + delete-account paths tested end to end.
+- [ ] Kenya DPA 2019: privacy policy page live listing processors (Vercel, Neon, Paystack, Cloudflare, Brevo, Polygon); data-export + delete-account paths tested end to end.
 - [ ] Terms of Service published (payout obligations, dispute process, IP defaults per event rules).
 
 ## 2. Money Path (the launch blocker)
