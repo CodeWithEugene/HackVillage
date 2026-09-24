@@ -17,6 +17,7 @@ export default function AppTopNav({
     { href: "/dashboard", label: "Dashboard" },
     { href: "/dashboard/events", label: "My events" },
     { href: "/dashboard/teams", label: "Teams" },
+    { href: "/dashboard/winnings", label: "Winnings" },
   ];
 
   if (user.roles.includes("ORGANIZER")) {

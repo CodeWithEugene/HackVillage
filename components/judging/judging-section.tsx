@@ -69,6 +69,22 @@ export async function JudgingSection({
             {readiness.teamsWithSubmission === 1 ? "" : "s"}
           </p>
         </>
+      ) : readiness.teamsWithSubmission > 0 && readiness.fullyJudgedTeams === readiness.teamsWithSubmission ? (
+        <>
+          <CardDescription>
+            All {readiness.teamsWithSubmission} submitted team
+            {readiness.teamsWithSubmission === 1 ? "" : "s"} fully judged — winners can be
+            announced. Announcing triggers the instant 50% payouts immediately.
+          </CardDescription>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href={`/organizer/events/${slug}/winners`}>
+              <Button>Announce winners →</Button>
+            </Link>
+            <Link href={`/organizer/events/${slug}/judges`}>
+              <Button variant="secondary">Judges &amp; readiness</Button>
+            </Link>
+          </div>
+        </>
       ) : (
         <>
           <CardDescription>
@@ -114,7 +130,11 @@ export async function JudgingSection({
             </p>
           )}
           <CardDescription>
-            Winner announcement and the instant 50% payouts arrive with Phase 5.
+            Winner announcement and the instant 50% payouts:{" "}
+            <Link href={`/organizer/events/${slug}/winners`} className="underline hover:text-ink">
+              open the winners console
+            </Link>
+            .
           </CardDescription>
         </>
       )}

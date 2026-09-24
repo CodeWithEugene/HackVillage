@@ -52,6 +52,13 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
     include: {
       org: { select: { name: true, slug: true, trustScore: true, about: true } },
       prizes: { orderBy: { place: "asc" } },
+      winners: {
+        include: {
+          user: { select: { handle: true, name: true } },
+          team: { select: { name: true } },
+          payouts: { select: { tranche: true, status: true } },
+        },
+      },
       _count: { select: { teams: { where: { status: { not: "DISBANDED" } } } } },
     },
   });
@@ -166,19 +173,36 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           <CardTitle>Prize breakdown</CardTitle>
           <table className="mt-3 w-full text-sm">
             <tbody>
-              {event.prizes.map((prize) => (
-                <tr key={prize.id} className="border-b border-ink/5 last:border-0">
-                  <td className="py-2 font-semibold text-ink">{prize.label}</td>
-                  <td className="py-2 text-right font-display text-base font-bold text-ink">
-                    {formatKes(prize.amountKes)}
-                  </td>
-                  <td className="py-2 pl-3 text-right text-xs text-muted">
-                    50% on the day
-                    <br />
-                    50% on milestone
-                  </td>
-                </tr>
-              ))}
+              {event.prizes.map((prize) => {
+                const winner = event.winners.find((w) => w.place === prize.place);
+                return (
+                  <tr key={prize.id} className="border-b border-ink/5 last:border-0">
+                    <td className="py-2 font-semibold text-ink">
+                      {prize.label}
+                      {winner ? (
+                        <span className="block text-xs font-normal text-muted">
+                          won by {winner.team.name} ·{" "}
+                          <Link href={`/developers/${winner.user.handle}`} className="underline">
+                            @{winner.user.handle}
+                          </Link>
+                        </span>
+                      ) : null}
+                    </td>
+                    <td className="py-2 text-right font-display text-base font-bold text-ink">
+                      {formatKes(prize.amountKes)}
+                    </td>
+                    <td className="py-2 pl-3 text-right text-xs text-muted">
+                      {winner
+                        ? winner.payouts.some((p) => p.tranche === "INSTANT" && p.status === "SUCCEEDED")
+                          ? "50% paid ✓"
+                          : "paying…"
+                        : "50% on the day"}
+                      <br />
+                      {prize.milestoneRequired ? "50% on milestone" : "full payout on win"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           <CardDescription>

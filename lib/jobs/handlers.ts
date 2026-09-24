@@ -36,11 +36,14 @@ export async function registerJobs(): Promise<void> {
   if (g.__hv_jobs_registered) return;
   g.__hv_jobs_registered = true;
 
-  const [{ getQueue: loadQueue }, attestations, deposits] = await Promise.all([
-    import("@/lib/queue"),
-    import("@/services/escrow/attestations"),
-    import("@/services/escrow/deposits"),
-  ]);
+  const [{ getQueue: loadQueue }, attestations, deposits, payouts, payoutAttestations] =
+    await Promise.all([
+      import("@/lib/queue"),
+      import("@/services/escrow/attestations"),
+      import("@/services/escrow/deposits"),
+      import("@/services/payout/service"),
+      import("@/services/payout/attestations"),
+    ]);
   const boss = await loadQueue();
 
   await registerJob(boss, "escrow.attest-vault-created", async (data) =>
@@ -50,7 +53,21 @@ export async function registerJobs(): Promise<void> {
     attestations.attestVaultLocked(String(data.eventId))
   );
 
-  // Hourly deposit expiry sweep — INITIATED deposits die after 24h.
+  // Payout families (Phase 5): execution, attestations, and the sweep.
+  await registerJob(boss, "payout.execute", async (data) => {
+    await payouts.executePayout(String(data.payoutId));
+  });
+  await registerJob(boss, "payout.attest", async (data) => {
+    await payoutAttestations.attestPayout({
+      eventId: String(data.eventId),
+      winnerId: String(data.winnerId),
+      tranche: data.tranche === "MILESTONE" ? "MILESTONE" : "INSTANT",
+      amountKes: Number(data.amountKes),
+      txRef: String(data.txRef),
+    });
+  });
+
+  // Hourly cron: deposit expiry + payout recovery sweep.
   await boss.createQueue("escrow.cron").catch((error: { code?: string }) => {
     if (error?.code !== "B03") throw error;
   });
@@ -65,5 +82,19 @@ export async function registerJobs(): Promise<void> {
     }
   });
 
-  console.log("[jobs] registered escrow handlers");
+  await boss.createQueue("payout.cron").catch((error: { code?: string }) => {
+    if (error?.code !== "B03") throw error;
+  });
+  await boss
+    .schedule("payout.cron", "*/10 * * * *", { kind: "sweep-payouts" })
+    .catch(() => undefined);
+  await boss.work("payout.cron", async (jobs: Job<{ kind?: string }>[]) => {
+    for (const job of jobs) {
+      if (job.data?.kind !== "sweep-payouts") continue;
+      const driven = await payouts.sweepStuckPayouts();
+      if (driven > 0) console.log(`[cron] payout sweep re-drove ${driven} payout(s)`);
+    }
+  });
+
+  console.log("[jobs] registered escrow + payout handlers");
 }

@@ -936,9 +936,9 @@ Per workflow-architect methodology — every workflow has a status. Specs live i
 | Go-live gating | WORKFLOW-golive.md | **Built (Phase 3)** | 3 | Deposit locked |
 | Submission (edit window) | — | **Built (Phase 2)** | 2 | Workspace form |
 | Judging + feedback gate | WORKFLOW-judging.md | **Built (Phase 4)** | 4 | Judge finalize |
-| **Instant payout (50%)** | WORKFLOW-payout-instant.md | Planned | 5 | Announce winners |
-| **Milestone payout (50%)** | WORKFLOW-payout-milestone.md | Planned | 5/6 | Organizer confirm |
-| Payout failure ops | WORKFLOW-payout-failure.md | Planned | 5 | transfer.failed |
+| **Instant payout (50%)** | WORKFLOW-payout-instant.md | **Built (Phase 5)** | 5 | Announce winners |
+| **Milestone payout (50%)** | WORKFLOW-payout-milestone.md | **Built (Phase 5)** | 5/6 | Organizer confirm |
+| Payout failure ops | WORKFLOW-payout-failure.md | **Built (Phase 5)** | 5 | transfer.failed |
 | Refund (pre-live cancel) | WORKFLOW-refund.md | Planned | 5 | Event cancel |
 | Dispute resolution | WORKFLOW-dispute.md | Planned | 8 | Developer dispute |
 | 48h media enforcement | WORKFLOW-media-deadline.md | Planned | 7 | Cron |

@@ -66,9 +66,26 @@ organizer command center counting finalized reviews only. Verified: lint,
 typecheck, 104 unit+integration tests, production build, plus a live HTTP
 smoke: credentials login as the seeded judge → /judge → team queue.
 
+**Phase 5 (Payouts & Winners) is complete and verified end to end**: payout
+data model (migration 6 — Winner, Payout with the ⬤ unique
+`{winnerId}:{tranche}` idempotency key, Milestone), Paystack port extensions
+(transfer recipients + transfers, simulation failure hooks), the payout
+engine (atomic winner announcement with judging-completeness + recipient
+gates, idempotent execution with per-attempt references, fail-closed
+retry→MANUAL_REVIEW policy, milestone confirmation → SETTLED, admin retry +
+mark-paid-with-receipt ops with audit logs, recovery sweep cron), transfer
+webhook routing, and all surfaces (recipient onboarding in Settings,
+winnings page with tranche timelines, organizer winners console with typed
+confirmation over KES 250k, milestone confirmer, admin payments queue with
+Trust KPI, public winner strips on event pages, payout attestations on
+/trust). Verified: lint, typecheck, 127 tests, production build, plus a
+full live cycle via `npm run dev:cycle` — judging → winners → instant 50%
+paid → milestone 50% paid → event + vault SETTLED, with winner strips and
+ledger entries visible over HTTP.
+
 Everything else is planned per the build plan phases — build features **in
-phase order** (Phase 5 = Payouts & Winners next: recipients, instant 50%,
-milestones, manual-review ops).
+phase order** (Phase 6 = Proof of Work & Career next: endorsements,
+portfolio, hiring partners, intros).
 
 ## Tech Stack (live)
 | Layer | Technology |

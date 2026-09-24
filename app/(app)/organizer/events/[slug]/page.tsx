@@ -133,6 +133,21 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
         <JudgingSection eventId={event.id} slug={event.slug} endsAt={event.endsAt} status={event.status} />
       )}
 
+      {/* Winners & payouts — after announcement */}
+      {(event.status === "WINNERS_ANNOUNCED" || event.status === "SETTLED") && (
+        <Card>
+          <CardTitle>Winners &amp; payouts</CardTitle>
+          <CardDescription>
+            Winners announced — the instant 50% paid on the day, the final 50% releasing per
+            milestone confirmation. Track every payout and confirm handovers in the winners
+            console.
+          </CardDescription>
+          <Link href={`/organizer/events/${event.slug}/winners`} className="mt-4 inline-block">
+            <Button>Open winners console</Button>
+          </Link>
+        </Card>
+      )}
+
       <Card>
         <CardTitle>Problem statement</CardTitle>
         <p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted">
