@@ -49,7 +49,7 @@ export function BuilderJourney() {
             Africa compete for money that is already there.
           </p>
           <Link href="/onboarding/organizer" className="journey-action">
-            Host An Event
+            Host A Hackathon
           </Link>
         </div>
         <div className="journey-pair journey-pair-left">
@@ -98,13 +98,18 @@ export function BuilderJourney() {
             Half your prize lands the moment you win. Ship your milestone and the rest follows —
             every payout recorded on a public ledger.
           </p>
-          <p className="journey-display">
-            Get Paid
-            <br />
-            Get Seen
-            <br />
-            Get Hired
-          </p>
+          <div className="journey-final-row">
+            <p className="journey-display">
+              Get Paid
+              <br />
+              Get Seen
+              <br />
+              Get Hired
+            </p>
+            <Link href="/events" className="journey-action">
+              Explore Hackathons
+            </Link>
+          </div>
         </div>
       </div>
     </section>

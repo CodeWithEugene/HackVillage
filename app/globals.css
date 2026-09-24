@@ -262,9 +262,15 @@
     max-width: 356px;
   }
   .journey-copy-right {
-    gap: 40px;
-    max-width: 280px;
-    margin-inline-start: clamp(0px, 3vw, 44px);
+    gap: 28px;
+    max-width: 360px;
+    margin-inline-start: clamp(0px, 1.8vw, 24px);
+  }
+  .journey-final-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: clamp(16px, 1.6vw, 24px);
   }
   .journey-display {
     color: var(--color-ink);
@@ -881,5 +887,68 @@
 
   .legal strong {
     @apply font-semibold text-ink;
+  }
+
+  /* 404 illustration — the face built into the middle "0" gets a little life. */
+  .nf-eye {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: nf-blink 4.8s ease-in-out infinite;
+  }
+  .nf-eye-right {
+    animation-delay: 0.06s;
+  }
+  .nf-eyebrow {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: nf-eyebrow-float-left 3.6s ease-in-out infinite;
+  }
+  .nf-eyebrow-right {
+    animation-name: nf-eyebrow-float-right;
+  }
+  .nf-mouth {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: nf-mouth-pulse 2.8s ease-in-out infinite;
+  }
+  @keyframes nf-blink {
+    0%,
+    88%,
+    100% {
+      transform: scaleY(1);
+    }
+    92% {
+      transform: scaleY(0.08);
+    }
+    96% {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes nf-eyebrow-float-left {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-4px) rotate(-2deg);
+    }
+  }
+  @keyframes nf-eyebrow-float-right {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-4px) rotate(2deg);
+    }
+  }
+  @keyframes nf-mouth-pulse {
+    0%,
+    100% {
+      transform: scaleY(1) scaleX(1);
+    }
+    50% {
+      transform: scaleY(1.12) scaleX(1.03);
+    }
   }
 }
