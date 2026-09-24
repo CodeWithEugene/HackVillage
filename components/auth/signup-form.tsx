@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { Building2, Code2 } from "lucide-react";
+import { Building2, Code2, Github } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,7 +25,13 @@ const ROLES = [
   },
 ] as const;
 
-export function SignUpForm() {
+export function SignUpForm({
+  googleEnabled,
+  githubEnabled,
+}: {
+  googleEnabled: boolean;
+  githubEnabled: boolean;
+}) {
   const [state, action, pending] = useActionState<AuthActionState, FormData>(signUpAction, {});
   const [role, setRole] = useState<"DEVELOPER" | "ORGANIZER">("DEVELOPER");
 
@@ -34,6 +41,34 @@ export function SignUpForm() {
       <p className="mt-1 text-sm text-muted">
         One account, many roles — you can add organizer or judge access later.
       </p>
+
+      {(googleEnabled || githubEnabled) && (
+        <>
+          <div className="mt-6 grid gap-2">
+            {googleEnabled && (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => signIn("google", { redirectTo: "/dashboard" })}
+              >
+                Continue with Google
+              </Button>
+            )}
+            {githubEnabled && (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => signIn("github", { redirectTo: "/dashboard" })}
+              >
+                <Github aria-hidden className="size-4" /> Continue with GitHub
+              </Button>
+            )}
+          </div>
+          <div className="my-5 flex items-center gap-3 text-xs text-muted">
+            <span className="h-px flex-1 bg-ink/10" /> or with email <span className="h-px flex-1 bg-ink/10" />
+          </div>
+        </>
+      )}
 
       <form action={action} className="mt-6 space-y-5">
         <input type="hidden" name="role" value={role} />
