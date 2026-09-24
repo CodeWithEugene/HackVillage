@@ -25,7 +25,8 @@
     "db:seed": "tsx --env-file=.env db/seeds/seed.ts",
     "db:studio": "prisma studio --schema db/schema.prisma",
     "dev:fund": "tsx --env-file=.env scripts/fund-event.ts",
-    "dev:cycle": "tsx --env-file=.env scripts/cycle-event.ts"
+    "dev:cycle": "tsx --env-file=.env scripts/cycle-event.ts",
+    "load:test": "tsx --env-file=.env scripts/load-test.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",

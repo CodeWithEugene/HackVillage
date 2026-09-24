@@ -122,9 +122,21 @@ Surfaces: check-in cards on the dashboard, dispute entry on winnings, the
 admin disputes console. Verified: lint, typecheck, 153 tests, production
 build.
 
-Everything else is planned per the build plan phases — build features **in
-phase order** (Phase 9 = Hardening & Launch next: runbooks, load tests,
-go-live checklist, final full verification).
+**Phase 9 (Hardening & Launch) is complete and verified — the v1.0 build
+is done**: four operational runbooks (payout failure triage, webhook replay
+& signature failures, chain-RPC outage / ledger-pending mode, dispute
+handling), the go-live checklist (legal/Paystack-live/chain-audit/pilot
+gates), SECURITY.md attester-key operations, the nightly ledger
+reconciliation job (three-way match, report-only, cron-registered and
+integration-tested), and the judging-rush load test — run live: 200 reads
+p95 33ms, 100-concurrent auth burst p95 285ms, webhook rejects p95 9ms,
+zero 5xx (PASS). Final verification: 156 unit+integration tests, 9 contract
+tests, lint clean, typecheck clean, production build green.
+
+**v1.0 feature-complete.** Remaining launch gates (external, tracked in
+docs/GO_LIVE_CHECKLIST.md): Paystack live keys + real webhook/payout drill,
+Amoy deployment + independent contract audit + mainnet (post-pilot, D6),
+legal sign-off (R5), and the Nairobi pilot event.
 
 ## Tech Stack (live)
 | Layer | Technology |

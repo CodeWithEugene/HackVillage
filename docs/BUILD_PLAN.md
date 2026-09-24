@@ -946,7 +946,7 @@ Per workflow-architect methodology — every workflow has a status. Specs live i
 | Legacy check-in | — | **Built (Phase 8)** | 8 | Cron +3mo |
 | Introduction request/accept | — | Planned | 6 | Hiring CTA |
 | Notification dispatch | — | **Built (Phase 7)** | 7 | All events above |
-| Ledger reconcile (3-way) | — | Planned | 3/5 | Nightly |
+| Ledger reconcile (3-way) | — | **Built (Phase 9)** | 3/5 | Nightly |
 
 ---
 

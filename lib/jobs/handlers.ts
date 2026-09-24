@@ -135,5 +135,28 @@ export async function registerJobs(): Promise<void> {
     }
   });
 
-  console.log("[jobs] registered escrow + payout + media + legacy handlers");
+  // Phase 9: nightly ledger reconciliation (three-way match, plan §12).
+  const { reconcileLedger } = await import("@/services/escrow/reconcile");
+  await boss.createQueue("ledger.cron").catch((error: { code?: string }) => {
+    if (error?.code !== "B03") throw error;
+  });
+  await boss
+    .schedule("ledger.cron", "0 3 * * *", { kind: "reconcile-ledger" })
+    .catch(() => undefined);
+  await boss.work("ledger.cron", async (jobs: Job<{ kind?: string }>[]) => {
+    for (const job of jobs) {
+      if (job.data?.kind !== "reconcile-ledger") continue;
+      const result = await reconcileLedger();
+      if (result.findings.length > 0) {
+        console.error(
+          `[cron] ledger reconciliation: ${result.findings.length} finding(s) across ${result.checkedEvents} events — investigate`
+        );
+        for (const finding of result.findings) {
+          console.error(`  - ${finding.kind}: ${finding.detail}`);
+        }
+      }
+    }
+  });
+
+  console.log("[jobs] registered escrow + payout + media + legacy + reconcile handlers");
 }
