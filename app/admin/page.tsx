@@ -67,6 +67,12 @@ export default async function AdminHomePage() {
             <CardDescription>Penalties, appeals, and manual adjustments.</CardDescription>
           </Card>
         </Link>
+        <Link href="/admin/disputes">
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardTitle>Disputes</CardTitle>
+            <CardDescription>Milestone disputes — release or reject with audit.</CardDescription>
+          </Card>
+        </Link>
       </div>
     </div>
   );

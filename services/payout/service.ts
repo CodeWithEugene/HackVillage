@@ -229,6 +229,11 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
     // item automatically — the profile writes itself from verified results.
     await materializePortfolioForWinner(payout.winnerId);
   }
+
+  // Legacy Tracker (Phase 8 — plan §10.7): 3-month check-ins for every
+  // submission of this event, not just the winners.
+  const { scheduleLegacyCheckins } = await import("@/services/legacy/service");
+  await scheduleLegacyCheckins(event.id);
 }
 
 // ── Payout execution (the job — plan §10.4 STEP 4) ──────────────────────

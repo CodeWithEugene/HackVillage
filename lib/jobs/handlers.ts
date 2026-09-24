@@ -114,5 +114,26 @@ export async function registerJobs(): Promise<void> {
     }
   });
 
-  console.log("[jobs] registered escrow + payout + media handlers");
+  // Phase 8: legacy check-ins + milestone reminders, daily.
+  const legacy = await import("@/services/legacy/service");
+  await boss.createQueue("legacy.cron").catch((error: { code?: string }) => {
+    if (error?.code !== "B03") throw error;
+  });
+  await boss
+    .schedule("legacy.cron", "0 9 * * *", { kind: "legacy-sweep" })
+    .catch(() => undefined);
+  await boss.work("legacy.cron", async (jobs: Job<{ kind?: string }>[]) => {
+    for (const job of jobs) {
+      if (job.data?.kind !== "legacy-sweep") continue;
+      const legacyResult = await legacy.runLegacySweep();
+      const milestoneResult = await legacy.runMilestoneReminders();
+      if (legacyResult.reminded + legacyResult.unresponsive + milestoneResult > 0) {
+        console.log(
+          `[cron] legacy: ${legacyResult.reminded} reminded, ${legacyResult.unresponsive} unresponsive, ${milestoneResult} milestone nudges`
+        );
+      }
+    }
+  });
+
+  console.log("[jobs] registered escrow + payout + media + legacy handlers");
 }

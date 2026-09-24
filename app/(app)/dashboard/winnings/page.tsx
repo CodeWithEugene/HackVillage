@@ -4,6 +4,7 @@ import { HandCoins } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { DisputeForm } from "@/components/legacy/legacy-cards";
 import { EmptyState } from "@/components/ui/empty-state";
 import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
@@ -163,6 +164,15 @@ export default async function WinningsPage() {
                     </li>
                   ))}
                 </ul>
+
+                {/* Dispute entry when milestone is stuck + 14 days past announcement */}
+                {win.milestoneRequired &&
+                !win.payouts.some((p) => p.tranche === "MILESTONE") &&
+                Date.now() - win.announcedAt.getTime() > 14 * 24 * 60 * 60 * 1000 ? (
+                  <div className="mt-3">
+                    <DisputeForm winnerId={win.id} />
+                  </div>
+                ) : null}
               </Card>
             </li>
           ))}

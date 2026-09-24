@@ -940,10 +940,10 @@ Per workflow-architect methodology — every workflow has a status. Specs live i
 | **Milestone payout (50%)** | WORKFLOW-payout-milestone.md | **Built (Phase 5)** | 5/6 | Organizer confirm |
 | Payout failure ops | WORKFLOW-payout-failure.md | **Built (Phase 5)** | 5 | transfer.failed |
 | Refund (pre-live cancel) | WORKFLOW-refund.md | Planned | 5 | Event cancel |
-| Dispute resolution | WORKFLOW-dispute.md | Planned | 8 | Developer dispute |
+| Dispute resolution | WORKFLOW-dispute.md | **Built (Phase 8)** | 8 | Developer dispute |
 | 48h media enforcement | WORKFLOW-media-deadline.md | **Built (Phase 7)** | 7 | Cron |
 | Trust adjustment + appeal | — | **Built (Phase 7)** | 7 | Penalty |
-| Legacy check-in | — | Planned | 8 | Cron +3mo |
+| Legacy check-in | — | **Built (Phase 8)** | 8 | Cron +3mo |
 | Introduction request/accept | — | Planned | 6 | Hiring CTA |
 | Notification dispatch | — | **Built (Phase 7)** | 7 | All events above |
 | Ledger reconcile (3-way) | — | Planned | 3/5 | Nightly |
