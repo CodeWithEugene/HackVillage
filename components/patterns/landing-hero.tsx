@@ -1,29 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Code2, ShieldCheck } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { CircuitLines } from "@/components/patterns/circuit-lines";
-
-function CodeSeal({ source = false }: { source?: boolean }) {
-  const id = source ? "hero-source-ring" : "hero-verified-ring";
-  return (
-    <div
-      className={`hero-seal ${source ? "hero-seal-source" : "hero-seal-verified"}`}
-      aria-hidden="true"
-    >
-      <svg viewBox="0 0 120 120" className="hero-seal-ring">
-        <defs>
-          <path id={id} d="M60,12 a48,48 0 1,1 -0.01,0" />
-        </defs>
-        <text fill="currentColor" fontSize="9.6" letterSpacing="2.1">
-          <textPath href={`#${id}`} textLength="301" lengthAdjust="spacing">
-            {source ? "OPEN SOURCE · BUILT TOGETHER · " : "PRIZE VERIFIED · BUILD WITH TRUST · "}
-          </textPath>
-        </text>
-      </svg>
-      {source ? <Code2 className="hero-seal-icon" /> : <ShieldCheck className="hero-seal-icon" />}
-    </div>
-  );
-}
 
 function Photo({ name, alt, center = false }: { name: string; alt: string; center?: boolean }) {
   return (
@@ -46,8 +24,6 @@ export function LandingHero() {
       <div className="hero-intro">
         <CircuitLines className="hero-circuit hero-circuit-left" />
         <CircuitLines className="hero-circuit hero-circuit-right" />
-        <CodeSeal source />
-        <CodeSeal />
 
         <div className="hero-copy">
           <p className="hero-eyebrow">Open source. Real people. Real impact.</p>
