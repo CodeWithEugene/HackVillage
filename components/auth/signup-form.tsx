@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { Building2, Code2, Github } from "lucide-react";
+import { Building2, Code2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 
+import { GithubIcon } from "@/components/icons/github-icon";
 import { GoogleIcon } from "@/components/icons/google-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -46,7 +47,7 @@ export function SignUpForm({
 
       {(googleEnabled || githubEnabled) && (
         <>
-          <p className="mt-6 text-sm font-semibold text-ink">Continue with:</p>
+          <p className="mt-6 text-center text-sm font-semibold text-ink">Continue with:</p>
           <div className={`mt-2 grid gap-2 ${googleEnabled && githubEnabled ? "grid-cols-2" : "grid-cols-1"}`}>
             {googleEnabled && (
               <Button
@@ -73,7 +74,7 @@ export function SignUpForm({
                   void signIn("github", { redirectTo: "/dashboard" });
                 }}
               >
-                {oauthLoading !== "github" && <Github aria-hidden className="size-4" />} GitHub
+                {oauthLoading !== "github" && <GithubIcon className="size-4" />} GitHub
               </Button>
             )}
           </div>
