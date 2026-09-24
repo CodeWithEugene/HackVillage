@@ -358,9 +358,6 @@
   .admin-header-actions .header-icon {
     color: var(--color-on-inverse);
   }
-  [data-theme="dark"] img[src="/branding/HackVillage-Logo.gif"] {
-    filter: brightness(0) invert(1);
-  }
   .theme-options {
     position: absolute;
     z-index: 60;

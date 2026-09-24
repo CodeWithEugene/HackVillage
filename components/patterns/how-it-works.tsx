@@ -4,37 +4,37 @@ const STEPS = [
   {
     number: "01",
     image: "launch",
-    intro: "Set the challenge. Secure the prizes. Give great ideas a place to start.",
-    title: "Launch With Trust",
+    intro: "Set the challenge, put up the money, and give great ideas somewhere to start.",
+    title: "The Prize Is Already There",
     description:
-      "Publish your brief and roles. Deposit the full prize pool to earn the Prize Verified badge.",
+      "Post your challenge and the roles you're looking for. Before anyone signs up, you put the full prize amount in — so builders know it's real, not a promise.",
     alt: "Kenyan hackathon organizers planning a challenge together at a laptop",
   },
   {
     number: "02",
     image: "build",
     intro: "Bring the right people together and turn one idea into a working project.",
-    title: "Team Up & Build",
+    title: "Builders Team Up",
     description:
-      "Developers join your hackathon, form teams, and manage their projects in one shared workspace.",
+      "People join, find teammates, and build their project together — all in one shared space, from first idea to final demo.",
     alt: "Three Kenyan developers collaborating on a project at a Nairobi hackathon",
   },
   {
     number: "03",
     image: "judge",
-    intro: "Give every project a fair, structured review and feedback they can use.",
-    title: "Showcase & Judge",
+    intro: "Give every project a fair review and feedback they can actually use.",
+    title: "Everyone Gets Judged the Same Way",
     description:
-      "Teams submit their work. Judges score against a clear rubric and share structured feedback.",
+      "Teams submit their work. Judges score every project against the same scorecard and leave notes builders can learn from.",
     alt: "A Kenyan developer demonstrating his project to a judge at a hackathon",
   },
   {
     number: "04",
     image: "reward",
-    intro: "Celebrate the work. Reward the winners. Every outcome stays verifiable.",
-    title: "Celebrate & Reward",
+    intro: "Celebrate the work, reward the winners, and let anyone check the receipts.",
+    title: "Winners Get Paid Instantly",
     description:
-      "Winners receive 50% instantly, with the rest tied to milestones. Every payout goes on the public ledger.",
+      "The moment winners are announced, half their prize lands in their account — instantly. The rest follows once they deliver, and anyone can check it actually happened.",
     alt: "Two Kenyan hackathon winners celebrating together with their trophy",
   },
 ];
@@ -50,14 +50,14 @@ export function HowItWorks() {
         <div className="how-it-works-heading-block">
           <p className="how-it-works-eyebrow">How It Works</p>
           <h2 id="how-it-works-heading">
-            From the First Idea
+            From First Idea
             <br />
-            <span>to the Final Payout.</span>
+            <span>to Final Payday.</span>
           </h2>
         </div>
         <p className="how-it-works-description">
-          One flow from launch to payout: deposit the prize, welcome builders, judge fairly, and
-          pay out the moment winners are announced.
+          One simple flow: lock in the prize money, bring people together, judge everyone the
+          same way, and pay winners the moment they&apos;re announced.
         </p>
       </header>
       <ol className="how-it-works-grid">
