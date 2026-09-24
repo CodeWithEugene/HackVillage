@@ -8,7 +8,7 @@ export default {
     "scope-enum": [
       2,
       "always",
-      ["escrow", "payout", "profiles", "events", "auth", "db", "contracts", "ui", "api", "docs"],
+      ["escrow", "payout", "profiles", "events", "auth", "db", "contracts", "ui", "api", "docs", "ci"],
     ],
     "scope-empty": [1, "never"], // warn: prefer a scope, allow repo-level commits without one
   },
