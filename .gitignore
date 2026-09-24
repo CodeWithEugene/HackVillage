@@ -1,0 +1,47 @@
+# dependencies
+/node_modules
+.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# local env files — never commit credentials (CONTRIBUTING.md)
+.env
+.env.local
+.env.*.local
+
+# vercel
+.vercel
+
+# hardhat
+/contracts/cache
+/contracts/artifacts
+
+# dev media uploads (local storage mode)
+/public/uploads
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# claude-flow local tooling data
+.claude-flow/

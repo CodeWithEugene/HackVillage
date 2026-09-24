@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+build
+dist
+coverage
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+LICENSE
+contracts
+.DS_Store

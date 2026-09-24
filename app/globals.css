@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+/*
+ * HackVillage design tokens — plan §13.1.
+ * Brand: salamander yellow + ink. Warm paper background, honest money states.
+ */
+@theme {
+  --color-brand: #ffed00;
+  --color-brand-soft: #fff59e;
+  --color-ink: #222222;
+  --color-ink-soft: #3a3a3a;
+  --color-paper: #fafaf7;
+  --color-muted: #6b6b6b;
+
+  --color-success: #0e9f6e;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 12px;
+  --radius-control: 8px;
+
+  --shadow-card: 0 1px 2px rgb(34 34 34 / 0.06), 0 4px 12px rgb(34 34 34 / 0.08);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-paper font-body text-ink antialiased;
+  }
+
+  ::selection {
+    background: var(--color-brand);
+    color: var(--color-ink);
+  }
+
+  /* Focus visibility — WCAG 2.1 AA (plan §13.1) */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

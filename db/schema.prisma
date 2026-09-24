@@ -1,0 +1,866 @@
+// HackVillage — baseline identity schema (Phase 0 of docs/BUILD_PLAN.md §6.1)
+// Events, escrow, payout, judging, and media models land in Phases 2–7.
+// Note: migrations and seeds live in db/ to match the structure documented in
+// CONTRIBUTING.md (npm scripts pass --schema=db/schema.prisma).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ─────────────────────────────────────────────────────────────────
+
+/// The role chosen at signup — routes onboarding only; roles are additive.
+enum PrimaryRole {
+  DEVELOPER
+  ORGANIZER
+}
+
+/// Capability roles — additive per user; enforced server-side (plan §14.1).
+enum Role {
+  DEVELOPER
+  ORGANIZER
+  JUDGE
+  HIRING
+  ADMIN
+}
+
+/// Organizer organization KYB status — gate for the first deposit (Phase 3).
+enum KycStatus {
+  NONE
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum OrgMemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum OrgMemberStatus {
+  ACTIVE
+  REVOKED
+}
+
+/// Event lifecycle (plan §10.1). Phase 2 owns DRAFT → PENDING_DEPOSIT only —
+/// LIVE and beyond are gated by the escrow service in Phase 3.
+enum EventStatus {
+  DRAFT
+  PENDING_DEPOSIT
+  LIVE
+  IN_PROGRESS
+  JUDGING
+  WINNERS_ANNOUNCED
+  SETTLED
+  CANCELLED
+  DISPUTED
+}
+
+enum VenueType {
+  PHYSICAL
+  ONLINE
+  HYBRID
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  WAITLISTED
+  CANCELLED
+}
+
+enum TeamStatus {
+  OPEN
+  LOCKED
+  DISBANDED
+}
+
+enum TeamMemberStatus {
+  INVITED
+  JOINED
+  LEFT
+  DECLINED
+}
+
+enum DepositStatus {
+  INITIATED
+  SUCCEEDED
+  FAILED
+  REVERSED
+}
+
+/// Mirrors the on-chain PrizeVault state machine 1:1 (plan §10.2, §11.2).
+enum VaultChainState {
+  AWAITING
+  LOCKED
+  HALF_RELEASED
+  SETTLED
+  REFUNDED
+}
+
+enum LedgerEntryType {
+  VAULT_CREATED
+  DEPOSIT_LOCKED
+  INSTANT_PAYOUT
+  MILESTONE_PAYOUT
+  VAULT_REFUNDED
+}
+
+enum WebhookSource {
+  PAYSTACK
+}
+
+// ── Identity (Auth.js v5 adapter-compatible shapes) ───────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  // Null for OAuth-only accounts. Credentials auth lands in Phase 1.
+  passwordHash String?
+  handle        String    @unique
+  avatarUrl     String?
+  primaryRole   PrimaryRole
+  // Set when the onboarding wizard completes — gates app routes (Phase 1).
+  onboardingCompletedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  // Soft delete: anonymize on account deletion, payout obligations remain.
+  deletedAt     DateTime?
+
+  accounts       Account[]
+  sessions       Session[]
+  roleGrants     RoleGrant[]
+  ownedOrgs      Organization[] @relation("OrgOwner")
+  orgMemberships OrgMember[]
+  profile        DeveloperProfile?
+  registrations  Registration[]
+  teamMemberships TeamMember[]
+  ledTeams       Team[] @relation("TeamLeader")
+  judgeAssignments JudgeAssignment[]
+  judgeScores Score[] @relation("JudgeScores")
+  judgeFeedback Feedback[] @relation("JudgeFeedback")
+  judgingProgress JudgingProgress[] @relation("JudgeProgress")
+  payoutsWon Winner[] @relation("PayoutWinners")
+  endorsementsGiven Endorsement[] @relation("EndorsementJudge")
+  endorsementsReceived Endorsement[] @relation("EndorsementDeveloper")
+  portfolioItems PortfolioItem[] @relation("PortfolioItems")
+  introRequestsSent Introduction[] @relation("IntroRequests")
+  introRequestsReceived Introduction[] @relation("IntroDeveloper")
+  notifications Notification[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model RoleGrant {
+  id        String   @id @default(cuid())
+  userId    String
+  role      Role
+  grantedBy String?
+  grantedAt DateTime @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+}
+
+// ── Organizations ─────────────────────────────────────────────────────────
+
+model Organization {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String    @unique
+  logoUrl    String?
+  about      String?
+  ownerId    String
+  kycStatus  KycStatus @default(NONE)
+  // 100 + Σ TrustEvents (floor 0) — maintained by the trust service (Phase 7).
+  trustScore Int       @default(100)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  owner   User        @relation("OrgOwner", fields: [ownerId], references: [id])
+  members OrgMember[]
+  invitations OrgInvitation[]
+  events Event[]
+  trustEvents TrustEvent[]
+}
+
+model OrgMember {
+  id     String          @id @default(cuid())
+  orgId  String
+  userId String
+  role   OrgMemberRole
+  status OrgMemberStatus @default(ACTIVE)
+
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+}
+
+/// Invite codes for joining an organization (Phase 1: create/join org in
+/// onboarding, plus /invites/[code] for existing users).
+model OrgInvitation {
+  id        String        @id @default(cuid())
+  orgId     String
+  email     String
+  role      OrgMemberRole @default(MEMBER)
+  token     String        @unique
+  expiresAt DateTime
+  acceptedAt DateTime?
+  createdAt DateTime      @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+}
+
+// ── Developer Proof-of-Work profile ──────────────────────────────────────
+
+model DeveloperProfile {
+  userId String @id
+  headline String?
+  bio String?
+  skills String[]
+  githubLogin String?
+  linkedinUrl String?
+  location String?
+  // Public browse visibility (privacy toggle, plan §7.4).
+  visible Boolean @default(true)
+  // Paystack transfer recipient — required before a user can be marked a
+  // winner (plan §6.1 invariant). Wired in Phase 5.
+  payoutRecipientCode String?
+  // "MPESA" | "BANK" — promoted to an enum when the payout service lands.
+  payoutMethod String?
+  // Derived metric — recomputed by jobs, never client-writable.
+  winRateCached Float?
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ── Events & Teams (Phase 2 — no money code; deposits arrive in Phase 3) ──
+
+model Event {
+  id String @id @default(cuid())
+  orgId String
+  slug String @unique
+  title String
+  summary String?
+  problemStatement String?
+  rules String?
+  venueType VenueType
+  location String?
+  coverUrl String?
+  startsAt DateTime
+  endsAt DateTime
+  registrationDeadline DateTime
+  maxTeams Int @default(20)
+  rolesWanted String[]
+  status EventStatus @default(DRAFT)
+  // Set by the escrow service when the vault locks (Phase 3).
+  prizeVerifiedAt DateTime?
+  // endsAt + 48h — enforced by the media job (Phase 7).
+  mediaDeadlineAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  publishedAt DateTime?
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  prizes PrizeBreakdown[]
+  roleTags EventRoleTag[]
+  registrations Registration[]
+  teams Team[]
+  deposits Deposit[]
+  vault VaultState?
+  ledgerEntries LedgerEntry[]
+  judges JudgeAssignment[]
+  rubric Rubric?
+  winners Winner[]
+  endorsements Endorsement[]
+  internshipTags InternshipTag[]
+  introductions Introduction[]
+  media MediaAsset[]
+
+  @@index([status, startsAt])
+}
+
+/// Pool amount is derived: the pool equals Σ PrizeBreakdown.amountKes for the
+/// event (Decision D1/D5 — organizers fund the pool, platform adds 5% on top
+/// at deposit time, ADR-012).
+model PrizeBreakdown {
+  id String @id @default(cuid())
+  eventId String
+  place Int
+  label String
+  amountKes Int
+  milestoneRequired Boolean @default(true)
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, place])
+}
+
+model EventRoleTag {
+  id String @id @default(cuid())
+  eventId String
+  tag String
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, tag])
+}
+
+model Registration {
+  id String @id @default(cuid())
+  eventId String
+  userId String
+  status RegistrationStatus @default(REGISTERED)
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+}
+
+model Team {
+  id String @id @default(cuid())
+  eventId String
+  name String
+  leaderId String
+  inviteCode String @unique
+  status TeamStatus @default(OPEN)
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  leader User @relation("TeamLeader", fields: [leaderId], references: [id])
+  members TeamMember[]
+  submission Submission?
+  scores Score[]
+  feedback Feedback[]
+  judgingProgress JudgingProgress[]
+  wins Winner[] @relation("TeamWins")
+
+  @@index([eventId])
+}
+
+model TeamMember {
+  id String @id @default(cuid())
+  teamId String
+  userId String
+  status TeamMemberStatus @default(INVITED)
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+}
+
+model Submission {
+  id String @id @default(cuid())
+  teamId String @unique
+  repoUrl String
+  demoUrl String?
+  description String
+  submittedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  /// [{userId, percent}] — must sum to 100; visible to all members (ADR-013).
+  splitDeclaration Json?
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  legacyCheckin LegacyCheckin?
+}
+
+// ── Escrow (Phase 3 — hard boundary; services/escrow owns these rows) ────
+
+model Deposit {
+  id String @id @default(cuid())
+  eventId String
+  /// Unique per attempt — the Paystack transaction reference. Idempotency
+  /// anchor for webhook replays (P3).
+  paystackReference String @unique
+  /// gross = pool portion + platform fee (ADR-012).
+  grossAmountKes Int
+  poolAmountKes Int
+  feeKes Int
+  currency String @default("KES")
+  channel String?
+  status DepositStatus @default(INITIATED)
+  /// Paystack authorization_url — or the dev simulation checkout in local dev.
+  authorizationUrl String?
+  paidAt DateTime?
+  rawWebhook Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+model VaultState {
+  id String @id @default(cuid())
+  eventId String @unique
+  /// The pool portion only — the fee never enters the vault (ADR-012).
+  amountKes Int
+  contractAddress String?
+  chainState VaultChainState @default(AWAITING)
+  lockedAt DateTime?
+  halfReleasedAt DateTime?
+  settledAt DateTime?
+  refundedAt DateTime?
+  lastTxHash String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+/// Mirror of on-chain attestation events — the /trust page reads this table;
+/// the chain remains the source of truth (plan §11.3).
+model LedgerEntry {
+  id String @id @default(cuid())
+  eventId String
+  type LedgerEntryType
+  payload Json
+  txHash String @unique
+  blockNumber Int?
+  mirroredAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+/// Webhook replay guard — unique(source, eventType, reference). Raw payloads
+/// are retained for forensics (plan §14.2).
+model WebhookEvent {
+  id String @id @default(cuid())
+  source WebhookSource
+  eventType String
+  reference String
+  signatureOk Boolean @default(false)
+  payload Json
+  processedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@unique([source, eventType, reference])
+}
+
+/// Append-only audit log for privileged actions (KYB approvals, trust
+/// adjustments, admin overrides — plan §6.8, P10).
+model AuditLog {
+  id String @id @default(cuid())
+  actorId String?
+  action String
+  entity String
+  entityId String?
+  reason String?
+  meta Json?
+  createdAt DateTime @default(now())
+}
+
+// ── Judging (Phase 4 — plan §6.5) ───────────────────────────────────────
+
+enum JudgeAssignmentStatus {
+  INVITED
+  ACTIVE
+  DECLINED
+}
+
+enum FeedbackKind {
+  STRENGTH
+  IMPROVEMENT
+  NEXT_STEP
+}
+
+model JudgeAssignment {
+  id String @id @default(cuid())
+  eventId String
+  userId String
+  status JudgeAssignmentStatus @default(INVITED)
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+}
+
+/// Organizer-tuned rubric from the platform template (Decision D4): ≥3
+/// criteria, weights summing to 100. Locked once judging opens.
+model Rubric {
+  id String @id @default(cuid())
+  eventId String @unique
+  /// [{id, label, weight}]
+  criteria Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Score {
+  id String @id @default(cuid())
+  judgeId String
+  teamId String
+  criterionId String
+  /// 0–10 per criterion.
+  value Int
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation("JudgeScores", fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@unique([judgeId, teamId, criterionId])
+  @@index([teamId])
+}
+
+model Feedback {
+  id String @id @default(cuid())
+  judgeId String
+  teamId String
+  point String
+  kind FeedbackKind
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation("JudgeFeedback", fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+}
+
+/// Finalization gate: a judge locks their review of one team only after the
+/// structured-feedback requirement is satisfied (≥3 points, one per kind).
+model JudgingProgress {
+  id String @id @default(cuid())
+  judgeId String
+  teamId String
+  finalizedAt DateTime?
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation("JudgeProgress", fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@unique([judgeId, teamId])
+}
+
+// ── Payouts (Phase 5 — hard boundary; services/payout owns these rows) ───
+
+enum PayoutTranche {
+  INSTANT
+  MILESTONE
+}
+
+enum PayoutStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  REVERSED
+  MANUAL_REVIEW
+}
+
+model Winner {
+  id String @id @default(cuid())
+  eventId String
+  teamId String
+  place Int
+  /// The team LEADER (ADR-013) — the single verified recipient per win.
+  userId String
+  amountKes Int
+  milestoneRequired Boolean @default(true)
+  announcedAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user User @relation("PayoutWinners", fields: [userId], references: [id])
+  team Team @relation("TeamWins", fields: [teamId], references: [id])
+  payouts Payout[]
+  milestone Milestone?
+  dispute Dispute?
+
+  @@unique([eventId, place])
+}
+
+model Payout {
+  id String @id @default(cuid())
+  winnerId String
+  tranche PayoutTranche
+  amountKes Int
+  /// ⬤ {winnerId}:{tranche} — the unique constraint makes a double payout
+  /// structurally impossible, even under races and retries (P3).
+  idempotencyKey String @unique
+  paystackTransferCode String?
+  paystackReference String?
+  recipientCode String
+  status PayoutStatus @default(QUEUED)
+  attemptCount Int @default(0)
+  lastError String?
+  queuedAt DateTime @default(now())
+  paidAt DateTime?
+
+  winner Winner @relation(fields: [winnerId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([winnerId])
+}
+
+model Milestone {
+  id String @id @default(cuid())
+  winnerId String @unique
+  title String
+  description String?
+  confirmedBy String?
+  confirmedAt DateTime?
+  /// Auto-reminders at 30/60/90 days (plan §10.5), job-driven.
+  dueAt DateTime
+
+  winner Winner @relation(fields: [winnerId], references: [id], onDelete: Cascade)
+}
+
+// ── Proof of Work & Career (Phase 6 — plan §6.6) ────────────────────────
+
+enum EndorsementVisibility {
+  PUBLISHED
+  HIDDEN
+}
+
+/// Judge endorsements of winners — the human layer on verified metrics.
+model Endorsement {
+  id String @id @default(cuid())
+  judgeId String
+  developerId String
+  eventId String
+  quote String
+  visibility EndorsementVisibility @default(PUBLISHED)
+  createdAt DateTime @default(now())
+
+  judge User @relation("EndorsementJudge", fields: [judgeId], references: [id], onDelete: Cascade)
+  developer User @relation("EndorsementDeveloper", fields: [developerId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([judgeId, developerId, eventId])
+}
+
+enum PortfolioLifecycle {
+  DEMO
+  IN_PRODUCTION
+  PIVOTED
+  ARCHIVED
+}
+
+/// The permanent home for every submission — auto-created at announcement.
+model PortfolioItem {
+  id String @id @default(cuid())
+  submissionId String @unique
+  developerId String
+  title String
+  summary String
+  repoUrl String
+  demoUrl String?
+  lifecycle PortfolioLifecycle @default(DEMO)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  developer User @relation("PortfolioItems", fields: [developerId], references: [id], onDelete: Cascade)
+
+  @@index([developerId])
+}
+
+enum InternshipTagKind {
+  INTERNSHIP
+  APPRENTICESHIP
+  MENTORSHIP
+}
+
+/// Value add-ons organizers attach to events (plan §2 A).
+model InternshipTag {
+  id String @id @default(cuid())
+  eventId String
+  kind InternshipTagKind
+  partnerName String
+  slots Int @default(1)
+  description String?
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+enum IntroStatus {
+  REQUESTED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+/// One-click introductions (plan §6.6): hiring partners request, winners accept.
+model Introduction {
+  id String @id @default(cuid())
+  hiringPartnerId String
+  developerId String
+  eventId String
+  message String
+  status IntroStatus @default(REQUESTED)
+  createdAt DateTime @default(now())
+  respondedAt DateTime?
+
+  hiringPartner User @relation("IntroRequests", fields: [hiringPartnerId], references: [id], onDelete: Cascade)
+  developer User @relation("IntroDeveloper", fields: [developerId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([hiringPartnerId, developerId, eventId])
+}
+
+// ── Media Vault & Trust (Phase 7 — plan §6.7) ───────────────────────────
+
+enum MediaKind {
+  PHOTO
+  VIDEO
+}
+
+enum MediaStatus {
+  PENDING
+  APPROVED
+  HIDDEN
+}
+
+model MediaAsset {
+  id String @id @default(cuid())
+  eventId String
+  /// Storage key — R2 in prod, local dev dir in simulation.
+  r2Key String @unique
+  url String
+  kind MediaKind
+  caption String?
+  uploadedBy String
+  status MediaStatus @default(PENDING)
+  uploadedAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+enum TrustEventType {
+  MEDIA_PENALTY
+  PAYOUT_EXCELLENCE
+  MANUAL_ADJUST
+  APPEAL_GRANTED
+}
+
+model TrustEvent {
+  id String @id @default(cuid())
+  orgId String
+  type TrustEventType
+  /// Score delta applied (negative for penalties).
+  delta Int
+  reason String
+  actorId String?
+  createdAt DateTime @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+/// In-app notifications (email fan-out happens via the notifications job).
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  type String
+  payload Json?
+  readAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+// ── Legacy & Disputes (Phase 8 — plan §6.7, §10.5) ───────────────────────
+
+enum LegacyOutcome {
+  STILL_DEMO
+  IN_PRODUCTION
+  PIVOTED
+  ABANDONED
+  UNRESPONSIVE
+}
+
+/// The 3-month check-in: did the prototype become a product? (plan §10.7)
+model LegacyCheckin {
+  id String @id @default(cuid())
+  submissionId String @unique
+  dueAt DateTime
+  completedAt DateTime?
+  outcome LegacyOutcome?
+  notes String?
+  reminderCount Int @default(0)
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([dueAt, completedAt])
+}
+
+enum DisputeStatus {
+  OPEN
+  RESOLVED_RELEASE
+  RESOLVED_REFUND
+  REJECTED
+}
+
+/// Milestone disputes: developer claims non-confirmation; admins arbitrate
+/// (plan §10.5) — force-release or refund (refund needs 2-admin approval).
+model Dispute {
+  id String @id @default(cuid())
+  winnerId String @unique
+  openedBy String
+  claim String
+  evidenceUrl String?
+  status DisputeStatus @default(OPEN)
+  resolvedBy String?
+  resolvedAt DateTime?
+  resolutionNote String?
+  secondApproverId String? // refunds require two admins (plan §14.1)
+  createdAt DateTime @default(now())
+
+  winner Winner @relation(fields: [winnerId], references: [id], onDelete: Cascade)
+}
