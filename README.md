@@ -245,7 +245,7 @@ Paystack API ──── Final transfer ──── Public Ledger entry record
 
 ### Prerequisites
 
-- Node.js >= 18.18 (Next.js 15 requirement)
+- Node.js >= 22.13 (required by pnpm 10+)
 - pnpm >= 9 (`corepack enable` or `npm install -g pnpm`)
 - PostgreSQL >= 15
 - A Paystack account (test keys sufficient for local development)
