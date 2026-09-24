@@ -22,13 +22,48 @@ export function VerifyEmailClient({ token }: { token: string }) {
     if (token) void verify(token);
   }, [token, verify]);
 
+  const resendForm = (
+    <>
+      <form action={resend} className="mt-6 space-y-4">
+        <div>
+          <Label htmlFor="resend-email">Your email</Label>
+          <Input
+            id="resend-email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder="the one you signed up with"
+            required
+          />
+        </div>
+        <Button type="submit" variant="secondary" className="w-full" loading={resending}>
+          Send A Fresh Verification Email
+        </Button>
+      </form>
+      {resendState.message === "sent" ? (
+        <p role="status" className="mt-3 text-sm font-medium text-success">
+          If an account needs verification, a new link is on its way.
+        </p>
+      ) : null}
+      <FormError message={resendState.error} />
+    </>
+  );
+
   if (!token) {
     return (
-      <Card className="text-center">
+      <Card>
         <h1 className="font-display text-2xl font-bold text-ink">Verify Your Email</h1>
         <p className="mt-2 text-sm text-muted">
-          This page needs the link from your verification email. Open the newest email from
-          HackVillage and click the button inside.
+          Open the newest email from HackVillage and click the button inside, or request a fresh
+          link below.
+        </p>
+        {resendForm}
+        <p className="mt-4 text-xs text-muted">
+          Links expire after 24 hours.{" "}
+          <Link href="/signin" className="underline">
+            Sign in
+          </Link>{" "}
+          to try again.
         </p>
       </Card>
     );
@@ -62,28 +97,7 @@ export function VerifyEmailClient({ token }: { token: string }) {
     <Card>
       <h1 className="font-display text-2xl font-bold text-ink">Couldn&apos;t Verify</h1>
       <p className="mt-2 text-sm text-danger">{verifyState.error}</p>
-      <form action={resend} className="mt-6 space-y-4">
-        <div>
-          <Label htmlFor="resend-email">Your email</Label>
-          <Input
-            id="resend-email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            placeholder="the one you signed up with"
-            required
-          />
-        </div>
-        <Button type="submit" variant="secondary" className="w-full" loading={resending}>
-          Send A Fresh Verification Email
-        </Button>
-      </form>
-      {resendState.message === "sent" ? (
-        <p role="status" className="mt-3 text-sm font-medium text-success">
-          If an account needs verification, a new link is on its way.
-        </p>
-      ) : null}
-      <FormError message={resendState.error} />
+      {resendForm}
       <p className="mt-4 text-xs text-muted">
         Links expire after 24 hours. Still stuck?{" "}
         <Link href="/signin" className="underline">
