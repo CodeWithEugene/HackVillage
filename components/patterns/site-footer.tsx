@@ -3,7 +3,10 @@ import Link from "next/link";
 const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[] }[] = [
   {
     title: "Platform",
-    links: [{ label: "Events", href: "/events" }],
+    links: [
+      { label: "Events", href: "/events" },
+      { label: "Developers", href: "/developers" },
+    ],
   },
   {
     title: "Project",

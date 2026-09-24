@@ -21,6 +21,16 @@ const serverEnvSchema = z.object({
   PLATFORM_FEE_BPS: z.coerce.number().int().min(0).max(1000).default(500),
   MIN_PRIZE_POOL_KES: z.coerce.number().int().positive().default(10_000),
   PAYOUT_MANUAL_REVIEW_THRESHOLD_KES: z.coerce.number().int().positive().default(500_000),
+
+  // OAuth providers (optional — providers activate only when configured)
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GITHUB_CLIENT_ID: z.string().optional(),
+  GITHUB_CLIENT_SECRET: z.string().optional(),
+
+  // Email (optional in dev — falls back to console logging)
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().default("HackVillage <no-reply@hackvillage.app>"),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

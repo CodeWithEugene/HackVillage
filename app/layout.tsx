@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "HackVillage",
     images: [
       {
-        src: "/branding/og.png",
+        url: "/branding/og.png",
         width: 1200,
         height: 630,
         alt: "HackVillage — the open-source infrastructure for high-impact tech events",
