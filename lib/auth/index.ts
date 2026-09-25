@@ -7,7 +7,8 @@ import { verify } from "@node-rs/argon2";
 import { z } from "zod";
 
 import { HackVillageAdapter } from "@/lib/auth/adapter";
-import { queueSignInAlert, queueWelcomeEmail } from "@/lib/auth/sign-in-alert";
+import { pickVerifiedGithubEmail } from "@/lib/auth/github-email";
+import { sendSignInAlert, sendWelcomeEmail } from "@/lib/auth/sign-in-alert";
 import type { PrimaryRole, Role } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/db";
 
@@ -74,6 +75,27 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      // A GitHub sign-in joins the existing HackVillage account with the same
+      // email instead of failing with OAuthAccountNotLinked. Safe only because
+      // userinfo below takes the email from GitHub's verified addresses.
+      allowDangerousEmailAccountLinking: true,
+      userinfo: {
+        url: "https://api.github.com/user",
+        async request({ tokens }: { tokens: { access_token?: string } }) {
+          const auth = {
+            Authorization: `Bearer ${tokens.access_token}`,
+            "User-Agent": "hackvillage",
+          };
+          const profile = await fetch("https://api.github.com/user", { headers: auth }).then(
+            (res) => res.json(),
+          );
+          const emails = await fetch("https://api.github.com/user/emails", { headers: auth })
+            .then((res) => (res.ok ? res.json() : []))
+            .catch(() => []);
+          // Replace whatever GitHub put on the profile with a verified address.
+          return { ...profile, email: pickVerifiedGithubEmail(emails) };
+        },
+      },
     })
   );
 }
@@ -95,13 +117,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ user, account, isNewUser }) {
       if (!user.email) return;
       if (isNewUser) {
-        queueWelcomeEmail({ email: user.email, name: user.name, provider: account?.provider });
+        await sendWelcomeEmail({ email: user.email, name: user.name, provider: account?.provider });
         return;
       }
-      await queueSignInAlert({ email: user.email, provider: account?.provider });
+      await sendSignInAlert({ email: user.email, provider: account?.provider });
     },
   },
   callbacks: {
+    // GitHub accounts with no verified email can't be matched to anyone
+    // safely, so that sign-in is refused (shown as AccessDenied).
+    async signIn({ user, account }) {
+      if (account?.provider === "github" && !user.email) return false;
+      return true;
+    },
     async jwt({ token, user }) {
       // First sign-in: capture the DB id so the session callback never has to
       // resolve by email (OAuth and credentials both provide it here).

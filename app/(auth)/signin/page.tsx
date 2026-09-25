@@ -13,7 +13,8 @@ const NOTICES: Record<string, string> = {
 const OAUTH_ERROR_NOTICES: Record<string, string> = {
   OAuthAccountNotLinked:
     "An account with that email already exists. Sign in with your password below instead.",
-  AccessDenied: "That sign-in was cancelled or denied. You can try again anytime.",
+  AccessDenied:
+    "That sign-in was cancelled or denied. For GitHub, make sure your account has a verified email address, then try again.",
   OAuthSignin: "We couldn't reach the sign-in provider. Please try again.",
   OAuthCallback: "The sign-in provider returned an unexpected response. Please try again.",
   Configuration: "Sign-in is temporarily misconfigured. Please try email and password instead.",
