@@ -221,6 +221,203 @@ async function main(): Promise<void> {
     });
   }
 
+  // ── Catalog fill: at least 3 hackathons behind every /hackathons filter ──
+  // Verified upcoming (prizeVerifiedAt set), pending deposit (not set), and
+  // past (ended). Dates are relative to seed time, like the events above.
+  type CatalogEntry = {
+    slug: string;
+    title: string;
+    summary: string;
+    problemStatement: string;
+    venueType: "PHYSICAL" | "ONLINE" | "HYBRID";
+    location: string | null;
+    startDay: number;
+    lengthDays: number;
+    status: "LIVE" | "PENDING_DEPOSIT" | "SETTLED";
+    verified: boolean;
+    rolesWanted: string[];
+    prizes: [number, string, number][];
+  };
+  const catalog: CatalogEntry[] = [
+    {
+      slug: "climate-data-sprint",
+      title: "Climate Data Sprint",
+      summary: "Turn open weather and soil data into early warnings farmers can act on.",
+      problemStatement:
+        "Smallholder farmers lose whole seasons to drought and flash floods that open datasets saw coming. Build tools that turn satellite, weather, and soil data into timely, local alerts delivered over SMS or WhatsApp.",
+      venueType: "HYBRID",
+      location: "Nairobi Garage, Westlands",
+      startDay: 9,
+      lengthDays: 2,
+      status: "LIVE",
+      verified: true,
+      rolesWanted: ["data", "backend", "mobile"],
+      prizes: [
+        [1, "1st place", 200_000],
+        [2, "2nd place", 100_000],
+      ],
+    },
+    {
+      slug: "coastal-agritech-build",
+      title: "Coastal AgriTech Build",
+      summary: "Cold chain, pricing, and market access tools for coastal fish and fruit traders.",
+      problemStatement:
+        "Traders along the coast lose a third of their stock before it reaches market. Build tools for cold chain tracking, fair price discovery, or buyer matching that work on low-end phones.",
+      venueType: "PHYSICAL",
+      location: "Swahilipot Hub, Mombasa",
+      startDay: 16,
+      lengthDays: 2,
+      status: "LIVE",
+      verified: true,
+      rolesWanted: ["mobile", "design", "backend"],
+      prizes: [
+        [1, "1st place", 150_000],
+        [2, "2nd place", 75_000],
+        [3, "3rd place", 50_000],
+      ],
+    },
+    {
+      slug: "edtech-for-rural-schools",
+      title: "EdTech for Rural Schools",
+      summary: "Offline learning tools for schools with one shared tablet and no reliable network.",
+      problemStatement:
+        "Many rural schools share a single device per class and see the internet once a week. Build lesson, assessment, or teacher support tools that sync when they can and work fully offline when they can't.",
+      venueType: "ONLINE",
+      location: null,
+      startDay: 30,
+      lengthDays: 3,
+      status: "PENDING_DEPOSIT",
+      verified: false,
+      rolesWanted: ["frontend", "design", "education"],
+      prizes: [
+        [1, "1st place", 80_000],
+        [2, "2nd place", 40_000],
+      ],
+    },
+    {
+      slug: "creative-economy-hack",
+      title: "Creative Economy Hack",
+      summary: "Royalty, licensing, and payout tools for Kenyan musicians, artists, and creators.",
+      problemStatement:
+        "Kenyan creators rarely see royalties from radio, streaming, or brand use of their work. Build tools that track usage, split earnings between collaborators, or license work fairly.",
+      venueType: "HYBRID",
+      location: "The Mall, Westlands",
+      startDay: 38,
+      lengthDays: 2,
+      status: "PENDING_DEPOSIT",
+      verified: false,
+      rolesWanted: ["fintech", "frontend", "design"],
+      prizes: [
+        [1, "1st place", 120_000],
+        [2, "2nd place", 60_000],
+      ],
+    },
+    {
+      slug: "smart-transit-kisumu",
+      title: "Smart Transit Kisumu",
+      summary: "Route, fare, and safety tools for Kisumu's boda boda and tuk tuk riders.",
+      problemStatement:
+        "Kisumu's riders and passengers have no shared view of routes, fair fares, or safety. Build tools that help riders find trips, agree fares upfront, or report incidents quickly.",
+      venueType: "PHYSICAL",
+      location: "LakeHub, Kisumu",
+      startDay: 45,
+      lengthDays: 2,
+      status: "PENDING_DEPOSIT",
+      verified: false,
+      rolesWanted: ["mobile", "maps", "backend"],
+      prizes: [
+        [1, "1st place", 90_000],
+        [2, "2nd place", 45_000],
+      ],
+    },
+    {
+      slug: "mobile-money-security-challenge",
+      title: "Mobile Money Security Challenge",
+      summary: "Catch SIM swap and social engineering fraud before the money moves.",
+      problemStatement:
+        "SIM swap and phone scams drain mobile money wallets every day. Teams built detection and user warning tools that flag risky transactions before they complete.",
+      venueType: "HYBRID",
+      location: "iHub, Nairobi",
+      startDay: -62,
+      lengthDays: 2,
+      status: "SETTLED",
+      verified: true,
+      rolesWanted: ["security", "fintech", "data"],
+      prizes: [
+        [1, "1st place", 300_000],
+        [2, "2nd place", 150_000],
+      ],
+    },
+    {
+      slug: "open-data-nairobi-county",
+      title: "Open Data Nairobi County",
+      summary: "Budget, permit, and service data made readable for every Nairobi resident.",
+      problemStatement:
+        "County budgets and service records are public but unreadable. Teams built dashboards and chat tools that explain where money goes and how to follow up on services.",
+      venueType: "ONLINE",
+      location: null,
+      startDay: -41,
+      lengthDays: 3,
+      status: "SETTLED",
+      verified: true,
+      rolesWanted: ["data", "frontend", "civic"],
+      prizes: [
+        [1, "1st place", 100_000],
+        [2, "2nd place", 50_000],
+      ],
+    },
+    {
+      slug: "swahili-nlp-hackathon",
+      title: "Swahili NLP Hackathon",
+      summary: "Speech and text models that understand Swahili and Sheng as people speak them.",
+      problemStatement:
+        "Most language tools still stumble on Swahili and fail completely on Sheng. Teams built speech recognition, translation, and search tools trained on how Kenyans actually speak and write.",
+      venueType: "HYBRID",
+      location: "Strathmore University, Nairobi",
+      startDay: -20,
+      lengthDays: 2,
+      status: "SETTLED",
+      verified: true,
+      rolesWanted: ["ai", "data", "backend"],
+      prizes: [
+        [1, "1st place", 250_000],
+        [2, "2nd place", 120_000],
+        [3, "3rd place", 60_000],
+      ],
+    },
+  ];
+  for (const entry of catalog) {
+    const startsAt = new Date(now + entry.startDay * DAY);
+    const endsAt = new Date(startsAt.getTime() + entry.lengthDays * DAY);
+    const event = await prisma.event.upsert({
+      where: { slug: entry.slug },
+      create: {
+        orgId: org.id,
+        slug: entry.slug,
+        title: entry.title,
+        summary: entry.summary,
+        problemStatement: entry.problemStatement,
+        venueType: entry.venueType,
+        location: entry.location,
+        startsAt,
+        endsAt,
+        registrationDeadline: new Date(startsAt.getTime() - 2 * DAY),
+        rolesWanted: entry.rolesWanted,
+        status: entry.status,
+        prizeVerifiedAt: entry.verified ? new Date(startsAt.getTime() - 10 * DAY) : null,
+        publishedAt: new Date(startsAt.getTime() - 14 * DAY),
+      },
+      update: {},
+    });
+    for (const [place, label, amount] of entry.prizes) {
+      await prisma.prizeBreakdown.upsert({
+        where: { eventId_place: { eventId: event.id, place } },
+        create: { eventId: event.id, place, label, amountKes: amount, milestoneRequired: true },
+        update: { label, amountKes: amount },
+      });
+    }
+  }
+
   // ── Judge for the live event (Phase 4 demo) ──────────────────────────
   const judge = await prisma.user.upsert({
     where: { email: "judge@hackvillage.dev" },
@@ -260,7 +457,7 @@ async function main(): Promise<void> {
     update: {},
   });
 
-  console.log("Seeded: Technetium Kenya org, 1 organizer, 5 developers, 1 judge, 2 events, 2 teams, 1 submission.");
+  console.log("Seeded: Technetium Kenya org, 1 organizer, 5 developers, 1 judge, 10 hackathons, 2 teams, 1 submission.");
   console.log("Demo login: organizer@hackvillage.dev / wanjiku@hackvillage.dev / judge@hackvillage.dev … password: demopass123");
 }
 
