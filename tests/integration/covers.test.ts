@@ -2,12 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { prisma } from "@/lib/db";
 import { coverKey } from "@/lib/events/cover-upload";
-import {
-  CoverError,
-  issueCoverUpload,
-  removeCover,
-  setCover,
-} from "@/lib/events/cover-service";
+import { CoverError, issueCoverUpload, removeCover, setCover } from "@/lib/events/cover-service";
 
 /**
  * Hackathon cover images: only the organization's owners and admins can
@@ -92,12 +87,23 @@ describe("hackathon covers", () => {
     expect(target.uploadUrl).toBeTruthy();
   });
 
+  it("explains that uploads are off on Vercel until R2 is configured", async () => {
+    process.env.VERCEL = "1";
+    try {
+      await expect(
+        issueCoverUpload({ userId: owner, eventId, contentType: "image/webp", sizeBytes: 1000 }),
+      ).rejects.toThrow(/aren't switched on yet/);
+    } finally {
+      delete process.env.VERCEL;
+    }
+  });
+
   it("refuses members, wrong types, and oversized files", async () => {
     await expect(
-      issueCoverUpload({ userId: member, eventId, contentType: "image/webp", sizeBytes: 1000 })
+      issueCoverUpload({ userId: member, eventId, contentType: "image/webp", sizeBytes: 1000 }),
     ).rejects.toThrow(CoverError);
     await expect(
-      issueCoverUpload({ userId: owner, eventId, contentType: "image/gif", sizeBytes: 1000 })
+      issueCoverUpload({ userId: owner, eventId, contentType: "image/gif", sizeBytes: 1000 }),
     ).rejects.toThrow(/JPEG, PNG, or WebP/);
     await expect(
       issueCoverUpload({
@@ -105,7 +111,7 @@ describe("hackathon covers", () => {
         eventId,
         contentType: "image/webp",
         sizeBytes: 20 * 1024 * 1024,
-      })
+      }),
     ).rejects.toThrow(/under 10MB/);
   });
 
@@ -124,7 +130,7 @@ describe("hackathon covers", () => {
 
   it("refuses a key issued for a different hackathon", async () => {
     await expect(
-      setCover({ userId: owner, eventId, key: coverKey(otherEventId, "image/webp") })
+      setCover({ userId: owner, eventId, key: coverKey(otherEventId, "image/webp") }),
     ).rejects.toThrow(/doesn't belong/);
   });
 

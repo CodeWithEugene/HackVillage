@@ -34,6 +34,12 @@ export async function issueCoverUpload(input: {
   if (problem) throw new CoverError(problem);
 
   const storage = getStoragePort();
+  // Vercel's filesystem doesn't keep files, so local storage only works in dev.
+  if (storage.mode === "local" && process.env.VERCEL) {
+    throw new CoverError(
+      "Cover uploads aren't switched on yet. Your hackathon keeps its category photo for now.",
+    );
+  }
   const target = await storage.createUploadTargetForKey({
     key: coverKey(input.eventId, input.contentType),
     contentType: input.contentType,
