@@ -46,11 +46,19 @@ export async function subscribeAction(
     return { error: "Too many attempts with that email, try again in a while." };
   }
 
-  const subscriber = await prisma.newsletterSubscriber.upsert({
-    where: { email },
-    create: { email, source: "landing-cta" },
-    update: { unsubscribedAt: null },
-  });
+  let subscriber: { id: string };
+  try {
+    subscriber = await prisma.newsletterSubscriber.upsert({
+      where: { email },
+      create: { email, source: "landing-cta" },
+      update: { unsubscribedAt: null },
+    });
+  } catch (error: unknown) {
+    // Nothing was saved, so tell the person to retry rather than claiming
+    // they're on the list. Logged with context for ops.
+    console.error("[newsletter] subscribe failed", error);
+    return { error: "We couldn't add you right now. Please try again in a moment." };
+  }
 
   try {
     await sendNewsletterMail({
