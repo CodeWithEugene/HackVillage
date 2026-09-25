@@ -20,8 +20,8 @@ interface ErrorStateProps {
 /**
  * The designed error state (plan: empty and error states are designed, not
  * left to whoever hits them first). A friendly sentence, a way forward, and a
- * reference support can look up. In development it also shows the real
- * message, so a stale dev server or a bad query is obvious at a glance.
+ * reference support can look up. The error message itself is never shown:
+ * it goes to the console (and Sentry once wired) instead.
  */
 export function ErrorState({ error, reset, fullReloadHome = false }: ErrorStateProps) {
   const [copied, setCopied] = useState(false);
@@ -91,20 +91,6 @@ export function ErrorState({ error, reset, fullReloadHome = false }: ErrorStateP
           </button>
           .
         </p>
-      ) : null}
-
-      {process.env.NODE_ENV === "development" ? (
-        <details className="w-full max-w-xl rounded-card bg-surface p-4 text-left text-xs shadow-card">
-          <summary className="cursor-pointer font-semibold text-ink">
-            Error Details (development only)
-          </summary>
-          <p className="mt-2 font-mono break-words text-danger">{error.message}</p>
-          {error.stack ? (
-            <pre className="mt-2 max-h-64 overflow-auto font-mono whitespace-pre-wrap text-muted">
-              {error.stack}
-            </pre>
-          ) : null}
-        </details>
       ) : null}
     </div>
   );
