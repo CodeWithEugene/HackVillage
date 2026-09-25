@@ -11,6 +11,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { currentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
+import { categoryLabel, isCategory } from "@/lib/events/categories";
 import { registrationOpen } from "@/lib/events/lifecycle";
 import { formatKes } from "@/lib/utils";
 import Link from "next/link";
@@ -78,6 +79,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
 
   const poolKes = event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0);
   const open = registrationOpen(event);
+  const categories = event.categories.filter(isCategory);
   const gallery = event.media;
 
   const registration_ = viewer
@@ -108,6 +110,20 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
         </div>
         {event.summary ? (
           <p className="mx-auto mt-2 max-w-2xl text-lg text-muted">{event.summary}</p>
+        ) : null}
+        {categories.length > 0 ? (
+          <ul className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Categories">
+            {categories.map((key) => (
+              <li key={key}>
+                <Link
+                  href={`/hackathons?category=${key}`}
+                  className="inline-block rounded-full border border-ink/15 px-3 py-1 text-xs font-semibold text-ink-soft hover:border-ink/30"
+                >
+                  {categoryLabel(key)}
+                </Link>
+              </li>
+            ))}
+          </ul>
         ) : null}
       </header>
 

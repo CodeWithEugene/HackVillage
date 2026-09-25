@@ -12,6 +12,7 @@ import {
   type HackathonPhase,
 } from "@/lib/events/format";
 import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
+import { HACKATHON_CATEGORIES, isCategory, type HackathonCategory } from "@/lib/events/categories";
 import { CalendarX2 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -27,6 +28,20 @@ const TABS: { key: HackathonPhase; label: string }[] = [
 
 function isPhase(value: string | undefined): value is HackathonPhase {
   return HACKATHON_PHASES.some((phase) => phase === value);
+}
+
+function listingHref({
+  filter,
+  category,
+}: {
+  filter?: HackathonPhase;
+  category?: HackathonCategory | null;
+}): string {
+  const params = new URLSearchParams();
+  if (filter) params.set("filter", filter);
+  if (category) params.set("category", category);
+  const query = params.toString();
+  return query ? `/hackathons?${query}` : "/hackathons";
 }
 
 /** Ongoing: ends soonest first. Upcoming: starts soonest first. Past: most recent first. */
@@ -45,9 +60,10 @@ function sortForPhase<T extends { startsAt: Date; endsAt: Date }>(
 export default async function EventsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ filter?: string }>;
+  searchParams: Promise<{ filter?: string; category?: string }>;
 }) {
-  const { filter: filterParam } = await searchParams;
+  const { filter: filterParam, category: categoryParam } = await searchParams;
+  const category = isCategory(categoryParam) ? categoryParam : null;
   const now = new Date();
 
   const events = await prisma.event.findMany({
@@ -76,12 +92,21 @@ export default async function EventsPage({
     teamCount: event._count.teams,
     orgName: event.org.name,
     orgTrustScore: event.org.trustScore,
+    categories: event.categories,
+    coverUrl: event.coverUrl,
   }));
+  // Only offer categories that at least one live listing actually uses.
+  const usedCategories = HACKATHON_CATEGORIES.filter(({ key }) =>
+    allCards.some((card) => card.categories.includes(key)),
+  );
+  const inCategory = category
+    ? allCards.filter((card) => card.categories.includes(category))
+    : allCards;
   const counts = { ongoing: 0, upcoming: 0, past: 0 };
-  for (const card of allCards) counts[hackathonPhase(card, now)] += 1;
+  for (const card of inCategory) counts[hackathonPhase(card, now)] += 1;
   const phase = isPhase(filterParam) ? filterParam : defaultPhase(counts);
   const cards = sortForPhase(
-    allCards.filter((card) => hackathonPhase(card, now) === phase),
+    inCategory.filter((card) => hackathonPhase(card, now) === phase),
     phase,
   );
 
@@ -99,7 +124,7 @@ export default async function EventsPage({
         {TABS.map((option) => (
           <Link
             key={option.key}
-            href={`/hackathons?filter=${option.key}`}
+            href={listingHref({ filter: option.key, category })}
             aria-current={option.key === phase ? "page" : undefined}
             className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
               option.key === phase ? "bg-brand text-ink" : "bg-ink/5 text-ink-soft hover:bg-ink/10"
@@ -109,6 +134,29 @@ export default async function EventsPage({
           </Link>
         ))}
       </nav>
+
+      {usedCategories.length > 0 ? (
+        <nav aria-label="Filter by category" className="mb-8 flex flex-wrap justify-center gap-2">
+          {[{ key: null, label: "All Categories" }, ...usedCategories].map((option) => {
+            const active = option.key === category;
+            return (
+              <Link
+                key={option.key ?? "all"}
+                // Switching category drops the tab, so it opens on one that has results.
+                href={listingHref({ category: option.key })}
+                aria-current={active ? "page" : undefined}
+                className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+                  active
+                    ? "border-brand bg-brand/10 text-ink"
+                    : "border-ink/15 text-ink-soft hover:border-ink/30"
+                }`}
+              >
+                {option.label}
+              </Link>
+            );
+          })}
+        </nav>
+      ) : null}
 
       {cards.length === 0 ? (
         <EmptyState

@@ -54,6 +54,7 @@ export default async function EditEventPage({
           problemStatement: event.problemStatement ?? "",
           rules: event.rules ?? "",
           rolesWanted: event.rolesWanted,
+          categories: event.categories,
           maxTeams: event.maxTeams,
           prizes: event.prizes.map((prize) => ({
             place: prize.place,

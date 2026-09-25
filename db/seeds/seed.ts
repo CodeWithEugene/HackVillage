@@ -113,6 +113,8 @@ async function main(): Promise<void> {
       registrationDeadline: new Date(now + 1 * DAY),
       maxTeams: 20,
       rolesWanted: ["frontend", "fintech", "mobile", "design"],
+      categories: ["fintech", "mobility"],
+      coverUrl: "/marketing/hero/kenya/hackathon-pair.webp",
       status: "LIVE",
       prizeVerifiedAt: new Date(now - 5 * DAY),
       publishedAt: new Date(now - 6 * DAY),
@@ -207,6 +209,8 @@ async function main(): Promise<void> {
       registrationDeadline: new Date(now + 18 * DAY),
       maxTeams: 15,
       rolesWanted: ["ai", "backend", "design"],
+      categories: ["ai", "health"],
+      coverUrl: "/marketing/hero/kenya/coding-focus.webp",
       status: "PENDING_DEPOSIT",
       publishedAt: new Date(now - 1 * DAY),
     },
@@ -238,6 +242,8 @@ async function main(): Promise<void> {
     status: "LIVE" | "PENDING_DEPOSIT" | "SETTLED";
     verified: boolean;
     rolesWanted: string[];
+    categories: string[];
+    coverUrl: string;
     prizes: [number, string, number][];
   };
   const catalog: CatalogEntry[] = [
@@ -254,6 +260,8 @@ async function main(): Promise<void> {
       status: "LIVE",
       verified: true,
       rolesWanted: ["data", "backend", "mobile"],
+      categories: ["climate", "agritech"],
+      coverUrl: "/marketing/how-it-works/launch.webp",
       prizes: [
         [1, "1st place", 200_000],
         [2, "2nd place", 100_000],
@@ -272,6 +280,8 @@ async function main(): Promise<void> {
       status: "LIVE",
       verified: true,
       rolesWanted: ["mobile", "design", "backend"],
+      categories: ["agritech", "fintech"],
+      coverUrl: "/marketing/hero/kenya/community.webp",
       prizes: [
         [1, "1st place", 150_000],
         [2, "2nd place", 75_000],
@@ -291,6 +301,8 @@ async function main(): Promise<void> {
       status: "LIVE",
       verified: true,
       rolesWanted: ["frontend", "backend", "civic"],
+      categories: ["civic"],
+      coverUrl: "/marketing/hero/kenya/speaker.webp",
       prizes: [
         [1, "1st place", 150_000],
         [2, "2nd place", 75_000],
@@ -309,6 +321,8 @@ async function main(): Promise<void> {
       status: "LIVE",
       verified: true,
       rolesWanted: ["hardware", "mobile", "fintech"],
+      categories: ["climate"],
+      coverUrl: "/marketing/how-it-works/build.webp",
       prizes: [
         [1, "1st place", 200_000],
         [2, "2nd place", 100_000],
@@ -327,6 +341,8 @@ async function main(): Promise<void> {
       status: "LIVE",
       verified: true,
       rolesWanted: ["backend", "data", "mobile"],
+      categories: ["agritech", "web3"],
+      coverUrl: "/marketing/hero/kenya/team-build.webp",
       prizes: [
         [1, "1st place", 250_000],
         [2, "2nd place", 120_000],
@@ -346,6 +362,8 @@ async function main(): Promise<void> {
       status: "PENDING_DEPOSIT",
       verified: false,
       rolesWanted: ["frontend", "design", "education"],
+      categories: ["edtech"],
+      coverUrl: "/marketing/hero/kenya/speaker.webp",
       prizes: [
         [1, "1st place", 80_000],
         [2, "2nd place", 40_000],
@@ -364,6 +382,8 @@ async function main(): Promise<void> {
       status: "PENDING_DEPOSIT",
       verified: false,
       rolesWanted: ["fintech", "frontend", "design"],
+      categories: ["web3", "fintech"],
+      coverUrl: "/marketing/hero/kenya/hackathon-pair.webp",
       prizes: [
         [1, "1st place", 120_000],
         [2, "2nd place", 60_000],
@@ -382,6 +402,8 @@ async function main(): Promise<void> {
       status: "PENDING_DEPOSIT",
       verified: false,
       rolesWanted: ["mobile", "maps", "backend"],
+      categories: ["mobility", "civic"],
+      coverUrl: "/marketing/how-it-works/reward.webp",
       prizes: [
         [1, "1st place", 90_000],
         [2, "2nd place", 45_000],
@@ -400,6 +422,8 @@ async function main(): Promise<void> {
       status: "SETTLED",
       verified: true,
       rolesWanted: ["security", "fintech", "data"],
+      categories: ["security", "fintech"],
+      coverUrl: "/marketing/how-it-works/judge.webp",
       prizes: [
         [1, "1st place", 300_000],
         [2, "2nd place", 150_000],
@@ -418,6 +442,8 @@ async function main(): Promise<void> {
       status: "SETTLED",
       verified: true,
       rolesWanted: ["data", "frontend", "civic"],
+      categories: ["civic"],
+      coverUrl: "/marketing/hero/kenya/event-arrival.webp",
       prizes: [
         [1, "1st place", 100_000],
         [2, "2nd place", 50_000],
@@ -436,6 +462,8 @@ async function main(): Promise<void> {
       status: "SETTLED",
       verified: true,
       rolesWanted: ["ai", "data", "backend"],
+      categories: ["ai"],
+      coverUrl: "/marketing/how-it-works/reward.webp",
       prizes: [
         [1, "1st place", 250_000],
         [2, "2nd place", 120_000],
@@ -460,6 +488,8 @@ async function main(): Promise<void> {
         endsAt,
         registrationDeadline: new Date(startsAt.getTime() - 2 * DAY),
         rolesWanted: entry.rolesWanted,
+        categories: entry.categories,
+        coverUrl: entry.coverUrl,
         status: entry.status,
         prizeVerifiedAt: entry.verified ? new Date(startsAt.getTime() - 10 * DAY) : null,
         publishedAt: new Date(startsAt.getTime() - 14 * DAY),
