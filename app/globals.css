@@ -1473,4 +1473,39 @@
       transform: scaleY(1.12) scaleX(1.03);
     }
   }
+
+  /* Auth pages: full height photo on the left half, form on the right. */
+  .auth-shell {
+    display: grid;
+    min-height: 100dvh;
+    background: var(--color-paper);
+  }
+  .auth-visual {
+    display: none;
+  }
+  .auth-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 3rem 1rem;
+  }
+  @media (min-width: 1024px) {
+    .auth-shell {
+      grid-template-columns: 1fr 1fr;
+    }
+    .auth-visual {
+      display: block;
+      position: sticky;
+      top: 0;
+      height: 100dvh;
+      overflow: hidden;
+      /* The right edge bows outward in one smooth arc. */
+      clip-path: ellipse(100% 78% at 0% 50%);
+    }
+    .auth-main {
+      padding: 3rem 2rem;
+    }
+  }
 }
