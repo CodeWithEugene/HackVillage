@@ -1,14 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { ErrorState } from "@/components/patterns/error-state";
 
-/**
- * System error state (plan §8.4): human sentence + retry + a path to support.
- * Never a raw stack trace in the user's face.
- */
+/** App wide error boundary: the designed error state, never a raw stack trace. */
 export default function Error({
   error,
   reset,
@@ -21,25 +17,5 @@ export default function Error({
     console.error("[app-error]", error);
   }, [error]);
 
-  return (
-    <div className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 text-center">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-ink">Something Went Wrong</h1>
-        <p className="mt-2 max-w-md text-muted">
-          The page hit an unexpected error. Your data is safe. Money operations
-          fail closed on this platform. Try again, and if it persists, contact
-          support with the reference below.
-        </p>
-        {error.digest ? (
-          <p className="mt-2 font-mono text-xs text-muted">Ref: {error.digest}</p>
-        ) : null}
-      </div>
-      <div className="flex gap-3">
-        <Button onClick={reset}>Try Again</Button>
-        <Link href="/">
-          <Button variant="secondary" arrow>Back Home</Button>
-        </Link>
-      </div>
-    </div>
-  );
+  return <ErrorState error={error} reset={reset} />;
 }
