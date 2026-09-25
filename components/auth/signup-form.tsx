@@ -42,7 +42,7 @@ export function SignUpForm({
     <Card>
       <h1 className="font-display text-2xl font-bold text-ink">Create Your Account</h1>
       <p className="mt-1 text-sm text-muted">
-        One account, many roles — you can add organizer or judge access later.
+        One account, many roles: you can add organizer or judge access later.
       </p>
 
       {(googleEnabled || githubEnabled) && (
@@ -124,7 +124,7 @@ export function SignUpForm({
           <Label htmlFor="handle">Handle (optional)</Label>
           <Input id="handle" name="handle" placeholder="your public profile address" maxLength={30} />
           <p className="mt-1.5 text-xs text-muted">
-            hackvillage.app/developers/<span className="font-mono">your-handle</span> — leave blank and
+            hackvillage.app/developers/<span className="font-mono">your-handle</span>. Leave blank and
             we&apos;ll suggest one from your email.
           </p>
         </div>

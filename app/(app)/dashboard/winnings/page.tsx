@@ -70,7 +70,7 @@ export default async function WinningsPage() {
         <div>
           <h1 className="font-display text-2xl font-bold text-ink">Winnings</h1>
           <p className="mt-1 text-sm text-muted">
-            Every prize, every tranche — 50% on the day, 50% on milestones.
+            Every prize, every tranche: 50% on the day, 50% on milestones.
           </p>
         </div>
         <div className="flex gap-3 text-right">
@@ -91,7 +91,7 @@ export default async function WinningsPage() {
         <Card className="border-warning/40">
           <CardTitle className="text-base">Add A Payout Method</CardTitle>
           <CardDescription>
-            You have no M-Pesa or bank destination on file — winnings can&apos;t flow until you do.
+            You have no M-Pesa or bank destination on file, so winnings can&apos;t flow until you do.
             It takes a minute.
           </CardDescription>
           <Link href="/settings" className="mt-3 inline-block">
@@ -104,7 +104,7 @@ export default async function WinningsPage() {
         <EmptyState
           icon={HandCoins}
           title="No winnings yet"
-          description="When you win a Prize Verified event, the 50% instant tranche lands here the same day — tracked to the shilling."
+          description="When you win a Prize Verified event, the 50% instant tranche lands here the same day, tracked to the shilling."
           action={
             <Link href="/events">
               <Badge variant="brand">Find an event</Badge>
@@ -119,7 +119,7 @@ export default async function WinningsPage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="font-display text-lg font-bold text-ink">
-                      {win.event.title} — {win.place}
+                      {win.event.title}, {win.place}
                       {["st", "nd", "rd"][win.place - 1] ?? "th"} place
                     </p>
                     <p className="text-xs text-muted">

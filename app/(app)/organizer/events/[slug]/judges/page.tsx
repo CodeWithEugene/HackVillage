@@ -77,7 +77,7 @@ export default async function EventJudgesPage({
         <CardTitle>How Results Compute</CardTitle>
         <CardDescription>
           Per judge: Σ(criterion score × weight) ÷ Σweights. Per team: the mean across finalized
-          judge reviews. Teams rank by that weighted score — ties share a rank. The rubric locks
+          judge reviews. Teams rank by that weighted score, and ties share a rank. The rubric locks
           the moment judging opens, and results count only finalized reviews.
         </CardDescription>
       </Card>

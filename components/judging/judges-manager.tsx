@@ -41,7 +41,7 @@ export function JudgesManager({
       </CardTitle>
       <CardDescription>
         Judges must be HackVillage users and can&apos;t participate in the event they judge. Every
-        judge finalizes per team — and the feedback gate (one strength, one improvement, one next
+        judge finalizes per team, and the feedback gate (one strength, one improvement, one next
         step) applies to every team before scores count.
       </CardDescription>
 

@@ -11,7 +11,7 @@ export default async function OnboardingChoosePage() {
   if (!user) {
     return (
       <p className="text-center text-muted">
-        Sign in first — then we&apos;ll set you up.
+        Sign in first, then we&apos;ll set you up.
       </p>
     );
   }
@@ -21,7 +21,7 @@ export default async function OnboardingChoosePage() {
       <header className="mb-8 text-center">
         <h1 className="font-display text-3xl font-bold text-ink">How Will You Use HackVillage?</h1>
         <p className="mt-2 text-muted">
-          Pick a starting point — you can add other roles anytime.
+          Pick a starting point, you can add other roles anytime.
         </p>
       </header>
       <RoleChoiceCards currentRole={user.primaryRole} />

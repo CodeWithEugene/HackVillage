@@ -63,7 +63,7 @@ export function MediaUploader({ eventId }: { eventId: string }) {
         <Upload aria-hidden className="size-5" /> Upload Event Media
       </CardTitle>
       <CardDescription>
-        High-resolution photos and clips — the gallery developers and the community see.
+        High-resolution photos and clips: the gallery developers and the community see.
         JPEG/PNG/WebP up to 15MB per file, MP4 for clips.
       </CardDescription>
 

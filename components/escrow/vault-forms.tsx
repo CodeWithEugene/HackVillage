@@ -33,12 +33,12 @@ export function FundVaultForm({
         </p>
       ) : (
         <p className="text-sm text-muted">
-          You&apos;ll be charged <strong className="text-ink">{grossDueKes}</strong> — the pool plus
+          You&apos;ll be charged <strong className="text-ink">{grossDueKes}</strong>: the pool plus
           the 5% platform fee (ADR-012). Winners always receive 100% of the declared prizes.
         </p>
       )}
       {state.error === "KYB_REQUIRED" ? (
-        <FormError message="Your organization needs verified KYB first — request it below." />
+        <FormError message="Your organization needs verified KYB first. Request it below." />
       ) : (
         <FormError message={state.error} />
       )}
@@ -59,7 +59,7 @@ export function KybRequestForm({ orgId }: { orgId: string }) {
     <form action={action} className="space-y-4">
       <input type="hidden" name="orgId" value={orgId} />
       <p className="text-sm text-muted">
-        Business verification (KYB) is required before your first deposit — a Central Bank of
+        Business verification (KYB) is required before your first deposit. It is a Central Bank of
         Kenya compliance step handled through our licensed payment partner. Platform staff review
         requests within 48 hours.
       </p>

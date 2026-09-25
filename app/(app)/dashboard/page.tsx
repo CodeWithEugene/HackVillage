@@ -51,7 +51,7 @@ export default async function DashboardPage() {
         <div>
           <h1 className="font-display text-2xl font-bold text-ink">Welcome Back, {firstName}</h1>
           <p className="mt-1 text-sm text-muted">
-            Your events, teams, and payouts — {pendingInvites > 0 ? `${pendingInvites} invite${pendingInvites === 1 ? "" : "s"} waiting · ` : ""}
+            Your events, teams, and payouts: {pendingInvites > 0 ? `${pendingInvites} invite${pendingInvites === 1 ? "" : "s"} waiting · ` : ""}
             {winningsInFlight > 0 ? `${winningsInFlight} payout${winningsInFlight === 1 ? "" : "s"} in flight` : "all settled"}
           </p>
         </div>
@@ -77,12 +77,12 @@ export default async function DashboardPage() {
         description={
           dueCheckins.length > 0
             ? ""
-            : "Prize Verified events appear here the moment you register — active events, teams, and in-flight payouts at a glance."
+            : "Prize Verified events appear here the moment you register: active events, teams, and in-flight payouts at a glance."
         }
         action={
           dueCheckins.length > 0 ? undefined : (
             <Link href="/events">
-              <Button>Browse Events</Button>
+              <Button arrow>Browse Events</Button>
             </Link>
           )
         }
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
           </CardTitle>
           <CardDescription>
             Escrowed prize pools, 50/50 payouts, structured judge feedback, verified Proof-of-Work
-            profiles, hiring intros, the 48-hour media standard, and 3-month legacy tracking — the
+            profiles, hiring intros, the 48-hour media standard, and 3-month legacy tracking. The
             platform runs end to end. Next: production hardening (runbooks, load tests, audit).
           </CardDescription>
         </Card>

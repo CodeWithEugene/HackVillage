@@ -52,7 +52,7 @@ export default async function AdminHomePage() {
         <Link href="/admin/kyb">
           <Card className="transition-shadow hover:shadow-lg">
             <CardTitle>KYB Review</CardTitle>
-            <CardDescription>Business verification queue — gates first deposits.</CardDescription>
+            <CardDescription>Business verification queue that gates first deposits.</CardDescription>
           </Card>
         </Link>
         <Link href="/admin/payments">
@@ -70,7 +70,7 @@ export default async function AdminHomePage() {
         <Link href="/admin/disputes">
           <Card className="transition-shadow hover:shadow-lg">
             <CardTitle>Disputes</CardTitle>
-            <CardDescription>Milestone disputes — release or reject with audit.</CardDescription>
+            <CardDescription>Milestone disputes: release or reject with audit.</CardDescription>
           </Card>
         </Link>
       </div>

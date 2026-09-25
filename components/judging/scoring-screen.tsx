@@ -58,9 +58,9 @@ export function ScoringScreen({
       <form action={saveScores} className="space-y-6">
         <input type="hidden" name="teamId" value={teamId} />
         <Card>
-          <CardTitle>Rubric Scoring — {teamName}</CardTitle>
+          <CardTitle>Rubric Scoring: {teamName}</CardTitle>
           <CardDescription>
-            Whole numbers 0–10 per criterion. Save as often as you like; finalization locks
+            Whole numbers 0-10 per criterion. Save as often as you like; finalization locks
             everything.
           </CardDescription>
 
@@ -108,7 +108,7 @@ export function ScoringScreen({
         <CardTitle>Structured Feedback</CardTitle>
         <CardDescription>
           The gate: one <strong>strength</strong>, one <strong>improvement</strong>, and one{" "}
-          <strong>next step</strong> per team before scores can finalize — this is what developers
+          <strong>next step</strong> per team before scores can finalize, and this is what developers
           take home.
         </CardDescription>
 
@@ -166,7 +166,7 @@ export function ScoringScreen({
               </div>
               <div>
                 <Label htmlFor="point">Feedback point</Label>
-                <Input id="point" name="point" required minLength={10} maxLength={600} placeholder="Specific and actionable — what would you tell this team?" />
+                <Input id="point" name="point" required minLength={10} maxLength={600} placeholder="Specific and actionable: what would you tell this team?" />
               </div>
               <Button type="submit" variant="secondary" loading={adding}>
                 Add
@@ -192,7 +192,7 @@ export function ScoringScreen({
           ) : null}
           {finalized ? (
             <p className="mt-4 flex items-center gap-2 text-sm font-semibold text-success">
-              <Check aria-hidden className="size-4" /> Review finalized — thank you.
+              <Check aria-hidden className="size-4" /> Review finalized, thank you.
             </p>
           ) : (
             <Button

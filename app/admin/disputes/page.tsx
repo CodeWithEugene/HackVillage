@@ -43,7 +43,7 @@ export default async function AdminDisputesPage() {
         <Card>
           <CardTitle>No Disputes</CardTitle>
           <p className="mt-2 text-sm text-muted">
-            The queue is clear — no milestones are being disputed.
+            The queue is clear. No milestones are being disputed.
           </p>
         </Card>
       ) : (

@@ -28,14 +28,14 @@ export default function PrivacyPolicyPage() {
       <h3>Account Information</h3>
       <p>
         When you sign up, we collect your name, email address, and a password (stored as a
-        salted hash — we never see or store it in plain text) or, if you sign in with Google or
+        salted hash, and we never see or store it in plain text) or, if you sign in with Google or
         GitHub, the profile information those providers share with us (name, email, and public
         profile photo).
       </p>
       <h3>Profile And Proof-of-Work Data</h3>
       <p>
         Developer accounts have a public handle and profile page showing verified event
-        participation, win/loss record, judge endorsements, and — where you connect it — public
+        participation, win/loss record, judge endorsements, and (where you connect it) public
         GitHub contribution activity. We do not accept self-reported stats; profile metrics are
         derived only from verified platform activity.
       </p>
@@ -57,7 +57,7 @@ export default function PrivacyPolicyPage() {
       <p>
         We use session cookies to keep you signed in (via Auth.js), and we log request metadata
         (IP address, user agent, timestamps) for security, rate-limiting, and abuse prevention.
-        We use Vercel Analytics for aggregate, privacy-respecting traffic metrics — it does not
+        We use Vercel Analytics for aggregate, privacy-respecting traffic metrics; it does not
         use cookies or track individuals across sites.
       </p>
 
@@ -74,8 +74,8 @@ export default function PrivacyPolicyPage() {
         <li>Organizer trust scores and event history.</li>
       </ul>
       <p>
-        Everything else — your email, password, payout account details, private messages, and
-        draft submissions — is private and visible only to you, the relevant event organizers
+        Everything else (your email, password, payout account details, private messages, and
+        draft submissions) is private and visible only to you, the relevant event organizers
         and judges, and HackVillage staff where necessary to operate the service.
       </p>
 
@@ -98,26 +98,26 @@ export default function PrivacyPolicyPage() {
       </p>
       <ul>
         <li>
-          <strong>Paystack</strong> — deposits, payouts, KYB/KYC verification.
+          <strong>Paystack</strong>: deposits, payouts, KYB/KYC verification.
         </li>
         <li>
-          <strong>Vercel</strong> — application hosting and analytics.
+          <strong>Vercel</strong>: application hosting and analytics.
         </li>
         <li>
-          <strong>Neon</strong> — our PostgreSQL database.
+          <strong>Neon</strong>: our PostgreSQL database.
         </li>
         <li>
-          <strong>Cloudflare</strong> — media storage (submission files, event assets) and DNS.
+          <strong>Cloudflare</strong>: media storage (submission files, event assets) and DNS.
         </li>
         <li>
-          <strong>Brevo</strong> — transactional email delivery (verification, password reset,
+          <strong>Brevo</strong>: transactional email delivery (verification, password reset,
           notifications).
         </li>
         <li>
-          <strong>Google / GitHub</strong> — only if you choose to sign in with them.
+          <strong>Google / GitHub</strong>: only if you choose to sign in with them.
         </li>
         <li>
-          <strong>Polygon</strong> (public blockchain) — escrow and payout attestations. See the
+          <strong>Polygon</strong> (public blockchain): escrow and payout attestations. See the
           note on blockchain data below.
         </li>
       </ul>
@@ -129,8 +129,8 @@ export default function PrivacyPolicyPage() {
       <h2>5. A Note On Blockchain Data</h2>
       <p>
         Escrow deposits and payouts are attested to the Polygon blockchain so anyone can verify
-        that prize money was real. Entries on a public blockchain are <strong>immutable</strong>{" "}
-        — once written, they cannot be edited or deleted, by us or anyone else. Attestations
+        that prize money was real. Entries on a public blockchain are <strong>immutable</strong>:
+        once written, they cannot be edited or deleted, by us or anyone else. Attestations
         contain transaction amounts and references, not your name, email, or other personal
         identifiers.
       </p>

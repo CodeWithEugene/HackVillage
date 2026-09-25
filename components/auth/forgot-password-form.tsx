@@ -23,7 +23,7 @@ export function ForgotPasswordForm() {
           hour.
         </p>
         <Link href="/signin" className="mt-6 inline-block">
-          <Button variant="secondary">Back To Sign In</Button>
+          <Button variant="secondary" arrow>Back To Sign In</Button>
         </Link>
       </Card>
     );

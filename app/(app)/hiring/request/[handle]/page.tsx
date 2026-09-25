@@ -35,7 +35,7 @@ export default async function RequestIntroPage({
           {winner.user.name ?? `@${handle}`}
         </h1>
         <p className="mt-1 text-sm text-muted">
-          Verified winner — {formatKes(winner.amountKes)} ·{" "}
+          Verified winner: {formatKes(winner.amountKes)} ·{" "}
           {winner.event.title}
         </p>
         {winner.user.profile?.skills?.length ? (
@@ -55,7 +55,7 @@ export default async function RequestIntroPage({
 
       <Card>
         <p className="text-sm text-muted">
-          Introduction requests anchor to verified wins — the platform confirms the developer
+          Introduction requests anchor to verified wins. The platform confirms the developer
           actually won and was actually paid before an intro can be requested.
         </p>
       </Card>

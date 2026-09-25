@@ -63,7 +63,7 @@ export default async function EventWinnersPage({
           <p className="mt-1 text-sm text-muted">
             {event.title} ·{" "}
             {announced
-              ? "announced — payout status below"
+              ? "announced, payout status below"
               : event.status === "JUDGING"
                 ? "select winners from the judged results"
                 : STATUS_LABELS[event.status]}
@@ -115,7 +115,7 @@ export default async function EventWinnersPage({
                         <div>
                           <p className="font-semibold text-ink">
                             {winner.place}
-                            {["st", "nd", "rd"][winner.place - 1] ?? "th"} place —{" "}
+                            {["st", "nd", "rd"][winner.place - 1] ?? "th"} place:{" "}
                             {winner.team.name}
                           </p>
                           <p className="text-xs text-muted">
@@ -176,7 +176,7 @@ export default async function EventWinnersPage({
                                 : "awaiting handover"}
                             </Badge>
                           ) : (
-                            <Badge variant="success">n/a — paid in full</Badge>
+                            <Badge variant="success">n/a, paid in full</Badge>
                           )}
                         </div>
                       </div>

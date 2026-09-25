@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Prize Vault" };
 
 const CHAIN_LABELS: Record<string, string> = {
   AWAITING: "Awaiting deposit",
-  LOCKED: "Locked — event live",
+  LOCKED: "Locked, event live",
   HALF_RELEASED: "50% released",
   SETTLED: "Fully settled",
   REFUNDED: "Refunded",
@@ -72,13 +72,13 @@ export default async function VaultPage({
           </p>
         </div>
         <Badge variant={vaultLive ? "success" : "warning"}>
-          {vaultLive ? "Event live — funds locked" : "Awaiting deposit"}
+          {vaultLive ? "Event live, funds locked" : "Awaiting deposit"}
         </Badge>
       </header>
 
       {depositNotice === "success" ? (
         <p role="status" className="rounded-card border border-success/40 bg-success/10 p-4 text-sm font-semibold text-success">
-          Deposit confirmed — the vault is locking and the event is going live.
+          Deposit confirmed, the vault is locking and the event is going live.
         </p>
       ) : null}
 
@@ -98,7 +98,7 @@ export default async function VaultPage({
         <Card>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted">Vault state</p>
           <p className="mt-1 font-display text-lg font-bold text-ink">
-            {event.vault ? CHAIN_LABELS[event.vault.chainState] : "—"}
+            {event.vault ? CHAIN_LABELS[event.vault.chainState] : "N/A"}
           </p>
           <p className="mt-1 text-xs text-muted">
             {event.vault?.contractAddress ? "attested on-chain" : "attestation pending"}
@@ -113,7 +113,7 @@ export default async function VaultPage({
           </CardTitle>
           <CardDescription>
             The deposit covers the remaining pool plus the platform fee. The event flips LIVE the
-            moment the vault locks — and every deposit lands on the{" "}
+            moment the vault locks, and every deposit lands on the{" "}
             <Link href="/trust" className="underline hover:text-ink">
               public ledger
             </Link>
@@ -127,7 +127,7 @@ export default async function VaultPage({
                 grossDueKes={formatKes(grossDue)}
                 disabled={
                   remaining <= 0
-                    ? "The vault is fully funded — waiting for confirmation."
+                    ? "The vault is fully funded, waiting for confirmation."
                     : undefined
                 }
               />
@@ -184,7 +184,7 @@ export default async function VaultPage({
                   {entry.type === "VAULT_CREATED"
                     ? "Vault created"
                     : entry.type === "DEPOSIT_LOCKED"
-                      ? "Deposit locked — Prize Verified"
+                      ? "Deposit locked, Prize Verified"
                       : entry.type.replace(/_/g, " ").toLowerCase()}
                 </span>
                 <code className="font-mono text-xs text-muted">
@@ -197,8 +197,8 @@ export default async function VaultPage({
             Attestation detail lives on{" "}
             <Link href="/trust" className="underline hover:text-ink">
               /trust
-            </Link>{" "}
-            — the community can verify every entry against the payment provider&apos;s receipt.
+            </Link>
+            . The community can verify every entry against the payment provider&apos;s receipt.
           </CardDescription>
         </Card>
       ) : null}

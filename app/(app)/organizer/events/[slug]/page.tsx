@@ -78,7 +78,7 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
         </div>
         {isDraft ? (
           <Link href={`/organizer/events/${event.slug}/edit`}>
-            <Button variant="secondary">Edit Draft</Button>
+            <Button variant="secondary" arrow>Edit Draft</Button>
           </Link>
         ) : null}
       </header>
@@ -116,12 +116,12 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
             <Lock aria-hidden className="size-5 text-warning" /> Waiting On The Prize Vault
           </CardTitle>
           <CardDescription>
-            This event is public as <strong>pending deposit</strong> — visible but not live.
+            This event is public as <strong>pending deposit</strong>, visible but not live.
             Fund the vault ({formatKes(poolKes)} pool + 5% fee) and the event flips LIVE with the
             Prize Verified badge the moment the deposit confirms.
           </CardDescription>
           <Link href={`/organizer/events/${event.slug}/vault`} className="mt-4 inline-block">
-            <Button>Open The Prize Vault</Button>
+            <Button arrow>Open The Prize Vault</Button>
           </Link>
         </Card>
       ) : null}
@@ -138,16 +138,16 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
         <Card>
           <CardTitle>Winners &amp; Payouts</CardTitle>
           <CardDescription>
-            Winners announced — the instant 50% paid on the day, the final 50% releasing per
+            Winners announced: the instant 50% paid on the day, the final 50% releasing per
             milestone confirmation. Track every payout and confirm handovers in the winners
             console.
           </CardDescription>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link href={`/organizer/events/${event.slug}/winners`}>
-              <Button>Open Winners Console</Button>
+              <Button arrow>Open Winners Console</Button>
             </Link>
             <Link href={`/organizer/events/${event.slug}/media`}>
-              <Button variant="secondary">Media Vault (48h)</Button>
+              <Button variant="secondary" arrow>Media Vault (48h)</Button>
             </Link>
           </div>
         </Card>
@@ -178,7 +178,7 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
       <Card>
         <CardTitle>Registrations ({event.registrations.length})</CardTitle>
         {event.registrations.length === 0 ? (
-          <CardDescription>Nobody has registered yet — shares of the event page help.</CardDescription>
+          <CardDescription>Nobody has registered yet; shares of the event page help.</CardDescription>
         ) : (
           <ul className="mt-3 divide-y divide-ink/5">
             {event.registrations.map(({ id, user: attendee }) => (

@@ -29,7 +29,7 @@ export function EditProfileForm({ handle, defaults }: { handle: string; defaults
       <header>
         <h1 className="font-display text-2xl font-bold text-ink">Your Profile</h1>
         <p className="mt-1 text-sm text-muted">
-          Everything on your public profile is platform-verified — wins, contributions,
+          Everything on your public profile is platform-verified: wins, contributions,
           endorsements. This form only sets your presentation.
         </p>
       </header>
@@ -111,8 +111,8 @@ export function EditProfileForm({ handle, defaults }: { handle: string; defaults
               className="size-4 accent-[#222]"
             />
             <span>
-              <strong>Public profile.</strong> Uncheck to hide yourself from developer browse —
-              direct links still work.
+              <strong>Public profile.</strong> Uncheck to hide yourself from developer browse.
+              Direct links still work.
             </span>
           </label>
 

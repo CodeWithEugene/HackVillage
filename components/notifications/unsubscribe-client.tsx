@@ -19,7 +19,7 @@ export function UnsubscribeClient({ token }: { token: string }) {
           them back on anytime from your account settings.
         </p>
         <Link href="/" className="mt-6 inline-block">
-          <Button variant="secondary">Back To HackVillage</Button>
+          <Button variant="secondary" arrow>Back To HackVillage</Button>
         </Link>
       </Card>
     );

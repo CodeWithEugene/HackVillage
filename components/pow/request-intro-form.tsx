@@ -29,7 +29,7 @@ export function RequestIntroForm({
         <Handshake aria-hidden className="size-5" /> Request An Introduction To @{handle}
       </CardTitle>
       <CardDescription>
-        One click sends your message — if they accept, contact details are exchanged both ways.
+        One click sends your message, and if they accept, contact details are exchanged both ways.
         Anchored to their verified win.
       </CardDescription>
       <form action={action} className="mt-4 space-y-3">

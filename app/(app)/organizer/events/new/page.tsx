@@ -24,7 +24,7 @@ export default async function NewEventPage() {
       <header>
         <h1 className="font-display text-2xl font-bold text-ink">Create An Event</h1>
         <p className="mt-1 text-sm text-muted">
-          Five steps to a draft. Publishing declares the prize pool — the event goes live only
+          Five steps to a draft. Publishing declares the prize pool, and the event goes live only
           after it&apos;s locked in the Prize Vault.
         </p>
       </header>

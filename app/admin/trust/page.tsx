@@ -27,7 +27,7 @@ export default async function AdminTrustPage() {
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-bold text-ink">Trust Ledger</h1>
       <p className="max-w-2xl text-sm text-muted">
-        Every score change has a TrustEvent behind it — media penalties, appeals, and manual
+        Every score change has a TrustEvent behind it: media penalties, appeals, and manual
         adjustments (all audit-logged). Manual adjustments cap at ±50.
       </p>
 

@@ -65,7 +65,7 @@ export default async function EventMediaPage({
           <CardTitle className="text-danger">The 48 Hour Window Has Closed</CardTitle>
           <CardDescription>
             A −10 trust penalty applies to {event.org.name} for missing the media deadline. You can
-            still upload the gallery — late is far better than never — and appeal from your
+            still upload the gallery (late is far better than never) and appeal from your
             organizer page if there were extraordinary circumstances.
           </CardDescription>
         </Card>
@@ -77,7 +77,7 @@ export default async function EventMediaPage({
             <Camera aria-hidden className="size-5" /> The 48 Hour Promise
           </CardTitle>
           <CardDescription>
-            High-res photos land within 48 hours of the event — that&apos;s the HackVillage
+            High-res photos land within 48 hours of the event; that&apos;s the HackVillage
             standard. Missing it costs −10 trust on the organizer score.
             {hoursLeft != null ? ` You have about ${hoursLeft} hour${hoursLeft === 1 ? "" : "s"}.` : null}
           </CardDescription>

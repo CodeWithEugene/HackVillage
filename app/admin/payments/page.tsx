@@ -48,12 +48,12 @@ export default async function AdminPaymentsPage() {
         <CardTitle>Open Payout Queue ({payouts.length})</CardTitle>
         <p className="mt-2 text-sm text-muted">
           Failed payouts retry automatically with backoff until the attempt cap, then land here.
-          Funds stay locked the whole time — nothing is ever lost. &ldquo;Mark paid&rdquo; requires
+          Funds stay locked the whole time. Nothing is ever lost. &ldquo;Mark paid&rdquo; requires
           the payment receipt and writes an audit entry.
         </p>
         {payouts.length === 0 ? (
           <p className="mt-4 rounded-control border border-dashed border-ink/15 bg-paper p-6 text-center text-sm text-muted">
-            Queue is clear — every payout is settled.
+            Queue is clear. Every payout is settled.
           </p>
         ) : (
           <ul className="mt-4 space-y-3">

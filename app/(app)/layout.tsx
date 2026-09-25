@@ -9,7 +9,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <AppTopNav user={{ name: user.name, handle: user.handle, roles: user.roles }} />
       <main className="site-container flex-1 py-8">{children}</main>
       <footer className="border-t border-ink/10 py-4 text-center text-xs text-muted">
-        HackVillage — trust is the product.
+        HackVillage: trust is the product.
       </footer>
     </div>
   );

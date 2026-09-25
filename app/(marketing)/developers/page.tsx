@@ -34,7 +34,7 @@ export default async function DevelopersPage() {
           Proof-of-Work Profiles
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted">
-          Every metric on these profiles is verified by platform events — wins, contributions, judge
+          Every metric on these profiles is verified by platform events: wins, contributions, judge
           endorsements. No self-reported stats, ever.
         </p>
       </header>

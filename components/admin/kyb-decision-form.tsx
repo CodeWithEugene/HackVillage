@@ -14,7 +14,7 @@ export function KybDecisionForm({ orgId }: { orgId: string }) {
       <input type="hidden" name="orgId" value={orgId} />
       <Input
         name="reason"
-        placeholder="Reason (required for rejections — logged)"
+        placeholder="Reason (required for rejections, logged)"
         aria-label={`KYB decision reason for ${orgId}`}
         maxLength={300}
       />

@@ -7,7 +7,7 @@ const STEPS = [
     intro: "Set the challenge, put up the money, and give great ideas somewhere to start.",
     title: "The Prize Is Already There",
     description:
-      "Post your challenge and the roles you're looking for. Before anyone signs up, you put the full prize amount in — so builders know it's real, not a promise.",
+      "Post your challenge and the roles you're looking for. Before anyone signs up, you put the full prize amount in, so builders know it's real, not a promise.",
     alt: "Kenyan hackathon organizers planning a challenge together at a laptop",
   },
   {
@@ -16,7 +16,7 @@ const STEPS = [
     intro: "Bring the right people together and turn one idea into a working project.",
     title: "Builders Team Up",
     description:
-      "People join, find teammates, and build their project together — all in one shared space, from first idea to final demo.",
+      "People join, find teammates, and build their project together, all in one shared space, from first idea to final demo.",
     alt: "Three Kenyan developers collaborating on a project at a Nairobi hackathon",
   },
   {
@@ -34,7 +34,7 @@ const STEPS = [
     intro: "Celebrate the work, reward the winners, and let anyone check the receipts.",
     title: "Winners Get Paid Instantly",
     description:
-      "The moment winners are announced, half their prize lands in their account — instantly. The rest follows once they deliver, and anyone can check it actually happened.",
+      "The moment winners are announced, half their prize lands in their account, instantly. The rest follows once they deliver, and anyone can check it actually happened.",
     alt: "Two Kenyan hackathon winners celebrating together with their trophy",
   },
 ];

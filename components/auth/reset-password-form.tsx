@@ -19,7 +19,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
           Open this page from the link in your reset email, or request a new one.
         </p>
         <Link href="/forgot-password" className="mt-6 inline-block">
-          <Button variant="secondary">Request A Reset Link</Button>
+          <Button variant="secondary" arrow>Request A Reset Link</Button>
         </Link>
       </Card>
     );

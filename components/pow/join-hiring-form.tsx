@@ -17,8 +17,8 @@ export function JoinHiringForm() {
     <Card className="mx-auto max-w-xl">
       <CardTitle>Become A Hiring Partner</CardTitle>
       <CardDescription>
-        Free for partners and developers. You get verified winners with receipts — win records,
-        real payouts, and judge endorsements — and one-click introductions.
+        Free for partners and developers. You get verified winners with receipts (win records,
+        real payouts, and judge endorsements) and one-click introductions.
       </CardDescription>
       <form action={action} className="mt-4 space-y-4">
         <div>

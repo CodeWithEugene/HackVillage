@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 const ARC_TEXT = "Verified. Paid. Proven.";
 
@@ -38,18 +39,24 @@ export function BuilderJourney() {
         <div className="journey-copy">
           <Sparkle className="journey-star-left" />
           <h2 id="builder-journey-heading" className="journey-display">
-            Build
-            <br />
-            Ship
-            <br />
-            Win
+            <span className="journey-heading-desktop">
+              Build
+              <br />
+              Ship
+              <br />
+              Win
+            </span>
+            <span className="journey-heading-mobile">Build, Ship, Win</span>
           </h2>
           <p className="journey-text">
             Every prize is fully deposited before the first line of code, so builders across
             Africa compete for money that is already there.
           </p>
-          <Link href="/onboarding/organizer" className="journey-action">
-            Host A Hackathon
+          <Link href="/onboarding/organizer" className="journey-action btn-pill">
+            <span className="btn-fill" aria-hidden />
+            <span className="btn-content">
+              Host A Hackathon <ArrowUpRight aria-hidden size={16} className="btn-arrow" />
+            </span>
           </Link>
         </div>
         <div className="journey-pair journey-pair-left">
@@ -95,7 +102,7 @@ export function BuilderJourney() {
         <div className="journey-copy journey-copy-right">
           <Sparkle className="journey-star-right" />
           <p className="journey-text">
-            Half your prize lands the moment you win. Ship your milestone and the rest follows —
+            Half your prize lands the moment you win. Ship your milestone and the rest follows, with
             every payout recorded on a public ledger.
           </p>
           <div className="journey-final-row">
@@ -106,8 +113,11 @@ export function BuilderJourney() {
               <br />
               Get Hired
             </p>
-            <Link href="/events" className="journey-action">
-              Explore Hackathons
+            <Link href="/events" className="journey-action btn-pill">
+              <span className="btn-fill" aria-hidden />
+              <span className="btn-content">
+                Explore Hackathons <ArrowUpRight aria-hidden size={16} className="btn-arrow" />
+              </span>
             </Link>
           </div>
         </div>

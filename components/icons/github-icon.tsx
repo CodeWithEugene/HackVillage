@@ -15,6 +15,15 @@ export function GithubIcon({ className }: { className?: string }) {
   );
 }
 
+/** Takes the surrounding text color, for icon rows that share one color. */
+export function GithubMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden className={className} fill="currentColor">
+      <path d={MARK_PATH} />
+    </svg>
+  );
+}
+
 export function GithubIconDark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 16 16" aria-hidden className={className} fill="#ffffff">

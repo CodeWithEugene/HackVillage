@@ -10,15 +10,15 @@ export default function NotFound() {
       <div>
         <h1 className="font-display text-2xl font-bold text-ink">This Page Took A Wrong Turn</h1>
         <p className="mt-2 text-muted">
-          The page you are looking for does not exist — or is not built yet.
+          The page you are looking for does not exist, or is not built yet.
         </p>
       </div>
       <div className="flex gap-3">
         <Link href="/">
-          <Button>Back Home</Button>
+          <Button arrow>Back Home</Button>
         </Link>
         <Link href="/events">
-          <Button variant="secondary">Browse Events</Button>
+          <Button variant="secondary" arrow>Browse Events</Button>
         </Link>
       </div>
     </div>

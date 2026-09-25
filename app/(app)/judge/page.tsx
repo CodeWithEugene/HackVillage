@@ -35,7 +35,7 @@ export default async function JudgeHomePage() {
       <header>
         <h1 className="font-display text-2xl font-bold text-ink">Judging</h1>
         <p className="mt-1 text-sm text-muted">
-          Your assigned events. Structured feedback — one strength, one improvement, one next step —
+          Your assigned events. Structured feedback (one strength, one improvement, one next step)
           unlocks every finalization.
         </p>
       </header>
@@ -98,7 +98,7 @@ export default async function JudgeHomePage() {
                   </div>
                 ) : (
                   <Link href={`/judge/events/${assignment.event.slug}`}>
-                    <Button size="sm">Open Team Queue</Button>
+                    <Button size="sm" arrow>Open Team Queue</Button>
                   </Link>
                 )}
               </Card>

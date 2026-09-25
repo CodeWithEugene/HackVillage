@@ -30,7 +30,7 @@ export function DisputeResolutionForm({ disputeId }: { disputeId: string }) {
       <FormSuccess message={state.message} />
       <div className="flex flex-wrap gap-2">
         <Button type="submit" name="resolution" value="RELEASE" size="sm" loading={pending}>
-          Release Milestone — Queue Final 50%
+          Release Milestone: Queue Final 50%
         </Button>
         <Button type="submit" name="resolution" value="REJECT" size="sm" variant="danger" loading={pending}>
           Reject Dispute

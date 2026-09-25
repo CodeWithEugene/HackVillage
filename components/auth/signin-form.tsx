@@ -91,7 +91,7 @@ export function SignInForm({
 
         {unverified ? (
           <div className="rounded-control border border-warning/30 bg-warning/10 p-3 text-sm text-ink">
-            Your email isn&apos;t verified yet. Check your inbox — or{" "}
+            Your email isn&apos;t verified yet. Check your inbox, or{" "}
             <Link
               href="/verify-email"
               className="font-semibold underline"

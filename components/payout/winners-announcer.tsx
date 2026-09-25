@@ -78,8 +78,8 @@ export function WinnersAnnouncer({
           <Trophy aria-hidden className="size-5" /> Announce Winners &amp; Pay 50%
         </CardTitle>
         <CardDescription>
-          Announcing creates the instant payout records and starts the transfers immediately —
-          winners see money the same day. The final 50% waits for milestone confirmation.
+          Announcing creates the instant payout records and starts the transfers immediately.
+          Winners see money the same day. The final 50% waits for milestone confirmation.
         </CardDescription>
 
         <div className="mt-5 space-y-4">
@@ -106,7 +106,7 @@ export function WinnersAnnouncer({
                 }
                 className="mt-2 h-11 w-full rounded-control border border-ink/15 bg-surface px-3 text-ink"
               >
-                <option value="">— select the winning team —</option>
+                <option value="">Select the winning team</option>
                 {rankedTeams.map((team) => (
                   <option key={team.teamId} value={team.teamId}>
                     {team.rank ? `#${team.rank} ` : ""}
@@ -122,7 +122,7 @@ export function WinnersAnnouncer({
 
         {missingRecipients.length > 0 ? (
           <p role="alert" className="mt-4 rounded-control border border-warning/40 bg-warning/10 p-3 text-sm font-semibold text-ink">
-            Some selected team leaders haven&apos;t set a payout method — they were prompted the
+            Some selected team leaders haven&apos;t set a payout method. They were prompted the
             moment they won, but you can announce once they do.
           </p>
         ) : null}
@@ -130,7 +130,7 @@ export function WinnersAnnouncer({
         {typedConfirmNeeded ? (
           <div className="mt-4">
             <Label htmlFor="typed-confirm">
-              This pool exceeds KES 250,000 — type <span className="font-mono font-bold">ANNOUNCE</span> to confirm
+              This pool exceeds KES 250,000, type <span className="font-mono font-bold">ANNOUNCE</span> to confirm
             </Label>
             <Input
               id="typed-confirm"

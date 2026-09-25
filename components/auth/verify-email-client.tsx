@@ -87,7 +87,7 @@ export function VerifyEmailClient({ token }: { token: string }) {
         <h1 className="mt-4 font-display text-2xl font-bold text-ink">Email Verified</h1>
         <p className="mt-2 text-sm text-muted">Your account is ready. Sign in to continue.</p>
         <Link href="/signin" className="mt-6 inline-block">
-          <Button>Go To Sign In</Button>
+          <Button arrow>Go To Sign In</Button>
         </Link>
       </Card>
     );

@@ -29,7 +29,7 @@ export function EndorseWinnersForm({
         <Quote aria-hidden className="size-5" /> Endorse The Winners
       </CardTitle>
       <CardDescription>
-        Your endorsement is permanent proof on the winner&apos;s Proof-of-Work profile — one line
+        Your endorsement is permanent proof on the winner&apos;s Proof-of-Work profile, one line
         future employers will read.
       </CardDescription>
 

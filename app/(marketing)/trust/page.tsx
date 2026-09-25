@@ -10,14 +10,14 @@ import { prisma } from "@/lib/db";
 import { getEnv } from "@/lib/env";
 
 export const metadata: Metadata = {
-  title: "Trust — Public Ledger",
+  title: "Trust: Public Ledger",
   description:
     "Every Prize Vault deposit and payout, attested on-chain. Verify that a hackathon's money was real before it went live.",
 };
 
 const TYPE_LABELS: Record<string, string> = {
   VAULT_CREATED: "Vault created",
-  DEPOSIT_LOCKED: "Deposit locked — Prize Verified",
+  DEPOSIT_LOCKED: "Deposit locked, Prize Verified",
   INSTANT_PAYOUT: "Instant 50% payout",
   MILESTONE_PAYOUT: "Milestone payout",
   VAULT_REFUNDED: "Refund",
@@ -41,7 +41,7 @@ export default async function TrustPage() {
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted">
           Radical transparency is the product: every prize deposit and payout on HackVillage is
-          attested on-chain with its payment-provider reference. Don&apos;t trust — verify.
+          attested on-chain with its payment-provider reference. Don&apos;t trust; verify.
         </p>
         <div className="mt-4 flex items-center justify-center gap-2">
           <Badge variant={chainMode === "amoy" ? "success" : "warning"}>
@@ -51,7 +51,7 @@ export default async function TrustPage() {
         </div>
         {chainMode === "simulation" ? (
           <p className="mt-2 text-xs text-muted">
-            This deployment has no chain configured — attestations below are locally simulated and
+            This deployment has no chain configured, so attestations below are locally simulated and
             clearly marked. Production connects the PrizeVault contract.
           </p>
         ) : null}
@@ -61,7 +61,7 @@ export default async function TrustPage() {
         <EmptyState
           icon={ShieldCheck}
           title="The ledger starts with the first deposit"
-          description="When an organizer funds a Prize Vault, the lock lands here — event, amount, payment reference, and chain transaction — for anyone to audit."
+          description="When an organizer funds a Prize Vault, the lock lands here: event, amount, payment reference, and chain transaction, for anyone to audit."
         />
       ) : (
         <ul className="space-y-3">
@@ -111,7 +111,7 @@ export default async function TrustPage() {
         <ol className="mt-4 space-y-3 text-sm leading-6 text-on-inverse/80">
           <li>
             <strong className="text-on-inverse">1.</strong> The organizer deposits 100% of the declared
-            pool through our licensed payment provider. Only the pool portion enters the vault —
+            pool through our licensed payment provider. Only the pool portion enters the vault;
             platform fees never touch prize money.
           </li>
           <li>
@@ -121,7 +121,7 @@ export default async function TrustPage() {
           </li>
           <li>
             <strong className="text-on-inverse">3.</strong> Winnings pay 50% instantly and 50% on
-            milestones — each payout attested here too. Cross-check any entry against the
+            milestones, and each payout is attested here too. Cross-check any entry against the
             transaction hash on a block explorer.
           </li>
         </ol>
