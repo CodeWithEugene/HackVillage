@@ -1,46 +1,77 @@
 import { headers } from "next/headers";
-import { after } from "next/server";
 
 import { signInAlertEmail, welcomeEmail } from "@/lib/auth/mail-templates";
 import { describeSignIn, signInMethodLabel } from "@/lib/auth/sign-in-context";
-import { sendMail } from "@/lib/ports/mail";
+import { sendMail, type MailMessage } from "@/lib/ports/mail";
 import { appUrl } from "@/lib/url";
 
 /**
- * Emails the account owner about a successful sign in (security critical, so
- * it always sends and skips notification preferences). Headers are read now,
- * while the request is live; the email goes out after the response so a slow
- * or failing mail provider never delays or breaks signing in.
+ * How long a sign in waits for the mail provider. These emails used to go
+ * out after the response with next/server `after()`, but in production those
+ * callbacks never reached the provider, so they are sent inline now, capped
+ * so a slow provider can only delay a sign in by this much, never break it.
  */
-export async function queueSignInAlert({
+export const SIGN_IN_MAIL_TIMEOUT_MS = 4000;
+
+/** Sends a sign in email; logs the outcome and never throws. */
+export async function sendWithinLimit(
+  label: string,
+  message: MailMessage,
+  send: (message: MailMessage) => Promise<{ delivered: boolean }> = sendMail,
+  timeoutMs: number = SIGN_IN_MAIL_TIMEOUT_MS,
+): Promise<"sent" | "not-sent" | "timeout" | "failed"> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const timeout = new Promise<"timeout">((resolve) => {
+      timer = setTimeout(() => resolve("timeout"), timeoutMs);
+    });
+    const result = await Promise.race([send(message), timeout]);
+    if (result === "timeout") {
+      console.error(`[auth] ${label} timed out after ${timeoutMs}ms`);
+      return "timeout";
+    }
+    if (result.delivered) {
+      console.info(`[auth] ${label} sent`);
+      return "sent";
+    }
+    // Without a mail key (dev and tests) the port prints the email instead.
+    return "not-sent";
+  } catch (error) {
+    console.error(`[auth] ${label} failed to send`, error);
+    return "failed";
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Emails the account owner about a successful sign in (security critical, so
+ * it always sends and skips notification preferences).
+ */
+export async function sendSignInAlert({
   email,
   provider,
 }: {
   email: string;
   provider?: string;
 }): Promise<void> {
+  let template;
   try {
     const context = describeSignIn({ headers: await headers(), provider });
-    const template = signInAlertEmail(context, appUrl("/forgot-password"));
-    after(async () => {
-      try {
-        await sendMail({ to: email, ...template });
-      } catch (error) {
-        console.error("[auth] sign in alert failed to send", error);
-      }
-    });
+    template = signInAlertEmail(context, appUrl("/forgot-password"));
   } catch (error) {
     // Outside a request (for example a script), there are no headers to describe.
     console.error("[auth] sign in alert skipped", error);
+    return;
   }
+  await sendWithinLimit("sign in alert", { to: email, ...template });
 }
 
 /**
  * Welcomes someone who just created an account with Google or GitHub (email
- * sign-ups get the verification email instead). Sent after the response, like
- * the sign in alert, so the mail provider never slows the sign-up down.
+ * sign-ups get the verification email instead).
  */
-export function queueWelcomeEmail({
+export async function sendWelcomeEmail({
   email,
   name,
   provider,
@@ -48,21 +79,11 @@ export function queueWelcomeEmail({
   email: string;
   name?: string | null;
   provider?: string;
-}): void {
+}): Promise<void> {
   const template = welcomeEmail({
     name: name ?? null,
     method: signInMethodLabel(provider),
     setupUrl: appUrl("/onboarding/choose"),
   });
-  try {
-    after(async () => {
-      try {
-        await sendMail({ to: email, ...template });
-      } catch (error) {
-        console.error("[auth] welcome email failed to send", error);
-      }
-    });
-  } catch (error) {
-    console.error("[auth] welcome email skipped", error);
-  }
+  await sendWithinLimit("welcome email", { to: email, ...template });
 }
