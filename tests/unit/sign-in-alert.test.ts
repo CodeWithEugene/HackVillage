@@ -63,9 +63,9 @@ describe("describeSignIn location, IP, time, and method", () => {
   });
 
   it("decodes URL encoded city names", () => {
-    expect(ctx({ "x-vercel-ip-city": "S%C3%A3o%20Paulo", "x-vercel-ip-country": "BR" }).location).toBe(
-      "São Paulo, Brazil"
-    );
+    expect(
+      ctx({ "x-vercel-ip-city": "S%C3%A3o%20Paulo", "x-vercel-ip-country": "BR" }).location,
+    ).toBe("São Paulo, Brazil");
   });
 
   it("falls back to the country, then to unknown", () => {
@@ -76,16 +76,16 @@ describe("describeSignIn location, IP, time, and method", () => {
 
   it("shows the time in the sign in location's own time zone", () => {
     expect(ctx({ "x-vercel-ip-timezone": "Africa/Nairobi" }).time).toBe(
-      "Friday, 25 September 2026 at 14:03 EAT"
+      "Friday, 25 September 2026 at 14:03 EAT",
     );
     expect(ctx({ "x-vercel-ip-timezone": "America/New_York" }).time).toBe(
-      "Friday, 25 September 2026 at 07:03 GMT-4"
+      "Friday, 25 September 2026 at 07:03 GMT-4",
     );
   });
 
   it("uses Nairobi time when the time zone is missing or invalid", () => {
     expect(ctx({ "x-vercel-ip-timezone": "Not/AZone" }).time).toBe(
-      "Friday, 25 September 2026 at 14:03 EAT"
+      "Friday, 25 September 2026 at 14:03 EAT",
     );
   });
 
@@ -100,10 +100,15 @@ describe("signInAlertEmail", () => {
   it("lists every detail and links to a password reset", () => {
     const email = signInAlertEmail(
       ctx({ "user-agent": UA.iphone, "x-vercel-ip-city": "Nairobi", "x-vercel-ip-country": "KE" }),
-      "https://www.hackvillage.xyz/forgot-password"
+      "https://www.hackvillage.xyz/forgot-password",
     );
     expect(email.subject).toBe("New Sign In To Your HackVillage Account");
-    for (const value of ["iPhone running iOS 17.5", "Safari 17", "Nairobi, Kenya", "Email and password"]) {
+    for (const value of [
+      "iPhone running iOS 17.5",
+      "Safari 17",
+      "Nairobi, Kenya",
+      "Email and password",
+    ]) {
       expect(email.html).toContain(value);
       expect(email.text).toContain(value);
     }
@@ -113,9 +118,46 @@ describe("signInAlertEmail", () => {
   it("escapes request derived values so a crafted header can't inject HTML", () => {
     const email = signInAlertEmail(
       ctx({ "x-vercel-ip-city": encodeURIComponent('<img src=x onerror="alert(1)">') }),
-      "https://www.hackvillage.xyz/forgot-password"
+      "https://www.hackvillage.xyz/forgot-password",
     );
     expect(email.html).not.toContain("<img src=x");
     expect(email.html).toContain("&lt;img src=x");
+  });
+});
+
+describe("welcomeEmail", () => {
+  it("greets a new Google or GitHub account by first name and links to setup", async () => {
+    const { welcomeEmail } = await import("@/lib/auth/mail-templates");
+    const email = welcomeEmail({
+      name: "Wanjiku Kamau",
+      method: "Google",
+      setupUrl: "https://www.hackvillage.xyz/onboarding/choose",
+    });
+    expect(email.subject).toBe("Welcome To HackVillage");
+    expect(email.html).toContain("Welcome, Wanjiku.");
+    expect(email.html).toContain("created with Google");
+    expect(email.html).toContain('href="https://www.hackvillage.xyz/onboarding/choose"');
+    expect(email.text).toContain(
+      "Finish setting up: https://www.hackvillage.xyz/onboarding/choose",
+    );
+  });
+
+  it("escapes a hostile display name and copes with a missing one", async () => {
+    const { welcomeEmail } = await import("@/lib/auth/mail-templates");
+    const hostile = welcomeEmail({
+      name: "<b>Eve</b>",
+      method: "GitHub",
+      setupUrl: "https://x.test",
+    });
+    expect(hostile.html).not.toContain("<b>Eve");
+    expect(
+      welcomeEmail({ name: null, method: "GitHub", setupUrl: "https://x.test" }).html,
+    ).toContain("Welcome. Your HackVillage account");
+  });
+
+  it("keeps its copy free of em and en dashes", async () => {
+    const { welcomeEmail } = await import("@/lib/auth/mail-templates");
+    const email = welcomeEmail({ name: "A", method: "Google", setupUrl: "https://x.test" });
+    expect(`${email.subject} ${email.text}`).not.toMatch(/[—–]/);
   });
 });

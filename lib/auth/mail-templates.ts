@@ -1,6 +1,7 @@
 /**
- * Auth email templates: verification, password reset, password changed, and
- * the account deactivation notice. These are security critical, so they
+ * Auth email templates: verification, welcome (Google and GitHub sign-ups),
+ * sign in alerts, password reset, password changed, and the account
+ * deactivation notice. These are security critical, so they
  * always send and never carry an unsubscribe link.
  */
 import type { SignInContext } from "@/lib/auth/sign-in-context";
@@ -22,6 +23,33 @@ export function verificationEmail(url: string): EmailTemplate {
       },
     }),
     text: renderText(["Welcome to HackVillage.", `Confirm your email address: ${url}`]),
+  };
+}
+
+/**
+ * Sent when someone creates an account with Google or GitHub. Email sign-ups
+ * get verificationEmail instead, so every new account hears from us once.
+ */
+export function welcomeEmail(input: { name: string | null; method: string; setupUrl: string }): EmailTemplate {
+  const greeting = input.name ? `Welcome, ${input.name.split(" ")[0]}` : "Welcome";
+  return {
+    subject: "Welcome To HackVillage",
+    html: renderEmail({
+      preheader: "Your account is ready. Finish setting up in a minute.",
+      section: {
+        heading: "Welcome To HackVillage",
+        bodyHtml: html`<p style="margin:0;">${greeting}. Your HackVillage account was created with ${input.method}.</p>
+          <p style="margin:12px 0 0;">Pick how you'll use HackVillage to finish setting up: join hackathons as a builder, or host them as an organizer.</p>
+          <p style="margin:12px 0 0;">If you didn't create this account, contact us at info@hackvillage.xyz.</p>`,
+        ctaUrl: input.setupUrl,
+        ctaLabel: "Finish Setting Up",
+      },
+    }),
+    text: renderText([
+      `${greeting}. Your HackVillage account was created with ${input.method}.`,
+      `Finish setting up: ${input.setupUrl}`,
+      "If you didn't create this account, contact us at info@hackvillage.xyz.",
+    ]),
   };
 }
 

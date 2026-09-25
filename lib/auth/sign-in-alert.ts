@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import { after } from "next/server";
 
-import { signInAlertEmail } from "@/lib/auth/mail-templates";
-import { describeSignIn } from "@/lib/auth/sign-in-context";
+import { signInAlertEmail, welcomeEmail } from "@/lib/auth/mail-templates";
+import { describeSignIn, signInMethodLabel } from "@/lib/auth/sign-in-context";
 import { sendMail } from "@/lib/ports/mail";
 import { appUrl } from "@/lib/url";
 
@@ -32,5 +32,37 @@ export async function queueSignInAlert({
   } catch (error) {
     // Outside a request (for example a script), there are no headers to describe.
     console.error("[auth] sign in alert skipped", error);
+  }
+}
+
+/**
+ * Welcomes someone who just created an account with Google or GitHub (email
+ * sign-ups get the verification email instead). Sent after the response, like
+ * the sign in alert, so the mail provider never slows the sign-up down.
+ */
+export function queueWelcomeEmail({
+  email,
+  name,
+  provider,
+}: {
+  email: string;
+  name?: string | null;
+  provider?: string;
+}): void {
+  const template = welcomeEmail({
+    name: name ?? null,
+    method: signInMethodLabel(provider),
+    setupUrl: appUrl("/onboarding/choose"),
+  });
+  try {
+    after(async () => {
+      try {
+        await sendMail({ to: email, ...template });
+      } catch (error) {
+        console.error("[auth] welcome email failed to send", error);
+      }
+    });
+  } catch (error) {
+    console.error("[auth] welcome email skipped", error);
   }
 }

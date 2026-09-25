@@ -7,7 +7,7 @@ import { verify } from "@node-rs/argon2";
 import { z } from "zod";
 
 import { HackVillageAdapter } from "@/lib/auth/adapter";
-import { queueSignInAlert } from "@/lib/auth/sign-in-alert";
+import { queueSignInAlert, queueWelcomeEmail } from "@/lib/auth/sign-in-alert";
 import type { PrimaryRole, Role } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/db";
 
@@ -90,9 +90,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
   events: {
     // Security alert for every sign in, whichever method was used. A brand
-    // new OAuth account is skipped: that "sign in" is the account being created.
+    // new Google or GitHub account gets a welcome email instead: that "sign
+    // in" is the account being created.
     async signIn({ user, account, isNewUser }) {
-      if (!user.email || isNewUser) return;
+      if (!user.email) return;
+      if (isNewUser) {
+        queueWelcomeEmail({ email: user.email, name: user.name, provider: account?.provider });
+        return;
+      }
       await queueSignInAlert({ email: user.email, provider: account?.provider });
     },
   },
