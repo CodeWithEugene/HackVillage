@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { Sparkle } from "@/components/patterns/sparkle";
 
 const ARC_TEXT = "Verified. Paid. Proven.";
 
@@ -24,20 +25,12 @@ function PillPhoto({ name, alt, className }: PillPhotoProps) {
   );
 }
 
-function Sparkle({ className }: { className: string }) {
-  return (
-    <svg className={`journey-star ${className}`} viewBox="0 0 80 80" aria-hidden="true">
-      <path d="M40 0C42 26 54 38 80 40C54 42 42 54 40 80C38 54 26 42 0 40C26 38 38 26 40 0Z" />
-    </svg>
-  );
-}
-
 export function BuilderJourney() {
   return (
     <section className="site-container builder-journey" aria-labelledby="builder-journey-heading">
       <div className="journey-column journey-column-left">
         <div className="journey-copy">
-          <Sparkle className="journey-star-left" />
+          <Sparkle className="journey-star journey-star-left" />
           <h2 id="builder-journey-heading" className="journey-display">
             <span className="journey-heading-desktop">
               Build
@@ -100,7 +93,7 @@ export function BuilderJourney() {
           />
         </div>
         <div className="journey-copy journey-copy-right">
-          <Sparkle className="journey-star-right" />
+          <Sparkle className="journey-star journey-star-right" />
           <p className="journey-text">
             Half your prize lands the moment you win. Ship your milestone and the rest follows, with
             every payout recorded on a public ledger.

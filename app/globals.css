@@ -151,6 +151,7 @@
   }
   /* Centered stack: label, heading, then the description. */
   .how-it-works-header {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -160,6 +161,27 @@
   }
   .how-it-works-heading-block {
     min-width: 0;
+  }
+  /* Home page stars (see .journey-star), flanking the centered heading block. */
+  .how-it-works-star {
+    position: absolute;
+    width: clamp(36px, 3.6vw, 56px);
+    height: auto;
+    fill: var(--color-brand);
+    pointer-events: none;
+  }
+  .how-it-works-star-left {
+    top: 22%;
+    right: calc(50% + clamp(330px, 26vw, 420px));
+  }
+  .how-it-works-star-right {
+    top: 58%;
+    left: calc(50% + clamp(330px, 26vw, 420px));
+  }
+  @media (max-width: 1023px) {
+    .how-it-works-star {
+      display: none;
+    }
   }
   .how-it-works-description {
     max-width: 56ch;

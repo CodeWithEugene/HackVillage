@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
+import { Sparkle } from "@/components/patterns/sparkle";
+
 const STEPS = [
   {
     number: "01",
@@ -51,6 +53,8 @@ export function HowItWorks({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2"
       aria-labelledby="how-it-works-heading"
     >
       <header className="how-it-works-header">
+        <Sparkle className="how-it-works-star how-it-works-star-left" />
+        <Sparkle className="how-it-works-star how-it-works-star-right" />
         <div className="how-it-works-heading-block">
           <p className="how-it-works-eyebrow">How It Works</p>
           <Heading id="how-it-works-heading" className="how-it-works-title">
