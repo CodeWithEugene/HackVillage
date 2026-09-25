@@ -1501,7 +1501,12 @@
       top: 0;
       height: 100dvh;
       overflow: hidden;
-      border-radius: 0 2.5rem 2.5rem 0;
+      /* Inverted (concave) top right and bottom right corners. */
+      --auth-corner: 2.5rem;
+      mask:
+        radial-gradient(var(--auth-corner) at 100% 0, #0000 98%, #000) top / 100% 51% no-repeat,
+        radial-gradient(var(--auth-corner) at 100% 100%, #0000 98%, #000) bottom / 100% 51%
+          no-repeat;
     }
     .auth-main {
       padding: 3rem 2rem;
