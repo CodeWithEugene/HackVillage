@@ -49,8 +49,13 @@ function buttonHtml(url: string, label: string): string {
 }
 
 /** Renders the shared HackVillage email shell around one content section. */
-export function renderEmail(options: { preheader: string; section: EmailSection }): string {
-  const { preheader, section } = options;
+export function renderEmail(options: {
+  preheader: string;
+  section: EmailSection;
+  /** Replaces the default "If this was not you, you can safely ignore it" footer (HTML). */
+  footerHtml?: string;
+}): string {
+  const { preheader, section, footerHtml } = options;
 
   return `<!doctype html>
 <html lang="en">
@@ -84,9 +89,12 @@ export function renderEmail(options: { preheader: string; section: EmailSection 
             <tr>
               <td style="padding:0 32px 28px;text-align:center;">
                 <p style="margin:0;color:${MUTED};font-size:12px;line-height:18px;">
-                  You are receiving this because an account exists on
+                  ${
+                    footerHtml ??
+                    `You are receiving this because an account exists on
                   <a href="https://www.hackvillage.xyz" style="color:${INK};">HackVillage</a>.
-                  If this was not you, you can safely ignore it.
+                  If this was not you, you can safely ignore it.`
+                  }
                 </p>
                 ${UNSUBSCRIBE_MARKER}
               </td>
