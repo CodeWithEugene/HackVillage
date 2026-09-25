@@ -526,6 +526,10 @@
     position: relative;
     min-height: 100%;
   }
+  /* Photo on the left half instead (How It Works page). Phones stack it on top either way. */
+  .cta-banner-photo-left .cta-banner-photo {
+    order: -1;
+  }
   @media (max-width: 1023px) {
     .cta-banner {
       grid-template-columns: minmax(0, 1fr);

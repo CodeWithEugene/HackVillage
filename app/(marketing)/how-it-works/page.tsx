@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { CtaBanner } from "@/components/patterns/cta-banner";
 import { HowItWorks } from "@/components/patterns/how-it-works";
 
 export const metadata: Metadata = {
@@ -12,6 +13,7 @@ export default function HowItWorksPage() {
   return (
     <div className="pt-8 font-display">
       <HowItWorks headingLevel="h1" />
+      <CtaBanner photoSide="left" />
     </div>
   );
 }
