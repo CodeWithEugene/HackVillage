@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 const STEPS = [
   {
@@ -61,6 +63,18 @@ export function HowItWorks({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2"
           One simple flow: lock in the prize money, bring people together, judge everyone the same
           way, and pay winners the moment they&apos;re announced.
         </p>
+        {/* Same pills as the home page hero. */}
+        <div className="hero-actions">
+          <Link href="/hackathons" className="hero-action-primary btn-pill">
+            <span className="btn-fill" aria-hidden />
+            <span className="btn-content">
+              Browse Hackathons <ArrowUpRight aria-hidden="true" size={17} className="btn-arrow" />
+            </span>
+          </Link>
+          <Link href="/onboarding/organizer" className="hero-action-secondary btn-pill">
+            Host A Hackathon <ArrowUpRight aria-hidden="true" size={16} className="btn-arrow" />
+          </Link>
+        </div>
       </header>
       <ol className="how-it-works-grid">
         {STEPS.map((step) => (
