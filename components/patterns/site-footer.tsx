@@ -1,8 +1,18 @@
 import Link from "next/link";
-import { Github, Mail, MapPin } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
+
+import { GithubMark } from "@/components/icons/github-icon";
+import { LinkedinIcon, XIcon, YoutubeIcon } from "@/components/icons/social-icons";
 
 const GITHUB_URL = "https://github.com/CodeWithEugene/HackVillage";
 const CONTACT_EMAIL = "info@hackvillage.xyz";
+
+const SOCIAL_LINKS = [
+  { label: "HackVillage on GitHub", href: GITHUB_URL, Icon: GithubMark },
+  { label: "HackVillage on LinkedIn", href: "https://www.linkedin.com/company/hackvillage", Icon: LinkedinIcon },
+  { label: "HackVillage on X", href: "https://x.com/hackvillagexyz", Icon: XIcon },
+  { label: "HackVillage on YouTube", href: "https://www.youtube.com/@hackvillage", Icon: YoutubeIcon },
+];
 
 const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -55,15 +65,21 @@ export function SiteFooter() {
             Open-source infrastructure for high-impact tech events, built for the African developer
             community.
           </p>
-          <div className="mt-6 flex items-center gap-4">
-            <a
-              href={GITHUB_URL}
-              aria-label="HackVillage on GitHub"
-              className="text-brand transition-colors hover:text-ink-soft"
-            >
-              <Github aria-hidden className="size-5" />
-            </a>
-          </div>
+          <ul className="mt-6 flex items-center gap-5">
+            {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+              <li key={href}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="block text-brand transition-colors hover:text-ink-soft"
+                >
+                  <Icon className="size-5" />
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
         {FOOTER_SECTIONS.map((section) => (
