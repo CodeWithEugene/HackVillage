@@ -27,7 +27,7 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
     title: "Platform",
     links: [
       { label: "Hackathons", href: "/hackathons" },
-      { label: "How it works", href: "/#how-it-works" },
+      { label: "How it works", href: "/how-it-works" },
       { label: "How escrow works", href: "/how-escrow-works" },
     ],
   },
@@ -35,7 +35,7 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
     title: "Project",
     links: [
       { label: "GitHub", href: GITHUB_URL },
-      { label: "Contributing", href: `${GITHUB_URL}/blob/main/CONTRIBUTING.md` },
+      { label: "Contributing", href: "/contribute" },
       { label: "Code of Conduct", href: `${GITHUB_URL}/blob/main/CODE_OF_CONDUCT.md` },
       { label: "Security", href: `${GITHUB_URL}/blob/main/SECURITY.md` },
       { label: "License", href: `${GITHUB_URL}/blob/main/LICENSE` },

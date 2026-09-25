@@ -16,7 +16,7 @@
 
 _Trust-as-a-Service for Developers. Innovation-as-a-Service for Organizations._
 
-[![License](https://img.shields.io/github/license/CodeWithEugene/HackVillage?style=flat-square)](./LICENSE)
+[![License](https://img.shields.io/github/license/CodeWithEugene/HackVillage?style=flat-square)](./LICENSE.md)
 [![Open Source](https://img.shields.io/badge/open--source-core-brightgreen?style=flat-square)](https://github.com/CodeWithEugene/HackVillage)
 [![Built with Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org)
 [![Backend](https://img.shields.io/badge/Node.js-TypeScript-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
@@ -302,7 +302,7 @@ Please read `CONTRIBUTING.md` before submitting a PR. All contributors are expec
 
 ## License
 
-This project is licensed under the [MIT License](./LICENSE).
+This project is licensed under the [Apache License 2.0](./LICENSE.md).
 
 ---
 

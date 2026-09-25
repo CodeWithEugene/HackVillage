@@ -149,24 +149,45 @@
     padding-block: clamp(24px, 4vw, 64px) clamp(64px, 7vw, 112px);
     scroll-margin-top: calc(var(--site-header-height) + 12px);
   }
+  /* Centered stack: label, heading, then the description. */
   .how-it-works-header {
+    position: relative;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: clamp(24px, 4vw, 56px);
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
     margin-bottom: clamp(36px, 5vw, 72px);
+    text-align: center;
   }
   .how-it-works-heading-block {
     min-width: 0;
   }
+  /* Home page stars (see .journey-star), flanking the centered heading block. */
+  .how-it-works-star {
+    position: absolute;
+    width: clamp(36px, 3.6vw, 56px);
+    height: auto;
+    fill: var(--color-brand);
+    pointer-events: none;
+  }
+  .how-it-works-star-left {
+    top: 58%;
+    right: calc(50% + clamp(330px, 26vw, 420px));
+  }
+  .how-it-works-star-right {
+    top: 22%;
+    left: calc(50% + clamp(330px, 26vw, 420px));
+  }
+  @media (max-width: 1023px) {
+    .how-it-works-star {
+      display: none;
+    }
+  }
   .how-it-works-description {
-    flex-shrink: 0;
-    max-width: 36ch;
-    padding-bottom: 6px;
+    max-width: 56ch;
     color: var(--color-body-copy);
     font-size: clamp(15px, 1vw, 18px);
     line-height: 1.6;
-    text-align: right;
   }
   .how-it-works-eyebrow {
     margin-bottom: 18px;
@@ -176,15 +197,16 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
-  .how-it-works-header h2 {
+  /* Same scale as the home page hero heading (.hero-heading), at every breakpoint below. */
+  .how-it-works-title {
     max-width: 1100px;
-    font-size: clamp(28px, 2.6vw, 40px);
+    font-size: clamp(2.75rem, 4.6vw, 5.5rem);
     font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.15;
+    letter-spacing: -0.045em;
+    line-height: 1.06;
     text-wrap: balance;
   }
-  .how-it-works-header h2 span {
+  .how-it-works-title span {
     color: var(--color-ink-soft);
   }
   .how-it-works-grid {
@@ -262,16 +284,6 @@
     }
   }
   @media (max-width: 599px) {
-    .how-it-works-header {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-    .how-it-works-description {
-      max-width: none;
-      padding-bottom: 0;
-      text-align: center;
-    }
     .how-it-works-grid {
       grid-template-columns: minmax(0, 1fr);
       gap: 36px;
@@ -1147,6 +1159,27 @@
     margin-inline: auto;
     text-align: center;
   }
+  /* Home page stars (see .journey-star), just outside the centered hero copy. */
+  .hero-star {
+    position: absolute;
+    width: clamp(36px, 3.6vw, 56px);
+    height: auto;
+    fill: var(--color-brand);
+    pointer-events: none;
+  }
+  .hero-star-left {
+    top: 26%;
+    right: calc(100% + clamp(24px, 3vw, 56px));
+  }
+  .hero-star-right {
+    top: 60%;
+    left: calc(100% + clamp(24px, 3vw, 56px));
+  }
+  @media (max-width: 1023px) {
+    .hero-star {
+      display: none;
+    }
+  }
   .hero-eyebrow {
     font-size: 10px;
     font-weight: 600;
@@ -1275,7 +1308,8 @@
       padding-bottom: 3vh;
       gap: 4vh;
     }
-    .hero-heading {
+    .hero-heading,
+    .how-it-works-title {
       font-size: clamp(4rem, 5vw, 6rem);
     }
     .hero-description {
@@ -1287,7 +1321,8 @@
     .hero-copy {
       max-width: 70%;
     }
-    .hero-heading {
+    .hero-heading,
+    .how-it-works-title {
       font-size: clamp(2.5rem, 5.3vw, 3.4rem);
     }
     .hero-actions {
@@ -1317,6 +1352,10 @@
     }
     .hero-heading {
       margin-top: 13px;
+      font-size: clamp(2rem, 8.8vw, 3.5rem);
+      line-height: 1.1;
+    }
+    .how-it-works-title {
       font-size: clamp(2rem, 8.8vw, 3.5rem);
       line-height: 1.1;
     }
@@ -1458,6 +1497,30 @@
 
   .legal a {
     @apply text-brand underline underline-offset-2 hover:text-ink-soft;
+  }
+
+  .legal code {
+    padding: 0.1em 0.35em;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 0.9em;
+    color: var(--color-ink);
+  }
+  .legal pre {
+    margin-top: 0.75rem;
+    overflow-x: auto;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: var(--color-brand-ink);
+    line-height: 1.7;
+  }
+  .legal pre code {
+    padding: 0;
+    background: none;
+    color: #e6f3fd;
+    font-size: 13px;
+    white-space: pre;
   }
 
   .legal strong {

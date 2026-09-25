@@ -1,4 +1,8 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+
+import { Sparkle } from "@/components/patterns/sparkle";
 
 const STEPS = [
   {
@@ -39,7 +43,9 @@ const STEPS = [
   },
 ];
 
-export function HowItWorks() {
+/** `headingLevel` is h1 on the standalone /how-it-works page; it looks the same either way. */
+export function HowItWorks({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" }) {
+  const Heading = headingLevel;
   return (
     <section
       id="how-it-works"
@@ -47,18 +53,32 @@ export function HowItWorks() {
       aria-labelledby="how-it-works-heading"
     >
       <header className="how-it-works-header">
+        <Sparkle className="how-it-works-star how-it-works-star-left" />
+        <Sparkle className="how-it-works-star how-it-works-star-right" />
         <div className="how-it-works-heading-block">
           <p className="how-it-works-eyebrow">How It Works</p>
-          <h2 id="how-it-works-heading">
+          <Heading id="how-it-works-heading" className="how-it-works-title">
             From First Idea
             <br />
             <span>to Final Payday.</span>
-          </h2>
+          </Heading>
         </div>
         <p className="how-it-works-description">
-          One simple flow: lock in the prize money, bring people together, judge everyone the
-          same way, and pay winners the moment they&apos;re announced.
+          One simple flow: lock in the prize money, bring people together, judge everyone the same
+          way, and pay winners the moment they&apos;re announced.
         </p>
+        {/* Same pills as the home page hero. */}
+        <div className="hero-actions">
+          <Link href="/hackathons" className="hero-action-primary btn-pill">
+            <span className="btn-fill" aria-hidden />
+            <span className="btn-content">
+              Browse Hackathons <ArrowUpRight aria-hidden="true" size={17} className="btn-arrow" />
+            </span>
+          </Link>
+          <Link href="/onboarding/organizer" className="hero-action-secondary btn-pill">
+            Host A Hackathon <ArrowUpRight aria-hidden="true" size={16} className="btn-arrow" />
+          </Link>
+        </div>
       </header>
       <ol className="how-it-works-grid">
         {STEPS.map((step) => (

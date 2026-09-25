@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
+import { Sparkle } from "@/components/patterns/sparkle";
+
 function Photo({ name, alt, center = false }: { name: string; alt: string; center?: boolean }) {
   return (
     <div className={center ? "hero-photo hero-photo-center" : "hero-photo"}>
@@ -22,6 +24,8 @@ export function LandingHero() {
     <section className="landing-hero font-display" aria-labelledby="hero-heading">
       <div className="hero-intro">
         <div className="hero-copy">
+          <Sparkle className="hero-star hero-star-left" />
+          <Sparkle className="hero-star hero-star-right" />
           <p className="hero-eyebrow">Open source. Real people. Real impact.</p>
           <h1 id="hero-heading" className="hero-heading">
             Great Hackathons.
