@@ -1,17 +1,9 @@
 import Link from "next/link";
-import { ArrowUpRight, CalendarDays, Clock, Lock, MapPin, Users } from "lucide-react";
+import { ArrowUpRight, CalendarDays, MapPin, Users } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { PrizeVerifiedBadge } from "@/components/patterns/prize-verified-badge";
 import { eventTiming, formatEventDates, formatShortDate } from "@/lib/events/format";
-import {
-  isPrizeVerified,
-  registrationOpen,
-  STATUS_LABELS,
-  statusTone,
-  type EventStatus,
-} from "@/lib/events/lifecycle";
+import { registrationOpen, type EventStatus } from "@/lib/events/lifecycle";
 import { cn, formatKes } from "@/lib/utils";
 
 export interface EventCardData {
@@ -25,7 +17,6 @@ export interface EventCardData {
   registrationDeadline: Date;
   publishedAt?: Date | null;
   status: EventStatus;
-  prizeVerifiedAt?: Date | null;
   poolKes: number;
   teamCount: number;
   orgName: string;
@@ -45,37 +36,28 @@ function venueLabel(event: EventCardData): string {
 }
 
 function registrationNote(event: EventCardData, open: boolean): string {
-  if (open) return `Register by ${formatShortDate(event.registrationDeadline)}`;
-  if (event.status === "PENDING_DEPOSIT") return "Awaiting deposit";
-  return "Registration closed";
+  return open
+    ? `Register by ${formatShortDate(event.registrationDeadline)}`
+    : "Registration closed";
 }
 
 export function EventCard({ event }: { event: EventCardData }) {
-  const verified = isPrizeVerified(event.status, event.prizeVerifiedAt);
   const open = registrationOpen(event);
   const timing = eventTiming(event);
 
   return (
     <Link
       href={`/hackathons/${event.slug}`}
-      className="group flex h-full flex-col rounded-card border border-ink/10 bg-surface p-5 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-brand/60 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+      className="group flex h-full flex-col rounded-card bg-surface p-5 shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
     >
-      <div className="flex items-center justify-between gap-3">
-        {verified ? (
-          <PrizeVerifiedBadge />
-        ) : (
-          <Badge variant={statusTone(event.status)}>{STATUS_LABELS[event.status]}</Badge>
-        )}
+      <div className="text-center">
         {timing ? (
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-soft">
             <span aria-hidden className={cn("size-1.5 rounded-full", TIMING_DOT[timing.tone])} />
             {timing.label}
           </span>
         ) : null}
-      </div>
-
-      <div className="text-center">
-        <h3 className="mt-4 font-display text-xl leading-snug font-bold text-ink">{event.title}</h3>
+        <h3 className="mt-3 font-display text-xl leading-snug font-bold text-ink">{event.title}</h3>
         <p className="mt-1 text-xs font-medium text-muted">by {event.orgName}</p>
         {event.summary ? (
           <p className="mt-3 line-clamp-2 text-sm leading-6 text-body-copy">{event.summary}</p>
@@ -87,17 +69,6 @@ export function EventCard({ event }: { event: EventCardData }) {
           </p>
           <p className="mt-0.5 font-display text-2xl font-bold text-ink">
             {formatKes(event.poolKes)}
-          </p>
-          <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-ink-soft">
-            {verified ? (
-              <>
-                <Lock aria-hidden className="size-3.5" /> Locked in escrow
-              </>
-            ) : (
-              <>
-                <Clock aria-hidden className="size-3.5" /> Pending verification
-              </>
-            )}
           </p>
         </div>
       </div>
