@@ -32,6 +32,19 @@ export interface StoragePort {
   /** Dev mode: persist an uploaded file. No-op in R2 mode. */
   saveLocal(key: string, body: Buffer): Promise<string>;
   publicUrlFor(key: string): string;
+  /**
+   * Upload target at an exact key (covers). Local mode points the browser at
+   * `devUploadPath`, a dev-only route that calls saveLocalAt.
+   */
+  createUploadTargetForKey(input: {
+    key: string;
+    contentType: string;
+    devUploadPath: string;
+  }): Promise<UploadTarget>;
+  /** Dev mode: persist a keyed upload under public/uploads. Throws in R2 mode. */
+  saveLocalAt(key: string, body: Buffer): Promise<string>;
+  /** Public URL for a keyed upload. */
+  urlForKey(key: string): string;
 }
 
 const MAX_BYTES = 15 * 1024 * 1024; // 15MB per asset (photos/short clips)
@@ -82,6 +95,34 @@ class LocalStorage implements StoragePort {
   publicUrlFor(key: string): string {
     return `/uploads/${key.replace("events/", "")}`;
   }
+
+  async createUploadTargetForKey(input: {
+    key: string;
+    contentType: string;
+    devUploadPath: string;
+  }): Promise<UploadTarget> {
+    const base = getEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+    return {
+      uploadUrl: `${base}${input.devUploadPath}?key=${encodeURIComponent(input.key)}`,
+      headers: { "Content-Type": input.contentType },
+      publicUrl: this.urlForKey(input.key),
+      key: input.key,
+    };
+  }
+
+  async saveLocalAt(key: string, body: Buffer): Promise<string> {
+    const root = path.join(process.cwd(), "public", "uploads");
+    const target = path.join(root, key);
+    if (!target.startsWith(root + path.sep))
+      throw new Error("Storage key escapes the uploads folder.");
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, body);
+    return this.urlForKey(key);
+  }
+
+  urlForKey(key: string): string {
+    return `/uploads/${key}`;
+  }
 }
 
 class R2Storage implements StoragePort {
@@ -94,7 +135,7 @@ class R2Storage implements StoragePort {
       secretAccessKey: string;
       bucket: string;
       publicBase: string;
-    }
+    },
   ) {}
 
   async createUploadTarget(input: {
@@ -129,6 +170,28 @@ class R2Storage implements StoragePort {
   publicUrlFor(key: string): string {
     return `${this.config.publicBase}/${key}`;
   }
+
+  async createUploadTargetForKey(input: {
+    key: string;
+    contentType: string;
+  }): Promise<UploadTarget> {
+    const { createPresignedUrl } = await import("@/lib/ports/r2-sign");
+    const { url, headers } = await createPresignedUrl({
+      ...this.config,
+      key: input.key,
+      contentType: input.contentType,
+      expiresIn: 900,
+    });
+    return { uploadUrl: url, headers, publicUrl: this.urlForKey(input.key), key: input.key };
+  }
+
+  async saveLocalAt(): Promise<string> {
+    throw new Error("R2Storage cannot save locally.");
+  }
+
+  urlForKey(key: string): string {
+    return `${this.config.publicBase}/${key}`;
+  }
 }
 
 let cached: StoragePort | null = null;
@@ -136,12 +199,7 @@ let cached: StoragePort | null = null;
 export function getStoragePort(): StoragePort {
   if (cached) return cached;
   const env = process.env;
-  if (
-    env.R2_ACCOUNT_ID &&
-    env.R2_ACCESS_KEY_ID &&
-    env.R2_SECRET_ACCESS_KEY &&
-    env.R2_BUCKET
-  ) {
+  if (env.R2_ACCOUNT_ID && env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY && env.R2_BUCKET) {
     const publicBase =
       env.R2_PUBLIC_BASE ?? `https://pub-${env.R2_ACCOUNT_ID}.r2.dev/${env.R2_BUCKET}`;
     cached = new R2Storage({

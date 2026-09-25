@@ -313,6 +313,8 @@ model Event {
   registrationDeadline DateTime
   maxTeams Int @default(20)
   rolesWanted String[]
+  // Keys from lib/events/categories.ts (AI, Web3, Fintech...), at most 3.
+  categories String[] @default([])
   status EventStatus @default(DRAFT)
   // Set by the escrow service when the vault locks (Phase 3).
   prizeVerifiedAt DateTime?

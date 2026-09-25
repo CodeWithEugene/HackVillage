@@ -145,7 +145,7 @@ export function SiteFooter() {
       </div>
 
       <div className="site-container">
-        <div className="grid justify-items-center gap-3 border-t border-ink/10 py-6 text-center text-sm text-body-copy xl:grid-cols-[1fr_auto_1fr] xl:items-center xl:gap-6">
+        <div className="grid justify-items-center gap-3 py-6 text-center text-sm text-body-copy xl:grid-cols-[1fr_auto_1fr] xl:items-center xl:gap-6">
           <p className="xl:justify-self-start">Copyright © {year} HackVillage</p>
           <p>
             A{" "}

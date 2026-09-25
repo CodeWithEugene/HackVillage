@@ -113,6 +113,8 @@ async function main(): Promise<void> {
       registrationDeadline: new Date(now + 1 * DAY),
       maxTeams: 20,
       rolesWanted: ["frontend", "fintech", "mobile", "design"],
+      categories: ["fintech", "mobility"],
+      coverUrl: "/marketing/hero/kenya/hackathon-pair.webp",
       status: "LIVE",
       prizeVerifiedAt: new Date(now - 5 * DAY),
       publishedAt: new Date(now - 6 * DAY),
@@ -207,6 +209,8 @@ async function main(): Promise<void> {
       registrationDeadline: new Date(now + 18 * DAY),
       maxTeams: 15,
       rolesWanted: ["ai", "backend", "design"],
+      categories: ["ai", "health"],
+      coverUrl: "/marketing/hero/kenya/coding-focus.webp",
       status: "PENDING_DEPOSIT",
       publishedAt: new Date(now - 1 * DAY),
     },
@@ -238,6 +242,8 @@ async function main(): Promise<void> {
     status: "LIVE" | "PENDING_DEPOSIT" | "SETTLED";
     verified: boolean;
     rolesWanted: string[];
+    categories: string[];
+    coverUrl: string;
     prizes: [number, string, number][];
   };
   const catalog: CatalogEntry[] = [
@@ -254,6 +260,8 @@ async function main(): Promise<void> {
       status: "LIVE",
       verified: true,
       rolesWanted: ["data", "backend", "mobile"],
+      categories: ["climate", "agritech"],
+      coverUrl: "/marketing/how-it-works/launch.webp",
       prizes: [
         [1, "1st place", 200_000],
         [2, "2nd place", 100_000],
@@ -272,10 +280,73 @@ async function main(): Promise<void> {
       status: "LIVE",
       verified: true,
       rolesWanted: ["mobile", "design", "backend"],
+      categories: ["agritech", "fintech"],
+      coverUrl: "/marketing/hero/kenya/community.webp",
       prizes: [
         [1, "1st place", 150_000],
         [2, "2nd place", 75_000],
         [3, "3rd place", 50_000],
+      ],
+    },
+    {
+      slug: "civic-tech-build-sprint",
+      title: "Civic Tech Build Sprint",
+      summary: "Tools that help Kenyans track public services, report issues, and follow up.",
+      problemStatement:
+        "Residents report broken water points, potholes, and missing services, then never hear back. Over three weeks, build tools that route reports to the right office, track them publicly, and close the loop with the people who raised them.",
+      venueType: "ONLINE",
+      location: null,
+      startDay: -4,
+      lengthDays: 21,
+      status: "LIVE",
+      verified: true,
+      rolesWanted: ["frontend", "backend", "civic"],
+      categories: ["civic"],
+      coverUrl: "/marketing/hero/kenya/speaker.webp",
+      prizes: [
+        [1, "1st place", 150_000],
+        [2, "2nd place", 75_000],
+      ],
+    },
+    {
+      slug: "clean-energy-hack",
+      title: "Clean Energy Hack",
+      summary: "Solar, metering, and pay as you go tools for off grid homes and small businesses.",
+      problemStatement:
+        "Millions of households rely on small solar kits with no easy way to track usage or pay in small amounts. Build metering dashboards, pay as you go billing, or maintenance tools for installers and the families they serve.",
+      venueType: "PHYSICAL",
+      location: "Dedan Kimathi University, Nyeri",
+      startDay: -2,
+      lengthDays: 14,
+      status: "LIVE",
+      verified: true,
+      rolesWanted: ["hardware", "mobile", "fintech"],
+      categories: ["climate"],
+      coverUrl: "/marketing/how-it-works/build.webp",
+      prizes: [
+        [1, "1st place", 200_000],
+        [2, "2nd place", 100_000],
+      ],
+    },
+    {
+      slug: "agri-supply-chain-challenge",
+      title: "Agri Supply Chain Challenge",
+      summary: "Traceability and payments from farm gate to market for Kenyan smallholders.",
+      problemStatement:
+        "Smallholder produce changes hands many times before it reaches a buyer, and farmers rarely see fair prices or prompt payment. Build traceability, grading, or instant payment tools that work at the farm gate.",
+      venueType: "HYBRID",
+      location: "Eldoret, Uasin Gishu",
+      startDay: -6,
+      lengthDays: 28,
+      status: "LIVE",
+      verified: true,
+      rolesWanted: ["backend", "data", "mobile"],
+      categories: ["agritech", "web3"],
+      coverUrl: "/marketing/hero/kenya/team-build.webp",
+      prizes: [
+        [1, "1st place", 250_000],
+        [2, "2nd place", 120_000],
+        [3, "3rd place", 60_000],
       ],
     },
     {
@@ -291,6 +362,8 @@ async function main(): Promise<void> {
       status: "PENDING_DEPOSIT",
       verified: false,
       rolesWanted: ["frontend", "design", "education"],
+      categories: ["edtech"],
+      coverUrl: "/marketing/hero/kenya/speaker.webp",
       prizes: [
         [1, "1st place", 80_000],
         [2, "2nd place", 40_000],
@@ -309,6 +382,8 @@ async function main(): Promise<void> {
       status: "PENDING_DEPOSIT",
       verified: false,
       rolesWanted: ["fintech", "frontend", "design"],
+      categories: ["web3", "fintech"],
+      coverUrl: "/marketing/hero/kenya/hackathon-pair.webp",
       prizes: [
         [1, "1st place", 120_000],
         [2, "2nd place", 60_000],
@@ -327,6 +402,8 @@ async function main(): Promise<void> {
       status: "PENDING_DEPOSIT",
       verified: false,
       rolesWanted: ["mobile", "maps", "backend"],
+      categories: ["mobility", "civic"],
+      coverUrl: "/marketing/how-it-works/reward.webp",
       prizes: [
         [1, "1st place", 90_000],
         [2, "2nd place", 45_000],
@@ -345,6 +422,8 @@ async function main(): Promise<void> {
       status: "SETTLED",
       verified: true,
       rolesWanted: ["security", "fintech", "data"],
+      categories: ["security", "fintech"],
+      coverUrl: "/marketing/how-it-works/judge.webp",
       prizes: [
         [1, "1st place", 300_000],
         [2, "2nd place", 150_000],
@@ -363,6 +442,8 @@ async function main(): Promise<void> {
       status: "SETTLED",
       verified: true,
       rolesWanted: ["data", "frontend", "civic"],
+      categories: ["civic"],
+      coverUrl: "/marketing/hero/kenya/event-arrival.webp",
       prizes: [
         [1, "1st place", 100_000],
         [2, "2nd place", 50_000],
@@ -381,6 +462,8 @@ async function main(): Promise<void> {
       status: "SETTLED",
       verified: true,
       rolesWanted: ["ai", "data", "backend"],
+      categories: ["ai"],
+      coverUrl: "/marketing/how-it-works/reward.webp",
       prizes: [
         [1, "1st place", 250_000],
         [2, "2nd place", 120_000],
@@ -405,6 +488,8 @@ async function main(): Promise<void> {
         endsAt,
         registrationDeadline: new Date(startsAt.getTime() - 2 * DAY),
         rolesWanted: entry.rolesWanted,
+        categories: entry.categories,
+        coverUrl: entry.coverUrl,
         status: entry.status,
         prizeVerifiedAt: entry.verified ? new Date(startsAt.getTime() - 10 * DAY) : null,
         publishedAt: new Date(startsAt.getTime() - 14 * DAY),
@@ -459,7 +544,7 @@ async function main(): Promise<void> {
     update: {},
   });
 
-  console.log("Seeded: Technetium Kenya org, 1 organizer, 5 developers, 1 judge, 10 hackathons, 2 teams, 1 submission.");
+  console.log("Seeded: Technetium Kenya org, 1 organizer, 5 developers, 1 judge, 13 hackathons, 2 teams, 1 submission.");
   console.log("Demo login: organizer@hackvillage.dev / wanjiku@hackvillage.dev / judge@hackvillage.dev … password: demopass123");
 }
 

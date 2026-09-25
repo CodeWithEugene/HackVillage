@@ -5,9 +5,13 @@ import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
+import { isPublicHackathon } from "@/lib/events/visibility";
 import { registrationOpen } from "@/lib/events/lifecycle";
 import { sendNotification } from "@/lib/notifications/send";
-import { registrationCancelledEmail, registrationConfirmedEmail } from "@/lib/notifications/templates/events";
+import {
+  registrationCancelledEmail,
+  registrationConfirmedEmail,
+} from "@/lib/notifications/templates/events";
 import { appUrl } from "@/lib/url";
 
 export interface RegistrationActionState {
@@ -19,7 +23,8 @@ export async function registerForEventAction(eventSlug: string): Promise<void> {
   const user = await requireUser();
 
   const event = await prisma.event.findUnique({ where: { slug: eventSlug } });
-  if (!event || !registrationOpen(event)) {
+  // Unfunded hackathons aren't on the public platform, so nobody can join them.
+  if (!event || !isPublicHackathon(event) || !registrationOpen(event)) {
     redirect(`/hackathons/${eventSlug}?registration=closed`);
   }
 

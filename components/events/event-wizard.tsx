@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormError, Input, Label, Textarea } from "@/components/ui/input";
+import { HACKATHON_CATEGORIES, MAX_CATEGORIES } from "@/lib/events/categories";
+import { COVER_HEIGHT, COVER_WIDTH } from "@/lib/events/cover-upload";
 import { formatKes } from "@/lib/utils";
 import { saveEventAction, type EventActionState } from "@/lib/events/actions";
 
@@ -22,6 +24,7 @@ export interface WizardDefaults {
   problemStatement?: string;
   rules?: string;
   rolesWanted?: string[];
+  categories?: string[];
   maxTeams?: number;
   prizes?: { place: number; label: string; amountKes: number; milestoneRequired: boolean }[];
 }
@@ -48,6 +51,15 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
   const [venueType, setVenueType] = useState<"PHYSICAL" | "ONLINE" | "HYBRID">(
     defaults?.venueType ?? "PHYSICAL"
   );
+  const [categories, setCategories] = useState<string[]>(defaults?.categories ?? []);
+  const toggleCategory = (key: string) =>
+    setCategories((current) =>
+      current.includes(key)
+        ? current.filter((value) => value !== key)
+        : current.length < MAX_CATEGORIES
+          ? [...current, key]
+          : current
+    );
   const [prizes, setPrizes] = useState<PrizeRow[]>(
     defaults?.prizes?.length
       ? defaults.prizes.map((p) => ({
@@ -93,6 +105,7 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
       <form action={action} className="space-y-6">
         <input type="hidden" name="eventId" value={defaults?.eventId ?? ""} />
         <input type="hidden" name="venueType" value={venueType} />
+        <input type="hidden" name="categories" value={categories.join(",")} />
         <input
           type="hidden"
           name="prizes"
@@ -119,6 +132,34 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
               <Label htmlFor="summary">One-line summary</Label>
               <Input id="summary" name="summary" maxLength={300} defaultValue={defaults?.summary ?? ""} placeholder="Build the rails Nairobi's matatu economy runs on" />
             </div>
+            <fieldset>
+              <legend className="mb-2 text-sm font-semibold text-ink">Categories</legend>
+              <div className="flex flex-wrap gap-2">
+                {HACKATHON_CATEGORIES.map((category) => {
+                  const selected = categories.includes(category.key);
+                  const full = !selected && categories.length >= MAX_CATEGORIES;
+                  return (
+                    <button
+                      key={category.key}
+                      type="button"
+                      aria-pressed={selected}
+                      disabled={full}
+                      onClick={() => toggleCategory(category.key)}
+                      className={`rounded-full border-2 px-3 py-1 text-sm font-semibold ${
+                        selected
+                          ? "border-brand bg-brand/10 text-ink"
+                          : "border-ink/10 text-muted hover:border-ink/25 disabled:opacity-40"
+                      }`}
+                    >
+                      {category.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-1.5 text-xs text-muted">
+                Pick up to {MAX_CATEGORIES}. Developers filter hackathons by these.
+              </p>
+            </fieldset>
             <fieldset>
               <legend className="mb-2 text-sm font-semibold text-ink">Venue</legend>
               <div className="grid grid-cols-3 gap-2">
@@ -259,12 +300,16 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
             <p className="font-display text-lg font-bold text-ink">Review &amp; create draft</p>
             <p className="text-sm text-muted">
               Publishing checks the pool, dates, and problem statement. The draft then waits for
-              the Prize Vault deposit before going live. Developers see it as
-              &ldquo;pending verification&rdquo;.
+              the Prize Vault deposit, and developers only see it once the deposit confirms.
+            </p>
+            <p className="text-sm text-muted">
+              After you save, add a {COVER_WIDTH} × {COVER_HEIGHT} px cover image from the
+              hackathon page. Until then it uses a photo that matches its first category.
             </p>
             <dl className="grid gap-2 rounded-control bg-paper p-4 text-sm">
               <div className="flex justify-between"><dt className="text-muted">Prize pool</dt><dd className="font-bold text-ink">{formatKes(total)}</dd></div>
               <div className="flex justify-between"><dt className="text-muted">Prize places</dt><dd className="font-semibold text-ink">{prizes.filter((p) => Number(p.amount) > 0).length}</dd></div>
+              <div className="flex justify-between gap-4"><dt className="text-muted">Categories</dt><dd className="text-right font-semibold text-ink">{categories.length > 0 ? categories.map((key) => HACKATHON_CATEGORIES.find((c) => c.key === key)?.label ?? key).join(", ") : "None yet"}</dd></div>
               <div className="flex justify-between"><dt className="text-muted">Venue</dt><dd className="font-semibold text-ink capitalize">{venueType.toLowerCase()}</dd></div>
             </dl>
           </Card>

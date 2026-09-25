@@ -1,5 +1,3 @@
-import type { EventStatus } from "@/lib/events/lifecycle";
-
 /** Events are run and displayed on Nairobi time, wherever the server sits. */
 const EVENT_TIME_ZONE = "Africa/Nairobi";
 
@@ -45,34 +43,22 @@ export function formatShortDate(date: Date): string {
   return `${day} ${month}`;
 }
 
-export interface EventTiming {
-  label: string;
-  tone: "brand" | "success" | "muted";
+export const HACKATHON_PHASES = ["ongoing", "upcoming", "past"] as const;
+export type HackathonPhase = (typeof HACKATHON_PHASES)[number];
+
+/** Where a hackathon sits in time, for the listing tabs. */
+export function hackathonPhase(
+  event: { startsAt: Date; endsAt: Date },
+  now: Date = new Date(),
+): HackathonPhase {
+  if (now.getTime() < event.startsAt.getTime()) return "upcoming";
+  if (now.getTime() > event.endsAt.getTime()) return "past";
+  return "ongoing";
 }
 
-/**
- * Where an event sits in time, for the chip on its card. Cancelled and
- * disputed events return null: their status badge already says it all.
- */
-export function eventTiming(
-  event: { status: EventStatus; startsAt: Date; endsAt: Date },
-  now: Date = new Date()
-): EventTiming | null {
-  switch (event.status) {
-    case "CANCELLED":
-    case "DISPUTED":
-      return null;
-    case "WINNERS_ANNOUNCED":
-    case "SETTLED":
-      return { label: "Concluded", tone: "muted" };
-    case "JUDGING":
-      return { label: "Judging", tone: "brand" };
-    default:
-      break;
-  }
-  if (event.endsAt.getTime() < now.getTime()) return { label: "Concluded", tone: "muted" };
-  if (event.startsAt.getTime() <= now.getTime()) return { label: "Happening Now", tone: "success" };
-  return { label: "Upcoming", tone: "brand" };
+/** The tab to open on: the first, in order, that has any hackathons. */
+export function defaultPhase(counts: Record<HackathonPhase, number>): HackathonPhase {
+  return HACKATHON_PHASES.find((phase) => counts[phase] > 0) ?? "ongoing";
 }
 
 const weekdayDateTime = new Intl.DateTimeFormat("en-KE", {
@@ -110,7 +96,7 @@ export function keyDates(
     endsAt: Date;
     mediaDeadlineAt?: Date | null;
   },
-  now: Date = new Date()
+  now: Date = new Date(),
 ): KeyDate[] {
   const milestones: [string, Date][] = [
     ["Registration closes", event.registrationDeadline],

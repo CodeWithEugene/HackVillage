@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { parseCategoryList } from "@/lib/events/categories";
+
 /**
  * Event wizard validation (server-authoritative). The wizard is a 5-step
  * client stepper over ONE form — this schema is the whole contract.
@@ -19,6 +21,8 @@ export const eventBasicsSchema = z.object({
   startsAt: z.coerce.date(),
   endsAt: z.coerce.date(),
   registrationDeadline: z.coerce.date(),
+  // Comma separated category keys from the wizard's chips; unknown keys are dropped.
+  categories: z.string().optional().transform(parseCategoryList),
 });
 
 export const eventProblemSchema = z.object({

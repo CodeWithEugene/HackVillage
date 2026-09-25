@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CalendarDays, Clock, MapPin, Users } from "lucide-react";
 
-import { PrizeVerifiedBadge } from "@/components/patterns/prize-verified-badge";
 import { KeyDatesCard } from "@/components/patterns/key-dates-card";
 import { OrganizerCard } from "@/components/patterns/organizer-card";
 import { StatusTimeline } from "@/components/patterns/status-timeline";
@@ -11,12 +11,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { currentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
-import {
-  isPrizeVerified,
-  registrationOpen,
-  STATUS_LABELS,
-  statusTone,
-} from "@/lib/events/lifecycle";
+import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
+import { categoryLabel, isCategory } from "@/lib/events/categories";
+import { coverFor } from "@/lib/events/covers";
+import { registrationOpen } from "@/lib/events/lifecycle";
 import { formatKes } from "@/lib/utils";
 import Link from "next/link";
 
@@ -27,8 +25,8 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const event = await prisma.event.findUnique({
-    where: { slug },
+  const event = await prisma.event.findFirst({
+    where: { slug, ...PUBLIC_HACKATHON_WHERE },
     select: { title: true, summary: true },
   });
   if (!event) return { title: "Hackathon Not Found" };
@@ -50,7 +48,8 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
   ]);
 
   const event = await prisma.event.findFirst({
-    where: { slug, publishedAt: { not: null } },
+    // Unfunded hackathons are not on the public platform (lib/events/visibility).
+    where: { slug, ...PUBLIC_HACKATHON_WHERE },
     include: {
       org: {
         select: {
@@ -81,8 +80,9 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
   if (!event) notFound();
 
   const poolKes = event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0);
-  const verified = isPrizeVerified(event.status, event.prizeVerifiedAt);
   const open = registrationOpen(event);
+  const categories = event.categories.filter(isCategory);
+  const cover = coverFor(event);
   const gallery = event.media;
 
   const registration_ = viewer
@@ -102,12 +102,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
       ) : null}
 
       <header className="text-center">
-        {verified ? (
-          <PrizeVerifiedBadge />
-        ) : (
-          <Badge variant={statusTone(event.status)}>{STATUS_LABELS[event.status]}</Badge>
-        )}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
           <h1 className="font-display text-3xl leading-tight font-bold text-ink sm:text-4xl">
             {event.title}
           </h1>
@@ -119,17 +114,21 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
         {event.summary ? (
           <p className="mx-auto mt-2 max-w-2xl text-lg text-muted">{event.summary}</p>
         ) : null}
+        {categories.length > 0 ? (
+          <ul className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Categories">
+            {categories.map((key) => (
+              <li key={key}>
+                <Link
+                  href={`/hackathons?category=${key}`}
+                  className="inline-block rounded-full border border-ink/15 px-3 py-1 text-xs font-semibold text-ink-soft hover:border-ink/30"
+                >
+                  {categoryLabel(key)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </header>
-
-      {!verified ? (
-        <div className="mt-6 rounded-card border border-warning/40 bg-warning/10 p-4">
-          <p className="text-sm leading-6 text-ink">
-            <strong>Prize pending verification.</strong> The organizer has declared a{" "}
-            {formatKes(poolKes)} pool. This hackathon goes live only after 100% of it is locked in
-            the Prize Vault, and your build is never chasing money that doesn&apos;t exist yet.
-          </p>
-        </div>
-      ) : null}
 
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] xl:gap-8">
         <div className="min-w-0 space-y-6">
@@ -164,6 +163,17 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
         </div>
 
         <aside className="space-y-6" aria-label="Hackathon details">
+          <div className="relative aspect-[16/9] overflow-hidden rounded-card bg-brand/10 shadow-card">
+            <Image
+              src={cover}
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1024px) 400px, 100vw"
+              unoptimized={!cover.startsWith("/")}
+              className="object-cover"
+            />
+          </div>
           <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
             <Card>
               <p className="text-xs font-semibold tracking-wide text-muted uppercase">Prize pool</p>

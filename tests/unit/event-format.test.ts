@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  eventTiming,
+  defaultPhase,
   formatDateTime,
   formatEventDates,
   formatShortDate,
+  hackathonPhase,
   keyDates,
 } from "@/lib/events/format";
 
@@ -43,47 +44,33 @@ describe("formatShortDate", () => {
   });
 });
 
-describe("eventTiming", () => {
-  const base = {
-    startsAt: eat("2026-10-13"),
-    endsAt: eat("2026-10-15"),
-  };
+describe("hackathonPhase", () => {
+  const event = { startsAt: eat("2026-10-13"), endsAt: eat("2026-10-15") };
 
-  it("is upcoming before the event starts", () => {
-    expect(eventTiming({ ...base, status: "LIVE" }, eat("2026-10-01"))).toEqual({
-      label: "Upcoming",
-      tone: "brand",
-    });
+  it("is upcoming before it starts", () => {
+    expect(hackathonPhase(event, eat("2026-10-01"))).toBe("upcoming");
   });
 
-  it("is happening now while a live event runs", () => {
-    expect(eventTiming({ ...base, status: "IN_PROGRESS" }, eat("2026-10-14"))).toEqual({
-      label: "Happening Now",
-      tone: "success",
-    });
+  it("is ongoing from the start through the end", () => {
+    expect(hackathonPhase(event, eat("2026-10-13"))).toBe("ongoing");
+    expect(hackathonPhase(event, eat("2026-10-14"))).toBe("ongoing");
+    expect(hackathonPhase(event, eat("2026-10-15"))).toBe("ongoing");
   });
 
-  it("reports judging while judges score", () => {
-    expect(eventTiming({ ...base, status: "JUDGING" }, eat("2026-10-16"))).toEqual({
-      label: "Judging",
-      tone: "brand",
-    });
+  it("is past once it has ended", () => {
+    expect(hackathonPhase(event, eat("2026-10-16"))).toBe("past");
+  });
+});
+
+describe("defaultPhase", () => {
+  it("opens on the first tab in order that has hackathons", () => {
+    expect(defaultPhase({ ongoing: 2, upcoming: 3, past: 1 })).toBe("ongoing");
+    expect(defaultPhase({ ongoing: 0, upcoming: 3, past: 1 })).toBe("upcoming");
+    expect(defaultPhase({ ongoing: 0, upcoming: 0, past: 1 })).toBe("past");
   });
 
-  it("is concluded once winners are out or the event has ended", () => {
-    expect(eventTiming({ ...base, status: "SETTLED" }, eat("2026-11-01"))).toEqual({
-      label: "Concluded",
-      tone: "muted",
-    });
-    expect(eventTiming({ ...base, status: "LIVE" }, eat("2026-10-20"))).toEqual({
-      label: "Concluded",
-      tone: "muted",
-    });
-  });
-
-  it("has no timing for cancelled or disputed events", () => {
-    expect(eventTiming({ ...base, status: "CANCELLED" }, eat("2026-10-01"))).toBeNull();
-    expect(eventTiming({ ...base, status: "DISPUTED" }, eat("2026-10-01"))).toBeNull();
+  it("falls back to ongoing when there are none at all", () => {
+    expect(defaultPhase({ ongoing: 0, upcoming: 0, past: 0 })).toBe("ongoing");
   });
 });
 

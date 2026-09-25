@@ -3,10 +3,8 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { Building2, Code2 } from "lucide-react";
-import { signIn } from "next-auth/react";
 
-import { GithubIcon } from "@/components/icons/github-icon";
-import { GoogleIcon } from "@/components/icons/google-icon";
+import { OAuthButtons } from "@/components/auth/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormError, Input, Label } from "@/components/ui/input";
@@ -36,7 +34,6 @@ export function SignUpForm({
 }) {
   const [state, action, pending] = useActionState<AuthActionState, FormData>(signUpAction, {});
   const [role, setRole] = useState<"DEVELOPER" | "ORGANIZER">("DEVELOPER");
-  const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
 
   return (
     <Card>
@@ -45,44 +42,11 @@ export function SignUpForm({
         One account, many roles: you can add organizer or judge access later.
       </p>
 
-      {(googleEnabled || githubEnabled) && (
-        <>
-          <p className="mt-6 text-center text-sm font-semibold text-ink">Continue with:</p>
-          <div className={`mt-2 grid gap-2 ${googleEnabled && githubEnabled ? "grid-cols-2" : "grid-cols-1"}`}>
-            {googleEnabled && (
-              <Button
-                type="button"
-                variant="secondary"
-                loading={oauthLoading === "google"}
-                disabled={oauthLoading !== null}
-                onClick={() => {
-                  setOauthLoading("google");
-                  void signIn("google", { redirectTo: "/dashboard" });
-                }}
-              >
-                {oauthLoading !== "google" && <GoogleIcon className="size-4" />} Google
-              </Button>
-            )}
-            {githubEnabled && (
-              <Button
-                type="button"
-                variant="secondary"
-                loading={oauthLoading === "github"}
-                disabled={oauthLoading !== null}
-                onClick={() => {
-                  setOauthLoading("github");
-                  void signIn("github", { redirectTo: "/dashboard" });
-                }}
-              >
-                {oauthLoading !== "github" && <GithubIcon className="size-4" />} GitHub
-              </Button>
-            )}
-          </div>
-          <div className="my-5 flex items-center gap-3 text-xs text-muted">
-            <span className="h-px flex-1 bg-ink/10" /> or with email <span className="h-px flex-1 bg-ink/10" />
-          </div>
-        </>
-      )}
+      <OAuthButtons
+        googleEnabled={googleEnabled}
+        githubEnabled={githubEnabled}
+        redirectTo="/dashboard"
+      />
 
       <form action={action} className="mt-6 space-y-5">
         <input type="hidden" name="role" value={role} />
@@ -122,10 +86,15 @@ export function SignUpForm({
 
         <div>
           <Label htmlFor="handle">Handle (optional)</Label>
-          <Input id="handle" name="handle" placeholder="your public profile address" maxLength={30} />
+          <Input
+            id="handle"
+            name="handle"
+            placeholder="your public profile address"
+            maxLength={30}
+          />
           <p className="mt-1.5 text-xs text-muted">
-            hackvillage.xyz/developers/<span className="font-mono">your-handle</span>. Leave blank and
-            we&apos;ll suggest one from your email.
+            hackvillage.xyz/developers/<span className="font-mono">your-handle</span>. Leave blank
+            and we&apos;ll suggest one from your email.
           </p>
         </div>
 
@@ -139,7 +108,9 @@ export function SignUpForm({
             required
             minLength={10}
           />
-          <p className="mt-1.5 text-xs text-muted">At least 10 characters, with a letter and a number.</p>
+          <p className="mt-1.5 text-xs text-muted">
+            At least 10 characters, with a letter and a number.
+          </p>
         </div>
 
         <FormError message={state.error} />

@@ -1,17 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, CalendarDays, Clock, Lock, MapPin, Users } from "lucide-react";
+import { ArrowUpRight, CalendarDays, MapPin, Users } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { PrizeVerifiedBadge } from "@/components/patterns/prize-verified-badge";
-import { eventTiming, formatEventDates, formatShortDate } from "@/lib/events/format";
-import {
-  isPrizeVerified,
-  registrationOpen,
-  STATUS_LABELS,
-  statusTone,
-  type EventStatus,
-} from "@/lib/events/lifecycle";
+import { categoryLabel, isCategory } from "@/lib/events/categories";
+import { coverFor } from "@/lib/events/covers";
+import { formatEventDates, formatShortDate } from "@/lib/events/format";
+import { registrationOpen, type EventStatus } from "@/lib/events/lifecycle";
 import { cn, formatKes } from "@/lib/utils";
 
 export interface EventCardData {
@@ -25,18 +20,13 @@ export interface EventCardData {
   registrationDeadline: Date;
   publishedAt?: Date | null;
   status: EventStatus;
-  prizeVerifiedAt?: Date | null;
   poolKes: number;
   teamCount: number;
   orgName: string;
   orgTrustScore: number;
+  categories: string[];
+  coverUrl: string | null;
 }
-
-const TIMING_DOT = {
-  brand: "bg-brand",
-  success: "bg-success",
-  muted: "bg-ink/30",
-} as const;
 
 function venueLabel(event: EventCardData): string {
   if (event.venueType === "ONLINE") return "Online";
@@ -45,91 +35,92 @@ function venueLabel(event: EventCardData): string {
 }
 
 function registrationNote(event: EventCardData, open: boolean): string {
-  if (open) return `Register by ${formatShortDate(event.registrationDeadline)}`;
-  if (event.status === "PENDING_DEPOSIT") return "Awaiting deposit";
-  return "Registration closed";
+  return open
+    ? `Register by ${formatShortDate(event.registrationDeadline)}`
+    : "Registration closed";
 }
 
 export function EventCard({ event }: { event: EventCardData }) {
-  const verified = isPrizeVerified(event.status, event.prizeVerifiedAt);
   const open = registrationOpen(event);
-  const timing = eventTiming(event);
+  const categories = event.categories.filter(isCategory);
+  const cover = coverFor(event);
 
   return (
     <Link
       href={`/hackathons/${event.slug}`}
-      className="group flex h-full flex-col rounded-card border border-ink/10 bg-surface p-5 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-brand/60 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+      className="group flex h-full flex-col overflow-hidden rounded-card bg-surface shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
     >
-      <div className="flex items-center justify-between gap-3">
-        {verified ? (
-          <PrizeVerifiedBadge />
-        ) : (
-          <Badge variant={statusTone(event.status)}>{STATUS_LABELS[event.status]}</Badge>
-        )}
-        {timing ? (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-soft">
-            <span aria-hidden className={cn("size-1.5 rounded-full", TIMING_DOT[timing.tone])} />
-            {timing.label}
-          </span>
+      <div className="relative aspect-[21/9] overflow-hidden bg-brand/10">
+        <Image
+          src={cover}
+          // Uploaded covers live on R2 and are already sized to 1600x900.
+          unoptimized={!cover.startsWith("/")}
+          alt=""
+          fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+        />
+        {categories.length > 0 ? (
+          <ul className="absolute top-3 left-3 flex flex-wrap gap-1.5" aria-label="Categories">
+            {categories.map((key) => (
+              <li
+                key={key}
+                className="rounded-full bg-white/85 px-2.5 py-0.5 text-[11px] font-semibold text-brand-ink backdrop-blur"
+              >
+                {categoryLabel(key)}
+              </li>
+            ))}
+          </ul>
         ) : null}
       </div>
 
-      <div className="text-center">
-        <h3 className="mt-4 font-display text-xl leading-snug font-bold text-ink">{event.title}</h3>
-        <p className="mt-1 text-xs font-medium text-muted">by {event.orgName}</p>
-        {event.summary ? (
-          <p className="mt-3 line-clamp-2 text-sm leading-6 text-body-copy">{event.summary}</p>
-        ) : null}
-
-        <div className="mt-4 rounded-2xl bg-brand/10 px-4 py-3">
-          <p className="text-[11px] font-semibold tracking-[0.14em] text-ink-soft uppercase">
-            Prize Pool
-          </p>
-          <p className="mt-0.5 font-display text-2xl font-bold text-ink">
-            {formatKes(event.poolKes)}
-          </p>
-          <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-ink-soft">
-            {verified ? (
-              <>
-                <Lock aria-hidden className="size-3.5" /> Locked in escrow
-              </>
-            ) : (
-              <>
-                <Clock aria-hidden className="size-3.5" /> Pending verification
-              </>
-            )}
-          </p>
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h3 className="line-clamp-2 font-display text-lg leading-snug font-bold text-ink">
+              {event.title}
+            </h3>
+            <p className="mt-0.5 truncate text-xs font-medium text-muted">by {event.orgName}</p>
+          </div>
+          <div className="shrink-0 text-right">
+            <p className="text-[10px] font-semibold tracking-[0.14em] text-ink-soft uppercase">
+              Prize Pool
+            </p>
+            <p className="mt-0.5 font-display text-lg font-bold whitespace-nowrap text-ink">
+              {formatKes(event.poolKes)}
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* One row: dates and team count keep their width; a long venue truncates. */}
-      <ul className="mt-4 mb-5 flex items-center justify-center gap-x-3 text-xs text-body-copy">
-        <li className="flex shrink-0 items-center gap-1.5 whitespace-nowrap">
-          <CalendarDays aria-hidden className="size-3.5 shrink-0 text-ink-soft" />
-          {formatEventDates(event.startsAt, event.endsAt)}
-        </li>
-        <li className="flex min-w-0 items-center gap-1.5" title={venueLabel(event)}>
-          <MapPin aria-hidden className="size-3.5 shrink-0 text-ink-soft" />
-          <span className="truncate">{venueLabel(event)}</span>
-        </li>
-        <li className="flex shrink-0 items-center gap-1.5 whitespace-nowrap">
-          <Users aria-hidden className="size-3.5 shrink-0 text-ink-soft" />
-          {event.teamCount} team{event.teamCount === 1 ? "" : "s"}
-        </li>
-      </ul>
+        {/* One row: dates and team count keep their width; a long venue truncates. */}
+        <ul className="mt-3 mb-4 flex items-center gap-x-3 text-xs text-body-copy">
+          <li className="flex shrink-0 items-center gap-1.5 whitespace-nowrap">
+            <CalendarDays aria-hidden className="size-3.5 shrink-0 text-ink-soft" />
+            {formatEventDates(event.startsAt, event.endsAt)}
+          </li>
+          <li className="flex min-w-0 items-center gap-1.5" title={venueLabel(event)}>
+            <MapPin aria-hidden className="size-3.5 shrink-0 text-ink-soft" />
+            <span className="truncate">{venueLabel(event)}</span>
+          </li>
+          <li className="flex shrink-0 items-center gap-1.5 whitespace-nowrap">
+            <Users aria-hidden className="size-3.5 shrink-0 text-ink-soft" />
+            {event.teamCount} team{event.teamCount === 1 ? "" : "s"}
+          </li>
+        </ul>
 
-      <div className="mt-auto flex items-center justify-between gap-3 border-t border-ink/10 pt-4 text-sm">
-        <span className={cn("font-semibold", open ? "text-success" : "text-muted")}>
-          {registrationNote(event, open)}
-        </span>
-        {/* The whole card is the link, so this is a span dressed as the pill button. */}
-        <span className={cn(buttonVariants({ size: "sm" }), "shrink-0")}>
-          <span className="btn-fill" aria-hidden />
-          <span className="btn-content">
-            View Hackathon
-            <ArrowUpRight aria-hidden className="btn-arrow size-4" />
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-ink/10 pt-3 text-sm">
+          <span className={cn("font-semibold", open ? "text-success" : "text-muted")}>
+            {registrationNote(event, open)}
           </span>
-        </span>
+          {/* The whole card is the link, so this is a span dressed as the pill button. */}
+          <span className={cn(buttonVariants({ size: "sm" }), "shrink-0")}>
+            <span className="btn-fill" aria-hidden />
+            <span className="btn-content">
+              View Hackathon
+              <ArrowUpRight aria-hidden className="btn-arrow size-4" />
+            </span>
+          </span>
+        </div>
       </div>
     </Link>
   );
