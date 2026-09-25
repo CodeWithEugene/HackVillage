@@ -1,4 +1,5 @@
 import { renderEmail, renderText, type EmailTemplate } from "@/lib/notifications/layout";
+import { html } from "@/lib/notifications/html";
 
 export function payoutMethodSavedEmail(): EmailTemplate {
   return {
@@ -7,7 +8,7 @@ export function payoutMethodSavedEmail(): EmailTemplate {
       preheader: "You are ready to get paid.",
       section: {
         heading: "Payout Method Saved",
-        bodyHtml: `<p style="margin:0;">Your payout method is saved. Whenever you win a prize, it will be sent here automatically.</p>`,
+        bodyHtml: html`<p style="margin:0;">Your payout method is saved. Whenever you win a prize, it will be sent here automatically.</p>`,
       },
     }),
     text: renderText(["Your payout method is saved. Whenever you win a prize, it will be sent here automatically."]),
@@ -21,7 +22,7 @@ export function instantPayoutPaidEmail(eventTitle: string, amountKes: number, ur
       preheader: "Half your prize just landed.",
       section: {
         heading: "Payout Sent",
-        bodyHtml: `<p style="margin:0;">Your instant payout for <strong>${eventTitle}</strong> has been sent.</p>`,
+        bodyHtml: html`<p style="margin:0;">Your instant payout for <strong>${eventTitle}</strong> has been sent.</p>`,
         details: [{ label: "Amount", value: `KES ${amountKes.toLocaleString("en-KE")}` }],
         ctaUrl: url,
         ctaLabel: "View Your Winnings",
@@ -38,7 +39,7 @@ export function milestonePayoutPaidEmail(eventTitle: string, amountKes: number, 
       preheader: "The final half of your prize just landed.",
       section: {
         heading: "Final Payout Sent",
-        bodyHtml: `<p style="margin:0;">Your milestone payout for <strong>${eventTitle}</strong> has been sent. That completes your prize.</p>`,
+        bodyHtml: html`<p style="margin:0;">Your milestone payout for <strong>${eventTitle}</strong> has been sent. That completes your prize.</p>`,
         details: [{ label: "Amount", value: `KES ${amountKes.toLocaleString("en-KE")}` }],
         ctaUrl: url,
         ctaLabel: "View Your Winnings",
@@ -55,7 +56,7 @@ export function milestoneConfirmedEmail(eventTitle: string, url: string): EmailT
       preheader: "Your final payout is queued.",
       section: {
         heading: "Milestone Confirmed",
-        bodyHtml: `<p style="margin:0;">Your milestone for <strong>${eventTitle}</strong> was confirmed. The final half of your prize is now queued for payout.</p>`,
+        bodyHtml: html`<p style="margin:0;">Your milestone for <strong>${eventTitle}</strong> was confirmed. The final half of your prize is now queued for payout.</p>`,
         ctaUrl: url,
         ctaLabel: "View Your Prize",
       },
@@ -71,7 +72,7 @@ export function payoutManuallyPaidEmail(eventTitle: string, amountKes: number): 
       preheader: "Our team confirmed your payment by hand.",
       section: {
         heading: "Payout Completed",
-        bodyHtml: `<p style="margin:0;">Your payout for <strong>${eventTitle}</strong> was completed by our team after a manual check.</p>`,
+        bodyHtml: html`<p style="margin:0;">Your payout for <strong>${eventTitle}</strong> was completed by our team after a manual check.</p>`,
         details: [{ label: "Amount", value: `KES ${amountKes.toLocaleString("en-KE")}` }],
       },
     }),
@@ -86,7 +87,7 @@ export function payoutManualReviewAdminEmail(payoutId: string, eventTitle: strin
       preheader: "A payout could not complete automatically.",
       section: {
         heading: "Payout Needs Review",
-        bodyHtml: `<p style="margin:0;">A payout for <strong>${eventTitle}</strong> failed after ${attemptCount} attempts and now needs manual review.</p>`,
+        bodyHtml: html`<p style="margin:0;">A payout for <strong>${eventTitle}</strong> failed after ${attemptCount} attempts and now needs manual review.</p>`,
         details: [{ label: "Payout ID", value: payoutId }],
         ctaUrl: url,
         ctaLabel: "Open The Admin Queue",
@@ -103,7 +104,7 @@ export function transferReversedAdminEmail(eventTitle: string, reference: string
       preheader: "A payout provider reversed a transfer.",
       section: {
         heading: "Transfer Reversed",
-        bodyHtml: `<p style="margin:0;">Paystack reversed a transfer for <strong>${eventTitle}</strong>. This needs a look before the winner is told anything.</p>`,
+        bodyHtml: html`<p style="margin:0;">Paystack reversed a transfer for <strong>${eventTitle}</strong>. This needs a look before the winner is told anything.</p>`,
         details: [{ label: "Reference", value: reference }],
         ctaUrl: url,
         ctaLabel: "Open The Admin Queue",

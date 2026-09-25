@@ -1,4 +1,5 @@
 import { renderEmail, renderText, type EmailTemplate } from "@/lib/notifications/layout";
+import { html } from "@/lib/notifications/html";
 
 export function mediaPenaltyEmail(eventTitle: string, orgName: string, url: string): EmailTemplate {
   return {
@@ -7,7 +8,7 @@ export function mediaPenaltyEmail(eventTitle: string, orgName: string, url: stri
       preheader: "Your hackathon missed its media deadline.",
       section: {
         heading: "Trust Penalty Applied",
-        bodyHtml: `<p style="margin:0;">Your hackathon <strong>${eventTitle}</strong> passed its forty eight hour media deadline with no approved gallery.</p>
+        bodyHtml: html`<p style="margin:0;">Your hackathon <strong>${eventTitle}</strong> passed its forty eight hour media deadline with no approved gallery.</p>
           <p style="margin:12px 0 0;">A ten point trust penalty was applied to <strong>${orgName}</strong>. Upload and approve a gallery, and you can appeal from your organizer page.</p>`,
         ctaUrl: url,
         ctaLabel: "Go To Your Organizer Page",
@@ -28,7 +29,7 @@ export function mediaAppealGrantedEmail(orgName: string, note: string): EmailTem
       preheader: "Your trust score was restored.",
       section: {
         heading: "Appeal Granted",
-        bodyHtml: `<p style="margin:0;">The media penalty appeal for <strong>${orgName}</strong> was granted. Ten points were restored to your trust score.</p>
+        bodyHtml: html`<p style="margin:0;">The media penalty appeal for <strong>${orgName}</strong> was granted. Ten points were restored to your trust score.</p>
           <p style="margin:12px 0 0;">Note from our team: ${note}</p>`,
       },
     }),
@@ -44,7 +45,7 @@ export function manualTrustAdjustmentEmail(orgName: string, delta: number, reaso
       preheader: "Our team made a manual trust adjustment.",
       section: {
         heading: "Trust Score Adjusted",
-        bodyHtml: `<p style="margin:0;">${Math.abs(delta)} points were ${direction} the trust score for <strong>${orgName}</strong>.</p>
+        bodyHtml: html`<p style="margin:0;">${Math.abs(delta)} points were ${direction} the trust score for <strong>${orgName}</strong>.</p>
           <p style="margin:12px 0 0;">Reason given: ${reason}</p>`,
       },
     }),

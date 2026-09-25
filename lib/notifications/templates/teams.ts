@@ -1,4 +1,5 @@
 import { renderEmail, renderText, type EmailTemplate } from "@/lib/notifications/layout";
+import { html } from "@/lib/notifications/html";
 
 export function teamInviteEmail(teamName: string, eventTitle: string, url: string): EmailTemplate {
   return {
@@ -7,7 +8,7 @@ export function teamInviteEmail(teamName: string, eventTitle: string, url: strin
       preheader: `Join ${teamName} for ${eventTitle}.`,
       section: {
         heading: "Team Invite",
-        bodyHtml: `<p style="margin:0;">You are invited to join <strong>${teamName}</strong> for <strong>${eventTitle}</strong>.</p>`,
+        bodyHtml: html`<p style="margin:0;">You are invited to join <strong>${teamName}</strong> for <strong>${eventTitle}</strong>.</p>`,
         ctaUrl: url,
         ctaLabel: "View The Invite",
       },
@@ -23,7 +24,7 @@ export function teamInviteAcceptedEmail(memberName: string, teamName: string): E
       preheader: "Your team just grew.",
       section: {
         heading: "New Team Member",
-        bodyHtml: `<p style="margin:0;"><strong>${memberName}</strong> accepted your invite and joined <strong>${teamName}</strong>.</p>`,
+        bodyHtml: html`<p style="margin:0;"><strong>${memberName}</strong> accepted your invite and joined <strong>${teamName}</strong>.</p>`,
       },
     }),
     text: renderText([`${memberName} accepted your invite and joined ${teamName}.`]),
@@ -37,7 +38,7 @@ export function teamInviteDeclinedEmail(memberName: string, teamName: string): E
       preheader: "They will not be joining this time.",
       section: {
         heading: "Invite Declined",
-        bodyHtml: `<p style="margin:0;"><strong>${memberName}</strong> declined the invite to join <strong>${teamName}</strong>.</p>`,
+        bodyHtml: html`<p style="margin:0;"><strong>${memberName}</strong> declined the invite to join <strong>${teamName}</strong>.</p>`,
       },
     }),
     text: renderText([`${memberName} declined the invite to join ${teamName}.`]),
@@ -51,7 +52,7 @@ export function teamMemberLeftEmail(memberName: string, teamName: string): Email
       preheader: "Your roster just changed.",
       section: {
         heading: "Team Member Left",
-        bodyHtml: `<p style="margin:0;"><strong>${memberName}</strong> left <strong>${teamName}</strong>.</p>`,
+        bodyHtml: html`<p style="margin:0;"><strong>${memberName}</strong> left <strong>${teamName}</strong>.</p>`,
       },
     }),
     text: renderText([`${memberName} left ${teamName}.`]),
@@ -65,7 +66,7 @@ export function submissionSavedEmail(teamName: string, eventTitle: string, url: 
       preheader: "Your team's project was recorded.",
       section: {
         heading: "Submission Saved",
-        bodyHtml: `<p style="margin:0;">The submission for <strong>${teamName}</strong> in <strong>${eventTitle}</strong> was saved. You can keep editing it until judging opens.</p>`,
+        bodyHtml: html`<p style="margin:0;">The submission for <strong>${teamName}</strong> in <strong>${eventTitle}</strong> was saved. You can keep editing it until judging opens.</p>`,
         ctaUrl: url,
         ctaLabel: "View The Submission",
       },

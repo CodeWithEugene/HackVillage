@@ -6,6 +6,7 @@
  * critical mail in lib/auth/mail-templates.ts.
  */
 import { renderEmail, renderText, type EmailTemplate } from "@/lib/notifications/layout";
+import { html, trustedHtml } from "@/lib/notifications/html";
 
 export type { EmailTemplate };
 
@@ -16,7 +17,7 @@ export function newsletterWelcomeEmail(): EmailTemplate {
       preheader: "Thanks for subscribing to the HackVillage newsletter.",
       section: {
         heading: "Welcome To HackVillage",
-        bodyHtml: `<p style="margin:0;">You're subscribed. We'll send you new Prize Verified hackathons, product updates, and the occasional story from a winner, straight to this inbox.</p>
+        bodyHtml: html`<p style="margin:0;">You're subscribed. We'll send you new Prize Verified hackathons, product updates, and the occasional story from a winner, straight to this inbox.</p>
           <p style="margin:12px 0 0;">No spam, and you can unsubscribe anytime from the link at the bottom of every email.</p>`,
         ctaUrl: "https://www.hackvillage.xyz/hackathons",
         ctaLabel: "Browse Open Hackathons",
@@ -47,7 +48,8 @@ export function newsletterBlastEmail(input: NewsletterBlastInput): EmailTemplate
       preheader: input.bodyText.slice(0, 140),
       section: {
         heading: input.heading,
-        bodyHtml: input.bodyHtml,
+        // Written by a maintainer for a one-off blast, never by users.
+        bodyHtml: trustedHtml(input.bodyHtml),
         ctaUrl: input.ctaUrl,
         ctaLabel: input.ctaLabel,
       },

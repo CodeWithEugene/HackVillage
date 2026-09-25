@@ -1,4 +1,5 @@
 import { renderEmail, renderText, type EmailTemplate } from "@/lib/notifications/layout";
+import { html } from "@/lib/notifications/html";
 
 export function judgeInvitedEmail(eventTitle: string, url: string): EmailTemplate {
   return {
@@ -7,7 +8,7 @@ export function judgeInvitedEmail(eventTitle: string, url: string): EmailTemplat
       preheader: "You are invited to judge.",
       section: {
         heading: "You Are Invited To Judge",
-        bodyHtml: `<p style="margin:0;">You are invited to judge <strong>${eventTitle}</strong> on HackVillage. Accept or decline from your dashboard.</p>`,
+        bodyHtml: html`<p style="margin:0;">You are invited to judge <strong>${eventTitle}</strong> on HackVillage. Accept or decline from your dashboard.</p>`,
         ctaUrl: url,
         ctaLabel: "Respond To The Invite",
       },
@@ -25,7 +26,7 @@ export function judgeRespondedEmail(judgeName: string, eventTitle: string, accep
       preheader: accepted ? "A judge is on board." : "You may want to invite someone else.",
       section: {
         heading: accepted ? "Judge Invite Accepted" : "Judge Invite Declined",
-        bodyHtml: `<p style="margin:0;"><strong>${judgeName}</strong> ${accepted ? "accepted" : "declined"} the invite to judge <strong>${eventTitle}</strong>.</p>`,
+        bodyHtml: html`<p style="margin:0;"><strong>${judgeName}</strong> ${accepted ? "accepted" : "declined"} the invite to judge <strong>${eventTitle}</strong>.</p>`,
       },
     }),
     text: renderText([`${judgeName} ${accepted ? "accepted" : "declined"} the invite to judge ${eventTitle}.`]),
@@ -39,7 +40,7 @@ export function judgingOpenEmail(eventTitle: string, url: string): EmailTemplate
       preheader: "Teams are waiting on your scores.",
       section: {
         heading: "Judging Is Open",
-        bodyHtml: `<p style="margin:0;">Judging is now open for <strong>${eventTitle}</strong>. Score each team and leave feedback when you are ready.</p>`,
+        bodyHtml: html`<p style="margin:0;">Judging is now open for <strong>${eventTitle}</strong>. Score each team and leave feedback when you are ready.</p>`,
         ctaUrl: url,
         ctaLabel: "Start Judging",
       },
@@ -61,7 +62,7 @@ export function winnerAnnouncedEmail(
       preheader: "Congratulations, your instant payout is on its way.",
       section: {
         heading: "You Won",
-        bodyHtml: `<p style="margin:0;">Your team took <strong>${placeLabel}</strong> in <strong>${eventTitle}</strong>. Half of your prize is on its way now, and the rest follows once your milestone is confirmed.</p>`,
+        bodyHtml: html`<p style="margin:0;">Your team took <strong>${placeLabel}</strong> in <strong>${eventTitle}</strong>. Half of your prize is on its way now, and the rest follows once your milestone is confirmed.</p>`,
         details: [{ label: "Prize amount", value: `KES ${amountKes.toLocaleString("en-KE")}` }],
         ctaUrl: url,
         ctaLabel: "View Results",
@@ -82,7 +83,7 @@ export function resultsAnnouncedEmail(eventTitle: string, url: string): EmailTem
       preheader: "See how every team placed.",
       section: {
         heading: "Results Are In",
-        bodyHtml: `<p style="margin:0;">Results for <strong>${eventTitle}</strong> are published. Thank you for building with us, and good luck at the next one.</p>`,
+        bodyHtml: html`<p style="margin:0;">Results for <strong>${eventTitle}</strong> are published. Thank you for building with us, and good luck at the next one.</p>`,
         ctaUrl: url,
         ctaLabel: "View Results",
       },
