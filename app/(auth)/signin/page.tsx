@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { OAuthPopupErrorRelay } from "@/components/auth/oauth-popup-pages";
 import { SignInForm } from "@/components/auth/signin-form";
 
 export const metadata: Metadata = { title: "Sign In" };
@@ -24,18 +25,20 @@ export default async function SignInPage({
   searchParams: Promise<{ registered?: string; reset?: string; error?: string }>;
 }) {
   const params = await searchParams;
-  const notice =
-    (params.registered && NOTICES.registered) || (params.reset && NOTICES.reset);
+  const notice = (params.registered && NOTICES.registered) || (params.reset && NOTICES.reset);
   const errorNotice =
     params.error &&
     (OAUTH_ERROR_NOTICES[params.error] ?? "Something went wrong with that sign-in, try again.");
 
   return (
-    <SignInForm
-      googleEnabled={Boolean(process.env.GOOGLE_CLIENT_ID)}
-      githubEnabled={Boolean(process.env.GITHUB_CLIENT_ID)}
-      notice={notice || undefined}
-      errorNotice={errorNotice || undefined}
-    />
+    <>
+      <OAuthPopupErrorRelay error={params.error} />
+      <SignInForm
+        googleEnabled={Boolean(process.env.GOOGLE_CLIENT_ID)}
+        githubEnabled={Boolean(process.env.GITHUB_CLIENT_ID)}
+        notice={notice || undefined}
+        errorNotice={errorNotice || undefined}
+      />
+    </>
   );
 }
