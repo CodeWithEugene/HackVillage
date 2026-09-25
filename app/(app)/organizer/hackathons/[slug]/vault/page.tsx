@@ -77,26 +77,33 @@ export default async function VaultPage({
       </header>
 
       {depositNotice === "success" ? (
-        <p role="status" className="rounded-card border border-success/40 bg-success/10 p-4 text-sm font-semibold text-success">
+        <p
+          role="status"
+          className="rounded-card border border-success/40 bg-success/10 p-4 text-sm font-semibold text-success"
+        >
           Deposit confirmed, the vault is locking and the hackathon is going live.
         </p>
       ) : null}
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Declared pool</p>
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Declared pool</p>
           <p className="mt-1 font-display text-2xl font-bold text-ink">{formatKes(declaredPool)}</p>
           <p className="mt-1 text-xs text-muted">
             {event.prizes.length} prize {event.prizes.length === 1 ? "place" : "places"}
           </p>
         </Card>
         <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Deposited (pool)</p>
-          <p className="mt-1 font-display text-2xl font-bold text-ink">{formatKes(succeededPool)}</p>
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">
+            Deposited (pool)
+          </p>
+          <p className="mt-1 font-display text-2xl font-bold text-ink">
+            {formatKes(succeededPool)}
+          </p>
           <p className="mt-1 text-xs text-muted">{formatKes(remaining)} remaining</p>
         </Card>
         <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Vault state</p>
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Vault state</p>
           <p className="mt-1 font-display text-lg font-bold text-ink">
             {event.vault ? CHAIN_LABELS[event.vault.chainState] : "N/A"}
           </p>
@@ -112,12 +119,8 @@ export default async function VaultPage({
             <Lock aria-hidden className="size-5" /> Fund The Vault To Go Live
           </CardTitle>
           <CardDescription>
-            The deposit covers the remaining pool plus the platform fee. The hackathon flips LIVE the
-            moment the vault locks, and every deposit lands on the{" "}
-            <Link href="/trust" className="underline hover:text-ink">
-              public ledger
-            </Link>
-            .
+            The deposit covers the remaining pool plus the platform fee. The hackathon flips LIVE
+            the moment the vault locks, and every deposit is recorded on the public ledger.
           </CardDescription>
 
           <div className="mt-5">
@@ -143,7 +146,7 @@ export default async function VaultPage({
           <CardTitle>Deposits</CardTitle>
           <table className="mt-3 w-full text-sm">
             <thead>
-              <tr className="text-left text-xs uppercase tracking-wide text-muted">
+              <tr className="text-left text-xs tracking-wide text-muted uppercase">
                 <th className="pb-2">Reference</th>
                 <th className="pb-2 text-right">Gross</th>
                 <th className="pb-2 text-right">Pool</th>
@@ -161,7 +164,11 @@ export default async function VaultPage({
                   <td className="py-2 text-right">
                     <Badge
                       variant={
-                        d.status === "SUCCEEDED" ? "success" : d.status === "INITIATED" ? "warning" : "neutral"
+                        d.status === "SUCCEEDED"
+                          ? "success"
+                          : d.status === "INITIATED"
+                            ? "warning"
+                            : "neutral"
                       }
                     >
                       {d.status.toLowerCase()}
@@ -187,18 +194,13 @@ export default async function VaultPage({
                       ? "Deposit locked, Prize Verified"
                       : entry.type.replace(/_/g, " ").toLowerCase()}
                 </span>
-                <code className="font-mono text-xs text-muted">
-                  {entry.txHash.slice(0, 18)}…
-                </code>
+                <code className="font-mono text-xs text-muted">{entry.txHash.slice(0, 18)}…</code>
               </li>
             ))}
           </ul>
           <CardDescription>
-            Attestation detail lives on{" "}
-            <Link href="/trust" className="underline hover:text-ink">
-              /trust
-            </Link>
-            . The community can verify every entry against the payment provider&apos;s receipt.
+            Every entry is attested on chain, and anyone can verify it against the payment
+            provider&apos;s receipt.
           </CardDescription>
         </Card>
       ) : null}

@@ -161,7 +161,7 @@ export async function registerJobs(): Promise<void> {
             result.findings.length,
             result.checkedEvents,
             result.findings,
-            appUrl("/trust")
+            appUrl("/admin/payments")
           )
         ).catch((error: unknown) => console.error("[cron] reconciliation digest failed", error));
       }

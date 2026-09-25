@@ -9,9 +9,17 @@ const CONTACT_EMAIL = "info@hackvillage.xyz";
 
 const SOCIAL_LINKS = [
   { label: "HackVillage on GitHub", href: GITHUB_URL, Icon: GithubMark },
-  { label: "HackVillage on LinkedIn", href: "https://www.linkedin.com/company/hackvillage", Icon: LinkedinIcon },
+  {
+    label: "HackVillage on LinkedIn",
+    href: "https://www.linkedin.com/company/hackvillage",
+    Icon: LinkedinIcon,
+  },
   { label: "HackVillage on X", href: "https://x.com/hackvillagexyz", Icon: XIcon },
-  { label: "HackVillage on YouTube", href: "https://www.youtube.com/@hackvillage", Icon: YoutubeIcon },
+  {
+    label: "HackVillage on YouTube",
+    href: "https://www.youtube.com/@hackvillage",
+    Icon: YoutubeIcon,
+  },
 ];
 
 const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[] }[] = [
@@ -19,8 +27,6 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
     title: "Platform",
     links: [
       { label: "Hackathons", href: "/hackathons" },
-      { label: "Developers", href: "/developers" },
-      { label: "Trust & escrow", href: "/trust" },
       { label: "How it works", href: "/#how-it-works" },
     ],
   },
@@ -101,7 +107,10 @@ export function SiteFooter() {
           <h2 className="font-display text-base font-semibold text-ink">Contact Us</h2>
           <ul className="mt-5 space-y-3">
             <li>
-              <a href={`mailto:${CONTACT_EMAIL}`} className={`flex items-center gap-2.5 ${LINK_CLASS}`}>
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className={`flex items-center gap-2.5 ${LINK_CLASS}`}
+              >
                 <Mail aria-hidden className="size-4 shrink-0 text-brand" />
                 {CONTACT_EMAIL}
               </a>
@@ -151,11 +160,17 @@ export function SiteFooter() {
           </p>
           <p className="xl:justify-self-end">
             Apache-2.0 licensed |{" "}
-            <Link href="/terms" className="text-ink-soft underline underline-offset-2 hover:text-ink">
+            <Link
+              href="/terms"
+              className="text-ink-soft underline underline-offset-2 hover:text-ink"
+            >
               Terms of Service
             </Link>{" "}
             |{" "}
-            <Link href="/privacy" className="text-ink-soft underline underline-offset-2 hover:text-ink">
+            <Link
+              href="/privacy"
+              className="text-ink-soft underline underline-offset-2 hover:text-ink"
+            >
               Privacy Policy
             </Link>
           </p>

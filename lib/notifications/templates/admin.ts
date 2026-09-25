@@ -19,7 +19,7 @@ export function ledgerReconciliationDigestEmail(
         bodyHtml: `<p style="margin:0;">Last night's ledger reconciliation checked ${checkedEvents} hackathons and found ${findingCount} issue${findingCount === 1 ? "" : "s"}.</p>
           <ul style="margin:12px 0 0;padding-left:20px;text-align:left;">${rows}</ul>`,
         ctaUrl: url,
-        ctaLabel: "Open The Trust Ledger",
+        ctaLabel: "Open Payment Ops",
       },
     }),
     text: renderText([

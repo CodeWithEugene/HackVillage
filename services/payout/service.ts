@@ -395,11 +395,11 @@ export async function confirmTransferSuccess(payoutId: string, reference: string
     txRef: reference,
   });
 
-  const trustUrl = appUrl("/trust");
+  const winningsUrl = appUrl("/dashboard/winnings");
   const template =
     payout.tranche === "INSTANT"
-      ? instantPayoutPaidEmail(payout.winner.event.title, payout.amountKes, trustUrl)
-      : milestonePayoutPaidEmail(payout.winner.event.title, payout.amountKes, trustUrl);
+      ? instantPayoutPaidEmail(payout.winner.event.title, payout.amountKes, winningsUrl)
+      : milestonePayoutPaidEmail(payout.winner.event.title, payout.amountKes, winningsUrl);
   await sendNotification({
     userId: payout.winner.user.id,
     to: payout.winner.user.email,
@@ -556,7 +556,7 @@ export async function confirmMilestone(
     userId: winner.userId,
     to: winner.user.email,
     category: "judging",
-    template: milestoneConfirmedEmail(winner.event.title, appUrl("/trust")),
+    template: milestoneConfirmedEmail(winner.event.title, appUrl("/dashboard/winnings")),
   }).catch((error: unknown) => console.error("[payout] milestone notification failed", error));
 
   return { outcome: "queued" };

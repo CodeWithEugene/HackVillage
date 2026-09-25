@@ -41,7 +41,7 @@ export function LandingHero() {
               </span>
             </Link>
             <Link href="/onboarding/organizer" className="hero-action-secondary btn-pill">
-              Host a Hackathon <ArrowUpRight aria-hidden="true" size={16} className="btn-arrow" />
+              Host A Hackathon <ArrowUpRight aria-hidden="true" size={16} className="btn-arrow" />
             </Link>
           </div>
         </div>
