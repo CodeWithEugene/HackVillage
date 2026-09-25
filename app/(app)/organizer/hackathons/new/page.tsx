@@ -6,7 +6,7 @@ import { requireSurface } from "@/lib/auth/guards";
 import { getEnv } from "@/lib/env";
 import { prisma } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Create Event" };
+export const metadata: Metadata = { title: "Create Hackathon" };
 
 export default async function NewEventPage() {
   const user = await requireSurface("organizer");
@@ -22,9 +22,9 @@ export default async function NewEventPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-2xl font-bold text-ink">Create An Event</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Create A Hackathon</h1>
         <p className="mt-1 text-sm text-muted">
-          Five steps to a draft. Publishing declares the prize pool, and the event goes live only
+          Five steps to a draft. Publishing declares the prize pool, and the hackathon goes live only
           after it&apos;s locked in the Prize Vault.
         </p>
       </header>

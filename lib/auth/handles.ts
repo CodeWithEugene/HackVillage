@@ -18,6 +18,7 @@ export const RESERVED_HANDLES: ReadonlySet<string> = new Set([
   "developers",
   "docs",
   "events",
+  "hackathons",
   "hackvillage",
   "hiring",
   "invite",
@@ -48,7 +49,7 @@ export function validateHandle(handle: string): string | null {
   if (handle.length > 30) return "Handles can be at most 30 characters.";
   if (handle !== handle.toLowerCase()) return "Handles are lowercase.";
   if (!HANDLE_PATTERN.test(handle)) {
-    return "Handles use letters, numbers and hyphens — no leading or trailing hyphens.";
+    return "Handles use letters, numbers and hyphens, with no leading or trailing hyphens.";
   }
   if (RESERVED_HANDLES.has(handle)) return "That handle is reserved.";
   return null;

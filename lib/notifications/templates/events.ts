@@ -4,9 +4,9 @@ export function eventPublishedEmail(eventTitle: string, eventUrl: string): Email
   return {
     subject: `${eventTitle} Is Published`,
     html: renderEmail({
-      preheader: "Fund the prize pool to take your event live.",
+      preheader: "Fund the prize pool to take your hackathon live.",
       section: {
-        heading: "Event Published",
+        heading: "Hackathon Published",
         bodyHtml: `<p style="margin:0;"><strong>${eventTitle}</strong> is published and waiting on its prize pool deposit. Fund it to earn the Prize Verified badge and go live.</p>`,
         ctaUrl: eventUrl,
         ctaLabel: "Fund The Prize Pool",
@@ -22,10 +22,10 @@ export function eventLiveOrganizerEmail(eventTitle: string, eventUrl: string): E
     html: renderEmail({
       preheader: "Your prize pool is locked in escrow.",
       section: {
-        heading: "Your Event Is Live",
-        bodyHtml: `<p style="margin:0;">The full prize pool for <strong>${eventTitle}</strong> is locked in escrow. Your event now carries the Prize Verified badge and is open for registration.</p>`,
+        heading: "Your Hackathon Is Live",
+        bodyHtml: `<p style="margin:0;">The full prize pool for <strong>${eventTitle}</strong> is locked in escrow. Your hackathon now carries the Prize Verified badge and is open for registration.</p>`,
         ctaUrl: eventUrl,
-        ctaLabel: "View Your Event",
+        ctaLabel: "View Your Hackathon",
       },
     }),
     text: renderText([`${eventTitle} is Prize Verified and live. The prize pool is locked in escrow.`, eventUrl]),
@@ -39,9 +39,9 @@ export function eventLiveDeveloperEmail(eventTitle: string, eventUrl: string): E
       preheader: "The prize money is real and locked in escrow.",
       section: {
         heading: "Prize Pool Locked",
-        bodyHtml: `<p style="margin:0;">An event you registered for, <strong>${eventTitle}</strong>, just had its full prize pool locked in escrow. The money is real before you write a single line of code.</p>`,
+        bodyHtml: `<p style="margin:0;">A hackathon you registered for, <strong>${eventTitle}</strong>, just had its full prize pool locked in escrow. The money is real before you write a single line of code.</p>`,
         ctaUrl: eventUrl,
-        ctaLabel: "View The Event",
+        ctaLabel: "View The Hackathon",
       },
     }),
     text: renderText([`${eventTitle} just became Prize Verified. The prize pool is locked in escrow.`, eventUrl]),
@@ -73,7 +73,7 @@ export function registrationConfirmedEmail(eventTitle: string, eventUrl: string)
         heading: "Registration Confirmed",
         bodyHtml: `<p style="margin:0;">You are registered for <strong>${eventTitle}</strong>. Form or join a team when you are ready.</p>`,
         ctaUrl: eventUrl,
-        ctaLabel: "Go To The Event",
+        ctaLabel: "Go To The Hackathon",
       },
     }),
     text: renderText([`You are registered for ${eventTitle}.`, eventUrl]),
@@ -84,7 +84,7 @@ export function registrationCancelledEmail(eventTitle: string): EmailTemplate {
   return {
     subject: `Your Registration For ${eventTitle} Was Cancelled`,
     html: renderEmail({
-      preheader: "You have been removed from the event.",
+      preheader: "You have been removed from the hackathon.",
       section: {
         heading: "Registration Cancelled",
         bodyHtml: `<p style="margin:0;">Your registration for <strong>${eventTitle}</strong> was cancelled, as you asked. You are welcome to register again anytime before the deadline.</p>`,

@@ -8,8 +8,8 @@ import { prisma } from "@/lib/db";
 import { CalendarX2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Events",
-  description: "Browse Prize Verified hackathons and tech events on HackVillage.",
+  title: "Hackathons",
+  description: "Browse Prize Verified hackathons on HackVillage.",
 };
 
 const FILTERS = [
@@ -79,19 +79,19 @@ export default async function EventsPage({
     <div className="site-container py-16">
       <header className="mb-8 text-center">
         <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">
-          Prize Verified Events
+          Prize Verified Hackathons
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted">
-          Every event here published with 100% of its prize pool declared, and the vault locks it
-          before the event goes live.
+          Every hackathon here published with 100% of its prize pool declared, and the vault locks it
+          before the hackathon goes live.
         </p>
       </header>
 
-      <nav aria-label="Filter events" className="mb-8 flex flex-wrap justify-center gap-2">
+      <nav aria-label="Filter hackathons" className="mb-8 flex flex-wrap justify-center gap-2">
         {FILTERS.map((option) => (
           <Link
             key={option.key}
-            href={option.key === "all" ? "/events" : `/events?filter=${option.key}`}
+            href={option.key === "all" ? "/hackathons" : `/hackathons?filter=${option.key}`}
             className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
               option.key === filter ? "bg-brand text-ink" : "bg-ink/5 text-ink-soft hover:bg-ink/10"
             }`}
@@ -104,11 +104,11 @@ export default async function EventsPage({
       {cards.length === 0 ? (
         <EmptyState
           icon={CalendarX2}
-          title="No events in this view yet"
-          description="Events land here as organizers publish them. The first Prize Verified pilot lands with the platform launch."
+          title="No Hackathons In This View Yet"
+          description="Hackathons land here as organizers publish them. The first Prize Verified pilot lands with the platform launch."
           action={
             <Link href="/onboarding/organizer">
-              <Button arrow>Host The First Event</Button>
+              <Button arrow>Host The First Hackathon</Button>
             </Link>
           }
         />

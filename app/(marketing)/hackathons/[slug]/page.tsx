@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     where: { slug },
     select: { title: true, summary: true },
   });
-  if (!event) return { title: "Event not found" };
+  if (!event) return { title: "Hackathon Not Found" };
   return { title: event.title, description: event.summary ?? event.title };
 }
 
@@ -86,7 +86,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
       {/* Status banner — P1: money state is one glance away */}
       {registration === "closed" ? (
         <div className="mb-6 rounded-card border border-warning/40 bg-warning/10 p-4 text-sm font-semibold text-ink">
-          Registration for this event has closed.
+          Registration for this hackathon has closed.
         </div>
       ) : null}
 
@@ -113,7 +113,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
         <div className="mt-6 rounded-card border border-warning/40 bg-warning/10 p-4">
           <p className="text-sm leading-6 text-ink">
             <strong>Prize pending verification.</strong> The organizer has declared a{" "}
-            {formatKes(poolKes)} pool. This event goes live only after 100% of it is locked in the
+            {formatKes(poolKes)} pool. This hackathon goes live only after 100% of it is locked in the
             Prize Vault, and your build is never chasing money that doesn&apos;t exist yet.
           </p>
         </div>
@@ -122,7 +122,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] xl:gap-8">
         <div className="min-w-0 space-y-6">
           <Card>
-            <CardTitle className="text-base font-semibold text-muted">Status</CardTitle>
+            <CardTitle className="text-center text-base font-semibold text-muted">Status</CardTitle>
             <div className="mt-3 overflow-x-auto">
               <StatusTimeline status={event.status} />
             </div>
@@ -153,7 +153,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           {/* Public gallery — 48-hour media vault */}
           {gallery.length > 0 ? (
             <Card>
-              <CardTitle>Event Gallery</CardTitle>
+              <CardTitle>Hackathon Gallery</CardTitle>
               <ul className="mt-4 grid gap-3 sm:grid-cols-3">
                 {gallery.map((asset) => (
                   <li key={asset.id} className="overflow-hidden rounded-card border border-ink/10">
@@ -161,7 +161,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
                       // eslint-disable-next-line @next/next/no-img-element -- media vault assets from dynamic storage
                       <img
                         src={asset.url}
-                        alt={asset.caption ?? "Event photo"}
+                        alt={asset.caption ?? "Hackathon photo"}
                         className="aspect-[4/3] w-full object-cover"
                       />
                     ) : (
@@ -177,7 +177,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           ) : null}
         </div>
 
-        <aside className="space-y-6" aria-label="Event details">
+        <aside className="space-y-6" aria-label="Hackathon details">
           <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
             <Card>
               <p className="text-xs font-semibold tracking-wide text-muted uppercase">Prize pool</p>
@@ -211,7 +211,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
             {isRegistered ? (
               <div className="space-y-3">
                 <Badge variant="success">Registered ✓</Badge>
-                <Link href={`/events/${event.slug}/workspace`} className="block">
+                <Link href={`/hackathons/${event.slug}/workspace`} className="block">
                   <Button arrow size="lg" className="w-full">
                     Open Team Workspace
                   </Button>
@@ -221,7 +221,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
               viewer ? (
                 <form action={`/api/events/${event.slug}/register`} method="post">
                   <Button type="submit" size="lg" className="w-full">
-                    Register For This Event
+                    Register For This Hackathon
                   </Button>
                 </form>
               ) : (

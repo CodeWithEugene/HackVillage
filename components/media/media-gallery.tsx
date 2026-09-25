@@ -35,7 +35,7 @@ export function MediaGallery({ assets }: { assets: Asset[] }) {
           <li key={asset.id} className="overflow-hidden rounded-card border border-ink/10">
             {asset.kind === "PHOTO" ? (
               // eslint-disable-next-line @next/next/no-img-element -- media vault files, dynamic storage
-              <img src={asset.url} alt={asset.caption ?? "Event photo"} className="aspect-[4/3] w-full object-cover" />
+              <img src={asset.url} alt={asset.caption ?? "Hackathon photo"} className="aspect-[4/3] w-full object-cover" />
             ) : (
               <video src={asset.url} controls className="aspect-[4/3] w-full" />
             )}

@@ -44,7 +44,7 @@ export default async function EventMediaPage({
           <h1 className="font-display text-2xl font-bold text-ink">Media Vault</h1>
           <p className="mt-1 text-sm text-muted">
             {event.title} ·{" "}
-            <Link href={`/organizer/events/${event.slug}`} className="underline hover:text-ink">
+            <Link href={`/organizer/hackathons/${event.slug}`} className="underline hover:text-ink">
               command center
             </Link>
           </p>
@@ -56,7 +56,7 @@ export default async function EventMediaPage({
               ? `${approvedCount} approved`
               : hoursLeft != null
                 ? `${hoursLeft}h to deadline`
-                : "48h after the event"}
+                : "48h after the hackathon"}
         </Badge>
       </header>
 
@@ -77,7 +77,7 @@ export default async function EventMediaPage({
             <Camera aria-hidden className="size-5" /> The 48 Hour Promise
           </CardTitle>
           <CardDescription>
-            High-res photos land within 48 hours of the event; that&apos;s the HackVillage
+            High-res photos land within 48 hours of the hackathon; that&apos;s the HackVillage
             standard. Missing it costs −10 trust on the organizer score.
             {hoursLeft != null ? ` You have about ${hoursLeft} hour${hoursLeft === 1 ? "" : "s"}.` : null}
           </CardDescription>

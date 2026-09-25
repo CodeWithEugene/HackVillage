@@ -34,16 +34,16 @@ export default function PrivacyPolicyPage() {
       </p>
       <h3>Profile And Proof-of-Work Data</h3>
       <p>
-        Developer accounts have a public handle and profile page showing verified event
+        Developer accounts have a public handle and profile page showing verified hackathon
         participation, win/loss record, judge endorsements, and (where you connect it) public
         GitHub contribution activity. We do not accept self-reported stats; profile metrics are
         derived only from verified platform activity.
       </p>
-      <h3>Event, Team, And Submission Data</h3>
+      <h3>Hackathon, Team, And Submission Data</h3>
       <p>
-        Event details, team rosters, project submissions, judge scores and feedback, and hiring
+        Hackathon details, team rosters, project submissions, judge scores and feedback, and hiring
         introduction requests are stored to run the judging and payout workflow, and are shown
-        to the relevant organizers, teammates, and judges for that event.
+        to the relevant organizers, teammates, and judges for that hackathon.
       </p>
       <h3>Payment And Payout Data</h3>
       <p>
@@ -66,26 +66,26 @@ export default function PrivacyPolicyPage() {
         Because trust is the product, some data is intentionally public once you opt in to it:
       </p>
       <ul>
-        <li>Developer Proof-of-Work profiles (handle, verified win rate, events, endorsements).</li>
+        <li>Developer Proof-of-Work profiles (handle, verified win rate, hackathons, endorsements).</li>
         <li>
           The public trust ledger at <a href="/trust">/trust</a>: every prize deposit and payout,
           with amount and a payment-provider reference, attested to a public blockchain.
         </li>
-        <li>Organizer trust scores and event history.</li>
+        <li>Organizer trust scores and hackathon history.</li>
       </ul>
       <p>
         Everything else (your email, password, payout account details, private messages, and
-        draft submissions) is private and visible only to you, the relevant event organizers
+        draft submissions) is private and visible only to you, the relevant hackathon organizers
         and judges, and HackVillage staff where necessary to operate the service.
       </p>
 
       <h2>3. How We Use Your Information</h2>
       <ul>
         <li>To create and secure your account, and authenticate you on future visits.</li>
-        <li>To run events: registration, team formation, judging, results, and payouts.</li>
-        <li>To verify prize pools are fully escrowed before an event is marked Prize Verified.</li>
+        <li>To run hackathons: registration, team formation, judging, results, and payouts.</li>
+        <li>To verify prize pools are fully escrowed before a hackathon is marked Prize Verified.</li>
         <li>To build and display your Proof-of-Work profile from verified activity.</li>
-        <li>To send transactional email (verification, password reset, event and payout notices).</li>
+        <li>To send transactional email (verification, password reset, hackathon and payout notices).</li>
         <li>To detect fraud, enforce our Terms of Service, and keep the platform secure.</li>
         <li>To comply with financial record-keeping and tax obligations.</li>
       </ul>
@@ -107,7 +107,7 @@ export default function PrivacyPolicyPage() {
           <strong>Neon</strong>: our PostgreSQL database.
         </li>
         <li>
-          <strong>Cloudflare</strong>: media storage (submission files, event assets) and DNS.
+          <strong>Cloudflare</strong>: media storage (submission files, hackathon assets) and DNS.
         </li>
         <li>
           <strong>Brevo</strong>: transactional email delivery (verification, password reset,

@@ -26,7 +26,7 @@ export default async function OrganizerPage() {
       <EmptyState
         icon={ShieldCheck}
         title="You need an organization"
-        description="Organizations hold escrowed prize pools and run events. Create one to start organizing; it takes a minute."
+        description="Organizations hold escrowed prize pools and run hackathons. Create one to start organizing; it takes a minute."
         action={
           <Link href="/onboarding/organizer">
             <Button arrow>Create Organization</Button>
@@ -60,7 +60,7 @@ export default async function OrganizerPage() {
         <div>
           <h1 className="font-display text-2xl font-bold text-ink">{org.name}</h1>
           <p className="mt-1 text-sm text-muted">
-            {membership.role.toLowerCase()} · hackvillage.app/organizers/{org.slug}
+            {membership.role.toLowerCase()} · hackvillage.xyz/organizers/{org.slug}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -73,22 +73,22 @@ export default async function OrganizerPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Plus aria-hidden className="size-5" /> Run An Event
+              <Plus aria-hidden className="size-5" /> Run A Hackathon
             </CardTitle>
             <CardDescription>
               Five steps to a draft; publishing declares the prize pool. The vault deposit flow
               (Phase 3) flips it live with the Prize Verified badge.
             </CardDescription>
           </div>
-          <Link href="/organizer/events/new">
-            <Button arrow>Create Event</Button>
+          <Link href="/organizer/hackathons/new">
+            <Button arrow>Create Hackathon</Button>
           </Link>
         </div>
       </Card>
 
       {eventsWithPools.length > 0 ? (
         <Card>
-          <CardTitle>Events</CardTitle>
+          <CardTitle>Hackathons</CardTitle>
           <ul className="mt-3 divide-y divide-ink/5">
             {eventsWithPools.map((event) => (
               <li key={event.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
@@ -98,7 +98,7 @@ export default async function OrganizerPage() {
                   <Badge variant={event.status === "DRAFT" ? "neutral" : event.status === "PENDING_DEPOSIT" ? "warning" : "success"}>
                     {event.status === "PENDING_DEPOSIT" ? "pending deposit" : event.status.toLowerCase()}
                   </Badge>
-                  <Link href={`/organizer/events/${event.slug}`}>
+                  <Link href={`/organizer/hackathons/${event.slug}`}>
                     <Button size="sm" variant="secondary" arrow>Manage</Button>
                   </Link>
                 </span>

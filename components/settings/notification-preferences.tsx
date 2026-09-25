@@ -12,7 +12,7 @@ import {
 import { CATEGORY_LABELS, NOTIFICATION_CATEGORIES, type NotificationCategory } from "@/lib/notifications/types";
 
 const CATEGORY_HINTS: Record<NotificationCategory, string> = {
-  eventUpdates: "Publishing, funding, and prize verified milestones for your events.",
+  eventUpdates: "Publishing, funding, and prize verified milestones for your hackathons.",
   teamActivity: "Team invites, join and leave notices, and submission confirmations.",
   judging: "Judge invites, judging opened, results, and payout confirmations.",
   reminders: "Portfolio check ins and milestone confirmation nudges.",

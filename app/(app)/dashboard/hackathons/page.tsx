@@ -10,7 +10,7 @@ import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 import { isPrizeVerified, registrationOpen, STATUS_LABELS } from "@/lib/events/lifecycle";
 
-export const metadata: Metadata = { title: "My Events" };
+export const metadata: Metadata = { title: "My Hackathons" };
 
 export default async function DashboardEventsPage() {
   const user = await requireOnboardedUser();
@@ -37,20 +37,20 @@ export default async function DashboardEventsPage() {
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-bold text-ink">My Events</h1>
-        <Link href="/events">
-          <Button variant="secondary" arrow>Browse Events</Button>
+        <h1 className="font-display text-2xl font-bold text-ink">My Hackathons</h1>
+        <Link href="/hackathons">
+          <Button variant="secondary" arrow>Browse Hackathons</Button>
         </Link>
       </header>
 
       {registrations.length === 0 ? (
         <EmptyState
           icon={CalendarDays}
-          title="You haven't registered for any events"
-          description="Find a Prize Verified event that matches your skills. Your Proof-of-Work record starts with your first one."
+          title="You haven't registered for any hackathons"
+          description="Find a Prize Verified hackathon that matches your skills. Your Proof-of-Work record starts with your first one."
           action={
-            <Link href="/events">
-              <Button arrow>Browse Events</Button>
+            <Link href="/hackathons">
+              <Button arrow>Browse Hackathons</Button>
             </Link>
           }
         />
@@ -88,7 +88,7 @@ export default async function DashboardEventsPage() {
                         </Button>
                       </form>
                     ) : null}
-                    <Link href={`/events/${event.slug}/workspace`}>
+                    <Link href={`/hackathons/${event.slug}/workspace`}>
                       <Button size="sm" arrow>{open ? "Workspace" : "View"}</Button>
                     </Link>
                   </div>

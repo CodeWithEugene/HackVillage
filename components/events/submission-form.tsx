@@ -54,7 +54,7 @@ export function SubmissionForm({
       <CardTitle>Submission</CardTitle>
       <CardDescription>
         One submission per team: any member can save it, everyone sees it. {windowOpen
-          ? "Editable until the event ends."
+          ? "Editable until the hackathon ends."
           : "The submission window has closed. This is your final entry."}
       </CardDescription>
 

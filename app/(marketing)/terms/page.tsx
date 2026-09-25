@@ -20,8 +20,8 @@ export default function TermsOfServicePage() {
 
       <h2>1. What HackVillage Is</h2>
       <p>
-        HackVillage is open-source infrastructure for high-impact tech events: organizers host
-        Prize Verified hackathons with escrowed prize pools, developers register, form teams,
+        HackVillage is open-source infrastructure for high-impact hackathons. Organizers host
+        them with escrowed prize pools, developers register, form teams,
         and submit projects, judges score submissions, and winners are paid out: 50% instantly
         on results, 50% at milestone completion. Every deposit and payout is attested on a
         public ledger.
@@ -43,7 +43,7 @@ export default function TermsOfServicePage() {
       <h2>3. Organizer Obligations</h2>
       <ul>
         <li>
-          An event may only display the &ldquo;Prize Verified&rdquo; badge once 100% of its
+          A hackathon may only display the &ldquo;Prize Verified&rdquo; badge once 100% of its
           declared prize pool is deposited and locked in escrow.
         </li>
         <li>
@@ -52,25 +52,25 @@ export default function TermsOfServicePage() {
         </li>
         <li>
           Organizers cannot withdraw escrowed funds except through the platform&apos;s payout
-          flow to verified winners, or a refund flow for cancelled events.
+          flow to verified winners, or a refund flow for cancelled hackathons.
         </li>
         <li>
-          Falsifying event details, prize pools, or judging results may result in account
+          Falsifying hackathon details, prize pools, or judging results may result in account
           suspension and forfeiture of organizer privileges.
         </li>
       </ul>
 
       <h2>4. Developer And Participant Conduct</h2>
       <ul>
-        <li>Submissions must be your own or your team&apos;s original work, built within the event&apos;s rules and timeframe, unless an event&apos;s own rules state otherwise.</li>
+        <li>Submissions must be your own or your team&apos;s original work, built within the hackathon&apos;s rules and timeframe, unless a hackathon&apos;s own rules state otherwise.</li>
         <li>Plagiarism, impersonation, vote manipulation, and collusion with judges are prohibited and grounds for disqualification and account suspension.</li>
-        <li>You retain ownership of your submissions and project IP. Submitting to an event does not transfer ownership to HackVillage or the organizer, except as that event&apos;s own published rules state.</li>
+        <li>You retain ownership of your submissions and project IP. Submitting to a hackathon does not transfer ownership to HackVillage or the organizer, except as that hackathon&apos;s own published rules state.</li>
         <li>Winning-team payout splits, when a team has multiple members, are the team&apos;s own responsibility to agree on before requesting payout.</li>
       </ul>
 
       <h2>5. Public Data And Proof-of-Work Profiles</h2>
       <p>
-        By participating in events, you consent to your verified participation, results,
+        By participating in hackathons, you consent to your verified participation, results,
         endorsements, and (if connected) public GitHub activity being displayed on your public
         Proof-of-Work profile, and to the related deposit/payout amounts being attested on the
         public trust ledger. See our{" "}
@@ -81,8 +81,8 @@ export default function TermsOfServicePage() {
       <p>
         HackVillage charges organizers a platform fee (a percentage of the declared prize pool,
         shown before deposit) to fund the escrow attestation, judging tooling, and payout
-        infrastructure. All prize amounts are denominated in Kenyan Shillings (KES) unless an
-        event states otherwise. Paystack&apos;s own fees for payment processing apply
+        infrastructure. All prize amounts are denominated in Kenyan Shillings (KES) unless a
+        hackathon states otherwise. Paystack&apos;s own fees for payment processing apply
         separately and are disclosed at checkout.
       </p>
 
@@ -94,7 +94,7 @@ export default function TermsOfServicePage() {
           github.com/CodeWithEugene/HackVillage
         </a>
         . The license covers the software itself; it does not grant rights to the HackVillage
-        name, logo, hosted data, or any specific event&apos;s content.
+        name, logo, hosted data, or any specific hackathon&apos;s content.
       </p>
 
       <h2>8. Prohibited Conduct</h2>

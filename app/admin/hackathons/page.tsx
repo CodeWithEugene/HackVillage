@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 import { STATUS_LABELS } from "@/lib/events/lifecycle";
 import { formatKes } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Admin · Events" };
+export const metadata: Metadata = { title: "Admin · Hackathons" };
 
 export default async function AdminEventsPage() {
   const events = await prisma.event.findMany({
@@ -22,15 +22,15 @@ export default async function AdminEventsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-2xl font-bold text-ink">Events</h1>
+      <h1 className="font-display text-2xl font-bold text-ink">Hackathons</h1>
 
       <Card>
-        <CardTitle>All Events ({events.length})</CardTitle>
+        <CardTitle>All Hackathons ({events.length})</CardTitle>
         <ul className="mt-3 divide-y divide-ink/5">
           {events.map((event) => (
             <li key={event.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
               <span>
-                <Link href={`/events/${event.slug}`} className="font-semibold text-ink underline">
+                <Link href={`/hackathons/${event.slug}`} className="font-semibold text-ink underline">
                   {event.title}
                 </Link>
                 <span className="block text-xs text-muted">

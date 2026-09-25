@@ -26,7 +26,7 @@ async function main(): Promise<void> {
   console.log(`\n== HackVillage load test against ${BASE} ==\n`);
 
   // 1. Public read throughput (landing, events, trust, a profile).
-  const readPaths = ["/", "/events", "/trust", "/developers"];
+  const readPaths = ["/", "/hackathons", "/trust", "/developers"];
   const readTimes: number[] = [];
   const readErrors: number[] = [];
   for (let round = 0; round < READ_ROUNDS; round += 1) {

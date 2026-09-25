@@ -42,7 +42,7 @@ export default async function AdminKybPage() {
                   <div>
                     <p className="font-semibold text-ink">{org.name}</p>
                     <p className="text-xs text-muted">
-                      hackvillage.app/organizers/{org.slug}
+                      hackvillage.xyz/organizers/{org.slug}
                       {org.members[0] ? ` · owner ${org.members[0].user.email}` : ""}
                     </p>
                   </div>

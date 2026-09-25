@@ -25,7 +25,7 @@ export interface MediaActionState {
 function toState(error: unknown): MediaActionState {
   if (error instanceof MediaError) return { error: error.message };
   console.error("[media] action failed", error);
-  return { error: "Something went wrong — try again in a moment." };
+  return { error: "Something went wrong. Try again in a moment." };
 }
 
 // ── Organizer: media vault ───────────────────────────────────────────────
@@ -72,8 +72,8 @@ export async function requestUploadUrlAction(
       kind: contentType.data.startsWith("video/") ? "VIDEO" : "PHOTO",
       caption,
     });
-    revalidatePath(`/organizer/events/${eventId.data}/media`);
-    return { message: "Upload ready — complete it in your browser.", uploadUrl: target.uploadUrl, uploadHeaders: target.headers };
+    revalidatePath(`/organizer/hackathons/${eventId.data}/media`);
+    return { message: "Upload ready. Complete it in your browser.", uploadUrl: target.uploadUrl, uploadHeaders: target.headers };
   } catch (error) {
     return toState(error);
   }
@@ -90,7 +90,7 @@ export async function setMediaStatusAction(
       select: { eventId: true },
     });
     await setMediaStatus(assetId, user.id, status);
-    if (asset) revalidatePath(`/organizer/events/${asset.eventId}/media`);
+    if (asset) revalidatePath(`/organizer/hackathons/${asset.eventId}/media`);
   } catch (error) {
     console.error("[media] status change failed", error);
   }
@@ -131,7 +131,7 @@ export async function adjustTrustAction(
       });
     }
     revalidatePath("/admin/trust");
-    return { message: "Trust updated — audit logged." };
+    return { message: "Trust updated and audit logged." };
   } catch (error) {
     return toState(error);
   }

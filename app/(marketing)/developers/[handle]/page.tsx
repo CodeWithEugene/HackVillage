@@ -137,7 +137,7 @@ export default async function DeveloperProfilePage({ params }: ProfilePageProps)
       {/* Verified record — platform-derived numbers only (§6.6) */}
       <div className="mt-6 grid gap-4 sm:grid-cols-5">
         <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Events</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Hackathons</p>
           <p className="mt-1 font-display text-2xl font-bold text-ink">{metrics.eventsParticipated}</p>
         </Card>
         <Card>
@@ -223,7 +223,7 @@ export default async function DeveloperProfilePage({ params }: ProfilePageProps)
                 <p className="leading-7 text-ink-soft">&ldquo;{endorsement.quote}&rdquo;</p>
                 <p className="mt-1 text-xs text-muted">
                   {endorsement.judge.name ?? `@${endorsement.judge.handle}`}, judge,{" "}
-                  <a href={`/events/${endorsement.event.slug}`} className="underline">
+                  <a href={`/hackathons/${endorsement.event.slug}`} className="underline">
                     {endorsement.event.title}
                   </a>
                 </p>
@@ -236,7 +236,7 @@ export default async function DeveloperProfilePage({ params }: ProfilePageProps)
       <Card className="mt-6">
         <CardTitle>Hiring?</CardTitle>
         <CardDescription>
-          Every metric above is derived from platform-verified events: wins, payouts, and judge
+          Every metric above is derived from platform-verified activity: wins, payouts, and judge
           endorsements, never self-reported.{" "}
           {viewerIsHiring ? (
             <>

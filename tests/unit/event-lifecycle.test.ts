@@ -47,7 +47,7 @@ describe("canPublishDraft", () => {
     expect(
       canPublishDraft(draft({ registrationDeadline: new Date("2026-08-10T09:00Z") }), MIN_POOL)
         .reason
-    ).toContain("before the event starts");
+    ).toContain("before the hackathon starts");
     expect(
       canPublishDraft(draft({ endsAt: new Date("2026-07-30T09:00Z") }), MIN_POOL).reason
     ).toContain("after it starts");

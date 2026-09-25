@@ -84,10 +84,10 @@ export default async function DashboardTeamsPage({
         <EmptyState
           icon={UsersRound}
           title="No teams yet"
-          description="Register for an event, then create a team or join one with a leader's code. Teams hold up to 5 members."
+          description="Register for a hackathon, then create a team or join one with a leader's code. Teams hold up to 5 members."
           action={
-            <Link href="/events">
-              <Button arrow>Find An Event</Button>
+            <Link href="/hackathons">
+              <Button arrow>Find A Hackathon</Button>
             </Link>
           }
         />
@@ -105,7 +105,7 @@ export default async function DashboardTeamsPage({
                     {team.event.title} · {team._count.members}/5 members
                   </p>
                 </div>
-                <Link href={`/events/${team.event.slug}/workspace`}>
+                <Link href={`/hackathons/${team.event.slug}/workspace`}>
                   <Button size="sm" arrow>Workspace</Button>
                 </Link>
               </Card>

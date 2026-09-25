@@ -65,7 +65,7 @@ export default async function JudgeEndorsePage({
         <Card>
           <CardTitle>All Endorsements Written</CardTitle>
           <CardDescription>
-            You&apos;ve endorsed every winner of this event, and they&apos;re live on their profiles.
+            You&apos;ve endorsed every winner of this hackathon, and they&apos;re live on their profiles.
           </CardDescription>
         </Card>
       ) : (

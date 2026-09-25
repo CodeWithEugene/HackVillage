@@ -16,7 +16,7 @@ export default function AppTopNav({
 }) {
   const links: { href: string; label: string }[] = [
     { href: "/dashboard", label: "Dashboard" },
-    { href: "/dashboard/events", label: "My events" },
+    { href: "/dashboard/hackathons", label: "My Hackathons" },
     { href: "/dashboard/teams", label: "Teams" },
     { href: "/dashboard/winnings", label: "Winnings" },
     { href: "/dashboard/intros", label: "Intros" },

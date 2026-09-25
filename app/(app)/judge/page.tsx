@@ -35,7 +35,7 @@ export default async function JudgeHomePage() {
       <header>
         <h1 className="font-display text-2xl font-bold text-ink">Judging</h1>
         <p className="mt-1 text-sm text-muted">
-          Your assigned events. Structured feedback (one strength, one improvement, one next step)
+          Your assigned hackathons. Structured feedback (one strength, one improvement, one next step)
           unlocks every finalization.
         </p>
       </header>
@@ -44,7 +44,7 @@ export default async function JudgeHomePage() {
         <EmptyState
           icon={Gavel}
           title="No judging assignments yet"
-          description="When an organizer invites you to judge an event, it lands here with the rubric and team queue."
+          description="When an organizer invites you to judge a hackathon, it lands here with the rubric and team queue."
         />
       ) : (
         <ul className="space-y-3">
@@ -97,7 +97,7 @@ export default async function JudgeHomePage() {
                     </form>
                   </div>
                 ) : (
-                  <Link href={`/judge/events/${assignment.event.slug}`}>
+                  <Link href={`/judge/hackathons/${assignment.event.slug}`}>
                     <Button size="sm" arrow>Open Team Queue</Button>
                   </Link>
                 )}

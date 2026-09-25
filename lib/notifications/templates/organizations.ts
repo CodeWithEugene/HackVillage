@@ -4,7 +4,7 @@ export function orgInviteEmail(orgName: string, url: string): EmailTemplate {
   return {
     subject: `You Are Invited To Join ${orgName} On HackVillage`,
     html: renderEmail({
-      preheader: `${orgName} invited you to help run events on HackVillage.`,
+      preheader: `${orgName} invited you to help run hackathons on HackVillage.`,
       section: {
         heading: "You Are Invited",
         bodyHtml: `<p style="margin:0;"><strong>${orgName}</strong> invited you to join their organization on HackVillage as an organizer. This link expires in seven days.</p>`,
@@ -48,15 +48,15 @@ export function kybApprovedEmail(orgName: string, eventsUrl: string): EmailTempl
   return {
     subject: `${orgName} Is Verified On HackVillage`,
     html: renderEmail({
-      preheader: "You can now fund and publish events.",
+      preheader: "You can now fund and publish hackathons.",
       section: {
         heading: "You Are Verified",
-        bodyHtml: `<p style="margin:0;"><strong>${orgName}</strong> passed verification. You can now publish events and fund prize pools.</p>`,
+        bodyHtml: `<p style="margin:0;"><strong>${orgName}</strong> passed verification. You can now publish hackathons and fund prize pools.</p>`,
         ctaUrl: eventsUrl,
-        ctaLabel: "Go To Your Events",
+        ctaLabel: "Go To Your Hackathons",
       },
     }),
-    text: renderText([`${orgName} passed verification. You can now publish events and fund prize pools.`, eventsUrl]),
+    text: renderText([`${orgName} passed verification. You can now publish hackathons and fund prize pools.`, eventsUrl]),
   };
 }
 

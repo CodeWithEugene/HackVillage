@@ -64,7 +64,7 @@ export default async function JudgeEventPage({
       {!judgingOpen ? (
         <Card>
           <p className="text-sm text-muted">
-            Judging opens when the event ends and the organizer opens the review window. Come back
+            Judging opens when the hackathon ends and the organizer opens the review window. Come back
             then. You can review the submissions below in the meantime.
           </p>
         </Card>
@@ -102,7 +102,7 @@ export default async function JudgeEventPage({
                       </a>
                     </p>
                   </div>
-                  <Link href={`/judge/events/${event.slug}/teams/${team.id}`}>
+                  <Link href={`/judge/hackathons/${event.slug}/teams/${team.id}`}>
                     <Button size="sm" variant={finalized ? "secondary" : "primary"} arrow>
                       {finalized ? "Review" : "Score Team"}
                     </Button>

@@ -56,7 +56,7 @@ export function EventCard({ event }: { event: EventCardData }) {
 
   return (
     <Link
-      href={`/events/${event.slug}`}
+      href={`/hackathons/${event.slug}`}
       className="group flex h-full flex-col rounded-card border border-ink/10 bg-surface p-5 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-brand/60 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       <div className="flex items-center justify-between gap-3">
@@ -119,7 +119,7 @@ export function EventCard({ event }: { event: EventCardData }) {
           {registrationNote(event, open)}
         </span>
         <span className="inline-flex items-center gap-1 font-semibold text-ink">
-          View Event
+          View Hackathon
           <ArrowUpRight
             aria-hidden
             className="size-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"

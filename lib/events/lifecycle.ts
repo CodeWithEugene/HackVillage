@@ -73,7 +73,7 @@ export function canPublishDraft(
   const ends = new Date(event.endsAt).getTime();
   const deadline = new Date(event.registrationDeadline).getTime();
 
-  if (!event.title.trim()) return { ok: false, reason: "The event needs a title." };
+  if (!event.title.trim()) return { ok: false, reason: "The hackathon needs a title." };
   if (!event.problemStatement?.trim()) {
     return { ok: false, reason: "Write the problem statement before publishing." };
   }
@@ -84,10 +84,10 @@ export function canPublishDraft(
     return { ok: false, reason: `The prize pool must be at least KES ${minPoolKes.toLocaleString("en-KE")}.` };
   }
   if (!(deadline < starts)) {
-    return { ok: false, reason: "Registration must close before the event starts." };
+    return { ok: false, reason: "Registration must close before the hackathon starts." };
   }
   if (!(starts < ends)) {
-    return { ok: false, reason: "The event must end after it starts." };
+    return { ok: false, reason: "The hackathon must end after it starts." };
   }
   return { ok: true };
 }
@@ -95,7 +95,7 @@ export function canPublishDraft(
 /** Public timeline phases shown on event cards and the detail page. */
 export const EVENT_PHASES = [
   { key: "vault", label: "Prize Vault" },
-  { key: "live", label: "Event live" },
+  { key: "live", label: "Hackathon live" },
   { key: "judging", label: "Judging" },
   { key: "winners", label: "Winners paid 50%" },
   { key: "settled", label: "Milestones settled" },

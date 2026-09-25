@@ -60,7 +60,7 @@ export function MediaUploader({ eventId }: { eventId: string }) {
   return (
     <Card>
       <CardTitle className="flex items-center gap-2">
-        <Upload aria-hidden className="size-5" /> Upload Event Media
+        <Upload aria-hidden className="size-5" /> Upload Hackathon Media
       </CardTitle>
       <CardDescription>
         High-resolution photos and clips: the gallery developers and the community see.

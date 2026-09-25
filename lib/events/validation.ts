@@ -25,7 +25,7 @@ export const eventProblemSchema = z.object({
   problemStatement: z
     .string()
     .trim()
-    .min(40, "Describe the problem in at least 40 characters — builders need context.")
+    .min(40, "Describe the problem in at least 40 characters, since builders need context.")
     .max(8000),
   rules: z.string().trim().max(8000).optional(),
   rolesWanted: z
@@ -62,11 +62,11 @@ export const eventWizardSchema = eventBasicsSchema
   .merge(eventPrizesSchema)
   .merge(eventSettingsSchema)
   .refine((data) => data.registrationDeadline < data.startsAt, {
-    message: "Registration must close before the event starts.",
+    message: "Registration must close before the hackathon starts.",
     path: ["registrationDeadline"],
   })
   .refine((data) => data.startsAt < data.endsAt, {
-    message: "The event must end after it starts.",
+    message: "The hackathon must end after it starts.",
     path: ["endsAt"],
   });
 
@@ -83,8 +83,8 @@ export function placesAreUnique(prizes: { place: number }[]): boolean {
 }
 
 const RESERVED_EVENT_SLUGS = new Set([
-  "admin", "api", "auth", "dashboard", "developers", "events", "hiring", "judge",
-  "new", "organizer", "settings", "signin", "signup", "trust", "workspace",
+  "admin", "api", "auth", "dashboard", "developers", "events", "hackathons", "hiring",
+  "judge", "new", "organizer", "settings", "signin", "signup", "trust", "workspace",
 ]);
 
 export function eventSlugStem(title: string): string {

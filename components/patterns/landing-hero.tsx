@@ -30,11 +30,11 @@ export function LandingHero() {
           </h1>
           <p className="hero-description">
             From team formation to judging and payouts, bring your hackathon together in one place.
-            Every event is <strong>Prize Verified</strong>, with funds secured before the building
+            Every hackathon is <strong>Prize Verified</strong>, with funds secured before the building
             begins.
           </p>
           <div className="hero-actions">
-            <Link href="/events" className="hero-action-primary btn-pill">
+            <Link href="/hackathons" className="hero-action-primary btn-pill">
               <span className="btn-fill" aria-hidden />
               <span className="btn-content">
                 Browse Hackathons <ArrowUpRight aria-hidden="true" size={17} className="btn-arrow" />
@@ -62,7 +62,7 @@ export function LandingHero() {
           />
         </div>
         <div className="hero-column hero-column-left">
-          <Photo name="speaker" alt="Kenyan tech speaker sharing ideas at a developer event" />
+          <Photo name="speaker" alt="Kenyan tech speaker sharing ideas at a hackathon" />
           <Photo
             name="team-build"
             alt="Two Kenyan developers collaborating on a hackathon project"
@@ -86,7 +86,7 @@ export function LandingHero() {
         <div className="hero-column hero-column-edge-right">
           <Photo
             name="event-arrival"
-            alt="Kenyan developer arriving at a tech event with his laptop"
+            alt="Kenyan developer arriving at a hackathon with his laptop"
           />
           <p className="hero-side-note">
             Connect.

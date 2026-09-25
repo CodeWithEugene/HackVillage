@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "HackVillage",
     short_name: "HackVillage",
     description:
-      "The open-source infrastructure for high-impact tech events. 100% escrowed prize pools, 50% instant payouts, verified Proof-of-Work profiles.",
+      "The open-source infrastructure for high-impact hackathons. 100% escrowed prize pools, 50% instant payouts, verified Proof-of-Work profiles.",
     start_url: "/",
     display: "standalone",
     background_color: "#fafbf7",

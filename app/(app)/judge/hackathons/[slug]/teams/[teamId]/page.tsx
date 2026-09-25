@@ -58,7 +58,7 @@ export default async function JudgeTeamPage({
             {team.members.map((m) => `@${m.user.handle}`).join(" · ")}
           </p>
         </div>
-        <Link href={`/judge/events/${event.slug}`} className="text-sm font-semibold text-ink underline">
+        <Link href={`/judge/hackathons/${event.slug}`} className="text-sm font-semibold text-ink underline">
           ← Back to queue
         </Link>
       </header>

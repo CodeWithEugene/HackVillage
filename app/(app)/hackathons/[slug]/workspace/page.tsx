@@ -49,11 +49,11 @@ export default async function WorkspacePage({
     return (
       <EmptyState
         icon={UsersRound}
-        title="You're not registered for this event"
-        description="Register from the event page first, then this workspace becomes your team's build hub."
+        title="You're not registered for this hackathon"
+        description="Register from the hackathon page first, then this workspace becomes your team's build hub."
         action={
-          <a href={`/events/${event.slug}`}>
-            <Button>Go To Event Page</Button>
+          <a href={`/hackathons/${event.slug}`}>
+            <Button>Go To Hackathon Page</Button>
           </a>
         }
       />
@@ -192,10 +192,10 @@ export default async function WorkspacePage({
           />
         ) : (
           <Card>
-            <CardTitle>Submissions Open When The Event Starts</CardTitle>
+            <CardTitle>Submissions Open When The Hackathon Starts</CardTitle>
             <CardDescription>
               The submission form (repo, demo, description, and the prize split declaration) unlocks
-              when the event goes live.
+              when the hackathon goes live.
             </CardDescription>
           </Card>
         )
@@ -205,7 +205,7 @@ export default async function WorkspacePage({
         <CardTitle>What Happens After Announcement</CardTitle>
         <CardDescription>
           Endorse the winners you judged:{" "}
-          <a href={`/judge/events/${event.slug}/endorse`} className="underline hover:text-ink">
+          <a href={`/judge/hackathons/${event.slug}/endorse`} className="underline hover:text-ink">
             write endorsements
           </a>{" "}
           once results are announced. Your one-liner becomes permanent proof on their

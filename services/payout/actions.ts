@@ -23,7 +23,7 @@ export interface PayoutActionState {
 function toState(error: unknown): PayoutActionState {
   if (error instanceof PayoutError) return { error: error.message };
   console.error("[payout] action failed", error);
-  return { error: "Something went wrong — try again in a moment." };
+  return { error: "Something went wrong. Try again in a moment." };
 }
 
 // ── Developer: payout method (recipient onboarding) ──────────────────────
@@ -58,7 +58,7 @@ export async function savePayoutMethodAction(
     });
     revalidatePath("/settings");
     revalidatePath("/dashboard/winnings");
-    return { message: "Payout method saved — winnings flow here." };
+    return { message: "Payout method saved. Winnings flow here." };
   } catch (error) {
     return toState(error);
   }
@@ -72,7 +72,7 @@ export async function announceWinnersAction(
 ): Promise<PayoutActionState> {
   const user = await requireUser();
   const eventId = z.string().cuid().safeParse(String(formData.get("eventId") ?? ""));
-  if (!eventId.success) return { error: "Unknown event." };
+  if (!eventId.success) return { error: "Unknown hackathon." };
 
   let placements: { place: number; teamId: string }[] = [];
   try {
@@ -91,11 +91,11 @@ export async function announceWinnersAction(
       select: { slug: true },
     });
     if (event) {
-      revalidatePath(`/organizer/events/${event.slug}`);
-      revalidatePath(`/events/${event.slug}`);
-      revalidatePath("/events");
+      revalidatePath(`/organizer/hackathons/${event.slug}`);
+      revalidatePath(`/hackathons/${event.slug}`);
+      revalidatePath("/hackathons");
     }
-    return { message: "Winners announced — the instant 50% payouts are on their way." };
+    return { message: "Winners announced. The instant 50% payouts are on their way." };
   } catch (error) {
     return toState(error);
   }
@@ -112,11 +112,11 @@ export async function confirmMilestoneAction(winnerId: string): Promise<PayoutAc
         where: { id: winnerId },
         include: { event: { select: { slug: true } } },
       });
-      if (winner) revalidatePath(`/organizer/events/${winner.event.slug}`);
-      return { message: "Milestone confirmed — the final 50% is releasing." };
+      if (winner) revalidatePath(`/organizer/hackathons/${winner.event.slug}`);
+      return { message: "Milestone confirmed. The final 50% is releasing." };
     }
     if (result.outcome === "forbidden") return { error: "Only organization admins can confirm milestones." };
-    if (result.outcome === "not-required") return { error: "This prize pays fully on the day — no milestone." };
+    if (result.outcome === "not-required") return { error: "This prize pays fully on the day, with no milestone." };
     return { error: "The milestone can't be confirmed yet (instant tranche unfinished or already confirmed)." };
   } catch (error) {
     return toState(error);

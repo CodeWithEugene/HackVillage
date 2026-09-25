@@ -51,14 +51,14 @@ export async function JudgingSection({
         <>
           <CardDescription>
             {ended
-              ? "The event has ended. Opening judging locks the rubric and gives your judges the team queue."
-              : "Judging opens after the event ends. Invite judges and tune the rubric meanwhile."}
+              ? "The hackathon has ended. Opening judging locks the rubric and gives your judges the team queue."
+              : "Judging opens after the hackathon ends. Invite judges and tune the rubric meanwhile."}
           </CardDescription>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Link href={`/organizer/events/${slug}/judges`}>
+            <Link href={`/organizer/hackathons/${slug}/judges`}>
               <Button variant="secondary" arrow>Manage Judges</Button>
             </Link>
-            <Link href={`/organizer/events/${slug}/rubric`}>
+            <Link href={`/organizer/hackathons/${slug}/rubric`}>
               <Button variant="secondary" arrow>Edit Rubric</Button>
             </Link>
             {ended ? <OpenJudgingButton eventId={eventId} /> : null}
@@ -77,10 +77,10 @@ export async function JudgingSection({
             announced. Announcing triggers the instant 50% payouts immediately.
           </CardDescription>
           <div className="mt-4 flex flex-wrap gap-3">
-            <Link href={`/organizer/events/${slug}/winners`}>
+            <Link href={`/organizer/hackathons/${slug}/winners`}>
               <Button arrow>Announce Winners</Button>
             </Link>
-            <Link href={`/organizer/events/${slug}/judges`}>
+            <Link href={`/organizer/hackathons/${slug}/judges`}>
               <Button variant="secondary" arrow>Judges &amp; Readiness</Button>
             </Link>
           </div>
@@ -93,7 +93,7 @@ export async function JudgingSection({
             judge{readiness.activeJudges === 1 ? "" : "s"}.
           </CardDescription>
           <div className="mt-3 flex flex-wrap gap-3">
-            <Link href={`/organizer/events/${slug}/judges`}>
+            <Link href={`/organizer/hackathons/${slug}/judges`}>
               <Button size="sm" variant="secondary" arrow>
                 Judges &amp; Readiness
               </Button>
@@ -131,7 +131,7 @@ export async function JudgingSection({
           )}
           <CardDescription>
             Winner announcement and the instant 50% payouts:{" "}
-            <Link href={`/organizer/events/${slug}/winners`} className="underline hover:text-ink">
+            <Link href={`/organizer/hackathons/${slug}/winners`} className="underline hover:text-ink">
               open the winners console
             </Link>
             .

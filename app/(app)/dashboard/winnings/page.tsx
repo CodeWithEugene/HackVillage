@@ -104,10 +104,10 @@ export default async function WinningsPage() {
         <EmptyState
           icon={HandCoins}
           title="No winnings yet"
-          description="When you win a Prize Verified event, the 50% instant tranche lands here the same day, tracked to the shilling."
+          description="When you win a Prize Verified hackathon, the 50% instant tranche lands here the same day, tracked to the shilling."
           action={
-            <Link href="/events">
-              <Badge variant="brand">Find an event</Badge>
+            <Link href="/hackathons">
+              <Badge variant="brand">Find a hackathon</Badge>
             </Link>
           }
         />

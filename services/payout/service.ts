@@ -117,7 +117,7 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
       },
     },
   });
-  if (!event) throw new PayoutError("Event not found.", "NOT_FOUND");
+  if (!event) throw new PayoutError("Hackathon not found.", "NOT_FOUND");
   const membership = event.org.members[0];
   if (!membership || membership.role === "MEMBER") {
     throw new PayoutError("Only organization admins can announce winners.", "FORBIDDEN");
@@ -125,8 +125,8 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
   if (event.status !== "JUDGING") {
     throw new PayoutError(
       event.winners.length > 0
-        ? "Winners are already announced for this event."
-        : "Announce winners while the event is in judging.",
+        ? "Winners are already announced for this hackathon."
+        : "Announce winners while the hackathon is in judging.",
       "WRONG_STATE"
     );
   }
@@ -146,7 +146,7 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
       : submissions;
   if (missing.length > 0) {
     throw new PayoutError(
-      `${missing.length} team(s) are not fully judged yet — results must be complete before announcing.`,
+      `${missing.length} team(s) are not fully judged yet, and results must be complete before announcing.`,
       "JUDGING_INCOMPLETE"
     );
   }
@@ -161,7 +161,7 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
       throw new PayoutError(`There is no prize place ${placement.place}.`, "WRONG_STATE");
     }
     if (!team) {
-      throw new PayoutError(`That team didn't submit for this event.`, "WRONG_STATE");
+      throw new PayoutError(`That team didn't submit for this hackathon.`, "WRONG_STATE");
     }
   }
 
@@ -210,7 +210,7 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
         await tx.milestone.create({
           data: {
             winnerId: winner.id,
-            title: `Milestone handover — ${prize.label}`,
+            title: `Milestone handover: ${prize.label}`,
             description: "Deliver and confirm the handover to release the final 50%.",
             dueAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           },
@@ -268,7 +268,7 @@ async function notifyResults(
   leaderUsers: { id: string; handle: string; email: string }[]
 ): Promise<void> {
   const leaderById = new Map(leaderUsers.map((u) => [u.id, u]));
-  const eventUrl = appUrl(`/events/${eventId}`);
+  const eventUrl = appUrl(`/hackathons/${eventId}`);
   const winningTeamIds = new Set(placements.map((p) => p.teamId));
 
   for (const placement of placements) {
@@ -435,7 +435,7 @@ async function handleTransferFailure(payoutId: string, reference: string, error:
     select: { event: { select: { title: true } } },
   });
   await alertAdmins(
-    payoutManualReviewAdminEmail(payoutId, winner?.event.title ?? "Unknown event", payout.attemptCount + 1, appUrl("/admin/payments"))
+    payoutManualReviewAdminEmail(payoutId, winner?.event.title ?? "Unknown hackathon", payout.attemptCount + 1, appUrl("/admin/payments"))
   ).catch((alertError: unknown) => console.error("[payout] admin alert failed", alertError));
 }
 

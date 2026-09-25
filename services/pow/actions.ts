@@ -22,7 +22,7 @@ export interface PowActionState {
 function toState(error: unknown): PowActionState {
   if (error instanceof PowError) return { error: error.message };
   console.error("[pow] action failed", error);
-  return { error: "Something went wrong — try again in a moment." };
+  return { error: "Something went wrong. Try again in a moment." };
 }
 
 // ── Judge endorsements ───────────────────────────────────────────────────
@@ -33,7 +33,7 @@ const endorsementSchema = z.object({
   quote: z
     .string()
     .trim()
-    .min(20, "Endorsements need at least 20 characters — make them count.")
+    .min(20, "Endorsements need at least 20 characters. Make them count.")
     .max(500),
 });
 
@@ -92,7 +92,7 @@ export async function becomeHiringPartnerAction(
   try {
     await becomeHiringPartner(user.id, company.data);
     revalidatePath("/dashboard");
-    return { message: "You're a hiring partner — verified winners are one click away." };
+    return { message: "You're a hiring partner, and verified winners are one click away." };
   } catch (error) {
     return toState(error);
   }
@@ -106,7 +106,7 @@ const introSchema = z.object({
   message: z
     .string()
     .trim()
-    .min(20, "Say what you're offering — at least 20 characters.")
+    .min(20, "Say what you're offering in at least 20 characters.")
     .max(1000),
 });
 
@@ -123,7 +123,7 @@ export async function requestIntroductionAction(
   try {
     await requestIntroduction({ partnerId: user.id, ...parsed.data });
     revalidatePath("/hiring/requests");
-    return { message: "Intro requested — the developer has your message." };
+    return { message: "Intro requested. The developer has your message." };
   } catch (error) {
     return toState(error);
   }
@@ -137,7 +137,7 @@ export async function respondToIntroductionAction(
   try {
     await respondToIntroduction(introductionId, user.id, accept);
     revalidatePath("/dashboard/intros");
-    return { message: accept ? "Accepted — contact details exchanged." : "Declined." };
+    return { message: accept ? "Accepted. Contact details exchanged." : "Declined." };
   } catch (error) {
     return toState(error);
   }

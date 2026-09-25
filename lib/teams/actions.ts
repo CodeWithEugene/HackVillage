@@ -44,33 +44,33 @@ export async function createTeamAction(
   const eventId = z.string().cuid().safeParse(String(formData.get("eventId") ?? ""));
   const name = String(formData.get("name") ?? "");
   const nameError = validTeamName(name);
-  if (!eventId.success) return { error: "Unknown event." };
+  if (!eventId.success) return { error: "Unknown hackathon." };
   if (nameError) return { error: nameError };
 
   const event = await prisma.event.findUnique({ where: { id: eventId.data } });
-  if (!event) return { error: "Unknown event." };
+  if (!event) return { error: "Unknown hackathon." };
 
   const registration = await prisma.registration.findUnique({
     where: { eventId_userId: { eventId: event.id, userId: user.id } },
   });
   if (!registration || registration.status !== "REGISTERED") {
-    return { error: "Register for the event before forming a team." };
+    return { error: "Register for the hackathon before forming a team." };
   }
   if (!registrationOpen(event)) {
-    return { error: "Registration for this event has closed." };
+    return { error: "Registration for this hackathon has closed." };
   }
 
   const existingTeam = await prisma.teamMember.findFirst({
     where: { userId: user.id, status: "JOINED", team: { eventId: event.id } },
     select: { id: true },
   });
-  if (existingTeam) return { error: "You're already on a team for this event." };
+  if (existingTeam) return { error: "You're already on a team for this hackathon." };
 
   const teamCount = await prisma.team.count({
     where: { eventId: event.id, status: { not: "DISBANDED" } },
   });
   if (teamCount >= event.maxTeams) {
-    return { error: "This event has reached its team limit." };
+    return { error: "This hackathon has reached its team limit." };
   }
 
   await prisma.$transaction(async (tx) => {
@@ -80,8 +80,8 @@ export async function createTeamAction(
     await tx.teamMember.create({ data: { teamId: team.id, userId: user.id, status: "JOINED" } });
   });
 
-  revalidatePath(`/events/${event.slug}/workspace`);
-  redirect(`/events/${event.slug}/workspace`);
+  revalidatePath(`/hackathons/${event.slug}/workspace`);
+  redirect(`/hackathons/${event.slug}/workspace`);
 }
 
 export async function inviteMemberAction(
@@ -116,7 +116,7 @@ export async function inviteMemberAction(
     where: { userId: invitee.id, status: "JOINED", team: { eventId: team.event.id } },
     select: { id: true },
   });
-  if (alreadyInEvent) return { error: "That developer is already on a team for this event." };
+  if (alreadyInEvent) return { error: "That developer is already on a team for this hackathon." };
 
   const decision = canJoinTeam(snapshotOf(team), false, true);
   if (!decision.ok) return { error: decision.reason! };
@@ -134,7 +134,7 @@ export async function inviteMemberAction(
     template: teamInviteEmail(team.name, team.event.title, appUrl("/dashboard/teams")),
   });
 
-  revalidatePath(`/events/${team.event.slug}/workspace`);
+  revalidatePath(`/hackathons/${team.event.slug}/workspace`);
   return {};
 }
 
@@ -161,14 +161,14 @@ export async function joinTeamByCodeAction(
     where: { eventId_userId: { eventId: team.event.id, userId: user.id } },
   });
   if (!registration || registration.status !== "REGISTERED") {
-    return { error: "Register for the event before joining a team." };
+    return { error: "Register for the hackathon before joining a team." };
   }
 
   const alreadyInEvent = await prisma.teamMember.findFirst({
     where: { userId: user.id, status: "JOINED", team: { eventId: team.event.id } },
     select: { id: true },
   });
-  if (alreadyInEvent) return { error: "You're already on a team for this event." };
+  if (alreadyInEvent) return { error: "You're already on a team for this hackathon." };
 
   const membership = team.members.find((m) => m.userId === user.id);
   const decision = canJoinTeam(
@@ -186,8 +186,8 @@ export async function joinTeamByCodeAction(
     });
   }
 
-  revalidatePath(`/events/${team.event.slug}/workspace`);
-  redirect(`/events/${team.event.slug}/workspace`);
+  revalidatePath(`/hackathons/${team.event.slug}/workspace`);
+  redirect(`/hackathons/${team.event.slug}/workspace`);
 }
 
 export async function acceptTeamInviteAction(teamId: string): Promise<void> {
@@ -219,7 +219,7 @@ export async function acceptTeamInviteAction(teamId: string): Promise<void> {
   });
 
   revalidatePath("/dashboard/teams");
-  redirect(`/events/${team.event.slug}/workspace`);
+  redirect(`/hackathons/${team.event.slug}/workspace`);
 }
 
 export async function declineTeamInviteAction(teamId: string): Promise<void> {
@@ -260,7 +260,7 @@ export async function leaveTeamAction(teamId: string): Promise<void> {
   const { team } = membership;
 
   if (team.leaderId === user.id) {
-    redirect(`/events/${team.event.slug}/workspace?leave=leader`);
+    redirect(`/hackathons/${team.event.slug}/workspace?leave=leader`);
   }
 
   await prisma.teamMember.updateMany({
@@ -275,7 +275,7 @@ export async function leaveTeamAction(teamId: string): Promise<void> {
     template: teamMemberLeftEmail(user.name ?? user.handle, team.name),
   });
 
-  revalidatePath(`/events/${team.event.slug}/workspace`);
+  revalidatePath(`/hackathons/${team.event.slug}/workspace`);
 }
 
 export async function toggleTeamLockAction(teamId: string): Promise<void> {
@@ -291,7 +291,7 @@ export async function toggleTeamLockAction(teamId: string): Promise<void> {
     data: { status: team.status === "OPEN" ? "LOCKED" : "OPEN" },
   });
 
-  revalidatePath(`/events/${team.event.slug}/workspace`);
+  revalidatePath(`/hackathons/${team.event.slug}/workspace`);
 }
 
 export async function disbandTeamAction(teamId: string): Promise<void> {
@@ -302,7 +302,7 @@ export async function disbandTeamAction(teamId: string): Promise<void> {
   });
   if (!team || team.leaderId !== user.id) redirect("/dashboard/teams");
   if (team.submission) {
-    redirect(`/events/${team.event.slug}/workspace?disband=submitted`);
+    redirect(`/hackathons/${team.event.slug}/workspace?disband=submitted`);
   }
 
   await prisma.$transaction([
@@ -313,5 +313,5 @@ export async function disbandTeamAction(teamId: string): Promise<void> {
     }),
   ]);
 
-  revalidatePath(`/events/${team.event.slug}/workspace`);
+  revalidatePath(`/hackathons/${team.event.slug}/workspace`);
 }

@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Prize Vault" };
 
 const CHAIN_LABELS: Record<string, string> = {
   AWAITING: "Awaiting deposit",
-  LOCKED: "Locked, event live",
+  LOCKED: "Locked, hackathon live",
   HALF_RELEASED: "50% released",
   SETTLED: "Fully settled",
   REFUNDED: "Refunded",
@@ -66,19 +66,19 @@ export default async function VaultPage({
           <h1 className="font-display text-2xl font-bold text-ink">Prize Vault</h1>
           <p className="mt-1 text-sm text-muted">
             {event.title} ·{" "}
-            <Link href={`/organizer/events/${event.slug}`} className="underline hover:text-ink">
+            <Link href={`/organizer/hackathons/${event.slug}`} className="underline hover:text-ink">
               command center
             </Link>
           </p>
         </div>
         <Badge variant={vaultLive ? "success" : "warning"}>
-          {vaultLive ? "Event live, funds locked" : "Awaiting deposit"}
+          {vaultLive ? "Hackathon live, funds locked" : "Awaiting deposit"}
         </Badge>
       </header>
 
       {depositNotice === "success" ? (
         <p role="status" className="rounded-card border border-success/40 bg-success/10 p-4 text-sm font-semibold text-success">
-          Deposit confirmed, the vault is locking and the event is going live.
+          Deposit confirmed, the vault is locking and the hackathon is going live.
         </p>
       ) : null}
 
@@ -112,7 +112,7 @@ export default async function VaultPage({
             <Lock aria-hidden className="size-5" /> Fund The Vault To Go Live
           </CardTitle>
           <CardDescription>
-            The deposit covers the remaining pool plus the platform fee. The event flips LIVE the
+            The deposit covers the remaining pool plus the platform fee. The hackathon flips LIVE the
             moment the vault locks, and every deposit lands on the{" "}
             <Link href="/trust" className="underline hover:text-ink">
               public ledger

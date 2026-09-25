@@ -27,7 +27,7 @@ export async function initiateDepositAction(
   const user = await requireUser();
   try {
     const { checkoutUrl } = await initiateDeposit(eventId, user.id);
-    revalidatePath(`/organizer/events/${eventId}/vault`);
+    revalidatePath(`/organizer/hackathons/${eventId}/vault`);
     redirect(checkoutUrl);
   } catch (error) {
     if (error instanceof DepositError) {
@@ -41,7 +41,7 @@ export async function initiateDepositAction(
     if (error instanceof Error && error.message === "NEXT_REDIRECT") throw error;
     if ((error as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) throw error;
     console.error("[escrow] initiateDeposit failed", error);
-    return { error: "We couldn't start the deposit — try again in a moment." };
+    return { error: "We couldn't start the deposit. Try again in a moment." };
   }
 }
 
@@ -75,5 +75,5 @@ export async function requestKybAction(
   await sendMail({ to: user.email, ...kybSubmittedEmail(org.name) });
 
   revalidatePath("/organizer");
-  return { message: "Request sent — platform staff review within 48 hours." };
+  return { message: "Request sent. Platform staff review within 48 hours." };
 }

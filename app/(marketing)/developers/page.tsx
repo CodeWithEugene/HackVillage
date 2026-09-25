@@ -34,7 +34,7 @@ export default async function DevelopersPage() {
           Proof-of-Work Profiles
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted">
-          Every metric on these profiles is verified by platform events: wins, contributions, judge
+          Every metric on these profiles is verified by platform activity: wins, contributions, judge
           endorsements. No self-reported stats, ever.
         </p>
       </header>
@@ -42,8 +42,8 @@ export default async function DevelopersPage() {
       {visible.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="Profiles land here as the community grows"
-          description="The first developers are joining now. Once events run, this page fills with verified win rates and endorsed portfolios."
+          title="Profiles Land Here As The Community Grows"
+          description="The first developers are joining now. Once hackathons run, this page fills with verified win rates and endorsed portfolios."
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

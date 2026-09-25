@@ -51,7 +51,7 @@ export default async function DashboardPage() {
         <div>
           <h1 className="font-display text-2xl font-bold text-ink">Welcome Back, {firstName}</h1>
           <p className="mt-1 text-sm text-muted">
-            Your events, teams, and payouts: {pendingInvites > 0 ? `${pendingInvites} invite${pendingInvites === 1 ? "" : "s"} waiting · ` : ""}
+            Your hackathons, teams, and payouts: {pendingInvites > 0 ? `${pendingInvites} invite${pendingInvites === 1 ? "" : "s"} waiting · ` : ""}
             {winningsInFlight > 0 ? `${winningsInFlight} payout${winningsInFlight === 1 ? "" : "s"} in flight` : "all settled"}
           </p>
         </div>
@@ -73,16 +73,16 @@ export default async function DashboardPage() {
 
       <EmptyState
         icon={CalendarX2}
-        title={dueCheckins.length > 0 ? "" : "No active events right now"}
+        title={dueCheckins.length > 0 ? "" : "No active hackathons right now"}
         description={
           dueCheckins.length > 0
             ? ""
-            : "Prize Verified events appear here the moment you register: active events, teams, and in-flight payouts at a glance."
+            : "Prize Verified hackathons appear here the moment you register: active hackathons, teams, and in-flight payouts at a glance."
         }
         action={
           dueCheckins.length > 0 ? undefined : (
-            <Link href="/events">
-              <Button arrow>Browse Events</Button>
+            <Link href="/hackathons">
+              <Button arrow>Browse Hackathons</Button>
             </Link>
           )
         }

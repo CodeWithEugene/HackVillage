@@ -82,14 +82,14 @@ export async function signUpAction(
   const emailNormalized = email.toLowerCase();
 
   const limit = rateLimit(`signup:${emailNormalized}`, 5, 60 * 60 * 1000);
-  if (!limit.ok) return { error: "Too many attempts — try again later." };
+  if (!limit.ok) return { error: "Too many attempts. Try again later." };
 
   const existing = await prisma.user.findFirst({
     where: { email: emailNormalized, deletedAt: null },
     select: { id: true },
   });
   if (existing) {
-    return { error: "An account with that email already exists — sign in instead." };
+    return { error: "An account with that email already exists. Sign in instead." };
   }
 
   let finalHandle: string;
@@ -100,7 +100,7 @@ export async function signUpAction(
       where: { handle: { equals: handle, mode: "insensitive" } },
       select: { id: true },
     });
-    if (taken) return { error: "That handle is taken — try another." };
+    if (taken) return { error: "That handle is taken. Try another." };
     finalHandle = handle;
   } else {
     const candidates = candidateHandles(emailNormalized.split("@")[0] ?? "developer");
@@ -155,7 +155,7 @@ export async function signInAction(
 
   const limit = rateLimit(`signin:${emailNormalized}`, 10, 15 * 60 * 1000);
   if (!limit.ok) {
-    return { error: "Too many attempts — wait a few minutes and try again." };
+    return { error: "Too many attempts. Wait a few minutes and try again." };
   }
 
   const user = await prisma.user.findUnique({ where: { email: emailNormalized } });
@@ -216,7 +216,7 @@ export async function resendVerificationAction(
   const emailNormalized = email.data.toLowerCase();
 
   const limit = rateLimit(`verify-resend:${emailNormalized}`, 3, 60 * 60 * 1000);
-  if (!limit.ok) return { error: "Verification emails are limited — try again in a while." };
+  if (!limit.ok) return { error: "Verification emails are limited. Try again in a while." };
 
   const user = await prisma.user.findUnique({ where: { email: emailNormalized } });
   if (!user || user.deletedAt || user.emailVerified) {
@@ -241,7 +241,7 @@ export async function requestPasswordResetAction(
   const emailNormalized = email.data.toLowerCase();
 
   const limit = rateLimit(`reset:${emailNormalized}`, 3, 60 * 60 * 1000);
-  if (!limit.ok) return { error: "Reset emails are limited — try again in a while." };
+  if (!limit.ok) return { error: "Reset emails are limited. Try again in a while." };
 
   const user = await prisma.user.findUnique({ where: { email: emailNormalized } });
   if (user && !user.deletedAt && user.passwordHash) {

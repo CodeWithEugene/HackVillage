@@ -33,7 +33,7 @@ export interface JudgingActionState {
 function toState(error: unknown): JudgingActionState {
   if (error instanceof JudgingError) return { error: error.message };
   console.error("[judging] action failed", error);
-  return { error: "Something went wrong — try again in a moment." };
+  return { error: "Something went wrong. Try again in a moment." };
 }
 
 // ── Organizer ────────────────────────────────────────────────────────────
@@ -58,7 +58,7 @@ export async function inviteJudgeAction(
       where: { id: eventId.data },
       select: { slug: true },
     });
-    if (event) revalidatePath(`/organizer/events/${event.slug}/judges`);
+    if (event) revalidatePath(`/organizer/hackathons/${event.slug}/judges`);
     return { message: "Invite sent." };
   } catch (error) {
     return toState(error);
@@ -73,7 +73,7 @@ export async function revokeJudgeAssignmentAction(assignmentId: string): Promise
       include: { event: { select: { slug: true } } },
     });
     await removeJudge(assignmentId, user.id);
-    if (assignment) revalidatePath(`/organizer/events/${assignment.event.slug}/judges`);
+    if (assignment) revalidatePath(`/organizer/hackathons/${assignment.event.slug}/judges`);
   } catch (error) {
     console.error("[judging] revoke failed", error);
   }
@@ -85,13 +85,13 @@ export async function saveRubricAction(
 ): Promise<JudgingActionState> {
   const user = await requireUser();
   const eventId = z.string().cuid().safeParse(String(formData.get("eventId") ?? ""));
-  if (!eventId.success) return { error: "Unknown event." };
+  if (!eventId.success) return { error: "Unknown hackathon." };
 
   let criteria: unknown;
   try {
     criteria = JSON.parse(String(formData.get("criteria") ?? "[]"));
   } catch {
-    return { error: "The rubric didn't submit correctly — try again." };
+    return { error: "The rubric didn't submit correctly. Try again." };
   }
 
   const parsed = rubricSchema.safeParse(criteria);
@@ -105,7 +105,7 @@ export async function saveRubricAction(
       where: { id: eventId.data },
       select: { slug: true },
     });
-    if (event) revalidatePath(`/organizer/events/${event.slug}/rubric`);
+    if (event) revalidatePath(`/organizer/hackathons/${event.slug}/rubric`);
     return { message: "Rubric saved." };
   } catch (error) {
     return toState(error);
@@ -118,8 +118,8 @@ export async function openJudgingAction(eventId: string): Promise<JudgingActionS
     await openJudgingService(eventId, user.id);
     const event = await prisma.event.findUnique({ where: { id: eventId }, select: { slug: true } });
     if (event) {
-      revalidatePath(`/organizer/events/${event.slug}`);
-      revalidatePath("/events");
+      revalidatePath(`/organizer/hackathons/${event.slug}`);
+      revalidatePath("/hackathons");
     }
     return {};
   } catch (error) {
@@ -145,7 +145,7 @@ export async function respondToJudgeInviteAction(
       where: { id: assignmentId },
       include: { event: { select: { slug: true } } },
     });
-    if (assignment) redirect(`/judge/events/${assignment.event.slug}`);
+    if (assignment) redirect(`/judge/hackathons/${assignment.event.slug}`);
   }
 }
 
@@ -164,7 +164,7 @@ export async function saveScoresAction(
   if (!team) return { error: "Unknown team." };
 
   const rubric = await prisma.rubric.findUnique({ where: { eventId: team.event.id } });
-  if (!rubric) return { error: "No rubric for this event." };
+  if (!rubric) return { error: "No rubric for this hackathon." };
   const criteria = (rubric.criteria as unknown as Criterion[]) ?? [];
 
   const values: { criterionId: string; value: number }[] = [];
@@ -173,14 +173,14 @@ export async function saveScoresAction(
     if (raw === null) continue; // untouched criteria keep existing values
     const parsed = scoreValueSchema.safeParse(raw);
     if (!parsed.success) {
-      return { error: `Score for “${criterion.label}” must be a whole number 0–10.` };
+      return { error: `Score for “${criterion.label}” must be a whole number from 0 to 10.` };
     }
     values.push({ criterionId: criterion.id, value: parsed.data });
   }
 
   try {
     await saveScoresService(teamId.data, user.id, values);
-    revalidatePath(`/judge/events/${team.event.slug}/teams/${team.id}`);
+    revalidatePath(`/judge/hackathons/${team.event.slug}/teams/${team.id}`);
     return { message: "Scores saved." };
   } catch (error) {
     return toState(error);
@@ -209,7 +209,7 @@ export async function saveFeedbackAction(
 
   try {
     await addFeedbackService(teamId.data, user.id, kind.data, point.data);
-    revalidatePath(`/judge/events/${team.event.slug}/teams/${team.id}`);
+    revalidatePath(`/judge/hackathons/${team.event.slug}/teams/${team.id}`);
     return { message: "Feedback added." };
   } catch (error) {
     return toState(error);
@@ -224,7 +224,7 @@ export async function deleteFeedbackAction(feedbackId: string): Promise<void> {
   });
   await removeFeedback(feedbackId, user.id);
   if (feedback) {
-    revalidatePath(`/judge/events/${feedback.team.event.slug}/teams/${feedback.teamId}`);
+    revalidatePath(`/judge/hackathons/${feedback.team.event.slug}/teams/${feedback.teamId}`);
   }
 }
 
@@ -238,8 +238,8 @@ export async function finalizeTeamAction(teamId: string): Promise<JudgingActionS
 
   try {
     await finalizeReview(teamId, user.id);
-    revalidatePath(`/judge/events/${team.event.slug}`);
-    revalidatePath(`/judge/events/${team.event.slug}/teams/${teamId}`);
+    revalidatePath(`/judge/hackathons/${team.event.slug}`);
+    revalidatePath(`/judge/hackathons/${team.event.slug}/teams/${teamId}`);
     return { message: "Review finalized." };
   } catch (error) {
     return toState(error);

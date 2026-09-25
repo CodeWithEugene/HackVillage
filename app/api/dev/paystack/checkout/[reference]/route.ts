@@ -61,7 +61,7 @@ export async function GET(
     <form method="post">
       <button class="pay" type="submit">Complete simulated payment</button>
     </form>
-    <a class="cancel" href="${getEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}/organizer/events/${deposit.eventId}/vault">Cancel and go back</a>
+    <a class="cancel" href="${getEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}/organizer/hackathons/${deposit.eventId}/vault">Cancel and go back</a>
     `
   );
 }
@@ -85,7 +85,7 @@ export async function POST(
   });
 
   if (deposit && outcome.outcome !== "unknown-reference") {
-    redirect(`${getEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}/organizer/events/${deposit.eventId}/vault?deposit=success`);
+    redirect(`${getEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}/organizer/hackathons/${deposit.eventId}/vault?deposit=success`);
   }
 
   return page("Simulated payment", `<p class="brand">Paystack <span class="sim">SIMULATION</span></p><p>Payment recorded — you can close this page.</p>`);

@@ -5,7 +5,7 @@ import { Fingerprint, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const STATS = [
-  { value: "100%", label: "Escrowed before an event goes live" },
+  { value: "100%", label: "Escrowed before a hackathon goes live" },
   { value: "50%", label: "Paid the instant winners are announced" },
   { value: "1hr", label: "Trust Score target to fully settle a prize" },
 ] as const;
@@ -73,7 +73,7 @@ export function TrustImpact() {
         <div className="trust-strip-photo">
           <Image
             src="/marketing/hero/kenya/speaker.webp"
-            alt="Kenyan tech speaker sharing ideas at a developer event"
+            alt="Kenyan tech speaker sharing ideas at a hackathon"
             fill
             sizes="200px"
             className="object-cover"

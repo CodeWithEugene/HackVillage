@@ -77,7 +77,7 @@ export async function saveSubmissionAction(
 
   const { team } = membership;
   if (!submissionWindowOpen(team.event)) {
-    return { error: "The submission window has closed for this event." };
+    return { error: "The submission window has closed for this hackathon." };
   }
 
   const memberIds = team.members
@@ -110,7 +110,7 @@ export async function saveSubmissionAction(
     });
   }
 
-  const workspaceUrl = appUrl(`/events/${team.event.slug}/workspace`);
+  const workspaceUrl = appUrl(`/hackathons/${team.event.slug}/workspace`);
   for (const member of team.members.filter((m) => m.status === "JOINED")) {
     await sendNotification({
       userId: member.user.id,
@@ -120,6 +120,6 @@ export async function saveSubmissionAction(
     });
   }
 
-  revalidatePath(`/events/${team.event.slug}/workspace`);
+  revalidatePath(`/hackathons/${team.event.slug}/workspace`);
   return { message: "Submission saved." };
 }

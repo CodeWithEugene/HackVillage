@@ -23,9 +23,9 @@ export function AuthVisual() {
         <p className="auth-visual-eyebrow">✦ Prize Verified Hackathons</p>
         <p className="auth-visual-heading">Build, Ship, Win.</p>
         <p className="auth-visual-text">
-          Every prize is locked in escrow before an event goes live.
+          Every prize is locked in escrow before a hackathon goes live.
         </p>
-        <Link href="/events" className="auth-visual-primary btn-pill">
+        <Link href="/hackathons" className="auth-visual-primary btn-pill">
           <span className="btn-fill" aria-hidden />
           <span className="btn-content">
             Explore Hackathons <ArrowUpRight aria-hidden size={16} className="btn-arrow" />

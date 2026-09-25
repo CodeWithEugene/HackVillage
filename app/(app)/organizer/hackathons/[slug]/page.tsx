@@ -13,7 +13,7 @@ import { prisma } from "@/lib/db";
 import { STATUS_LABELS } from "@/lib/events/lifecycle";
 import { formatKes } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Event Command Center" };
+export const metadata: Metadata = { title: "Hackathon Command Center" };
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -73,11 +73,11 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
           </div>
           <h1 className="mt-2 font-display text-2xl font-bold text-ink">{event.title}</h1>
           <p className="mt-1 text-xs text-muted">
-            hackvillage.app/events/{event.slug}
+            hackvillage.xyz/hackathons/{event.slug}
           </p>
         </div>
         {isDraft ? (
-          <Link href={`/organizer/events/${event.slug}/edit`}>
+          <Link href={`/organizer/hackathons/${event.slug}/edit`}>
             <Button variant="secondary" arrow>Edit Draft</Button>
           </Link>
         ) : null}
@@ -116,11 +116,11 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
             <Lock aria-hidden className="size-5 text-warning" /> Waiting On The Prize Vault
           </CardTitle>
           <CardDescription>
-            This event is public as <strong>pending deposit</strong>, visible but not live.
-            Fund the vault ({formatKes(poolKes)} pool + 5% fee) and the event flips LIVE with the
+            This hackathon is public as <strong>pending deposit</strong>, visible but not live.
+            Fund the vault ({formatKes(poolKes)} pool + 5% fee) and the hackathon flips LIVE with the
             Prize Verified badge the moment the deposit confirms.
           </CardDescription>
-          <Link href={`/organizer/events/${event.slug}/vault`} className="mt-4 inline-block">
+          <Link href={`/organizer/hackathons/${event.slug}/vault`} className="mt-4 inline-block">
             <Button arrow>Open The Prize Vault</Button>
           </Link>
         </Card>
@@ -143,10 +143,10 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
             console.
           </CardDescription>
           <div className="mt-4 flex flex-wrap gap-3">
-            <Link href={`/organizer/events/${event.slug}/winners`}>
+            <Link href={`/organizer/hackathons/${event.slug}/winners`}>
               <Button arrow>Open Winners Console</Button>
             </Link>
-            <Link href={`/organizer/events/${event.slug}/media`}>
+            <Link href={`/organizer/hackathons/${event.slug}/media`}>
               <Button variant="secondary" arrow>Media Vault (48h)</Button>
             </Link>
           </div>
@@ -178,7 +178,7 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
       <Card>
         <CardTitle>Registrations ({event.registrations.length})</CardTitle>
         {event.registrations.length === 0 ? (
-          <CardDescription>Nobody has registered yet; shares of the event page help.</CardDescription>
+          <CardDescription>Nobody has registered yet; shares of the hackathon page help.</CardDescription>
         ) : (
           <ul className="mt-3 divide-y divide-ink/5">
             {event.registrations.map(({ id, user: attendee }) => (

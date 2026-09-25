@@ -55,7 +55,7 @@ export default async function HiringPage() {
           </CardTitle>
           <CardDescription>
             Join as a hiring partner to request verified introductions. It&apos;s free: you pay
-            nothing, developers pay nothing; we&apos;re paid by event organizers.
+            nothing, developers pay nothing; we&apos;re paid by hackathon organizers.
           </CardDescription>
           <Link href="/hiring/join" className="mt-4 inline-block">
             <span className="inline-flex h-11 items-center rounded-control bg-brand px-5 font-semibold text-ink">
@@ -79,8 +79,8 @@ export default async function HiringPage() {
       {talent.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="The directory fills as events conclude"
-          description="Every winner of a Prize Verified event lands here automatically: verified win, verified payout, judge endorsement."
+          title="The directory fills as hackathons conclude"
+          description="Every winner of a Prize Verified hackathon lands here automatically: verified win, verified payout, judge endorsement."
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
@@ -112,7 +112,7 @@ export default async function HiringPage() {
 
               <p className="mt-3 text-xs text-muted">
                 Won{" "}
-                <Link href={`/events/${winner.event.slug}`} className="underline">
+                <Link href={`/hackathons/${winner.event.slug}`} className="underline">
                   {winner.event.title}
                 </Link>{" "}
                 · {winner.event.org.name} · {formatKes(winner.amountKes)} verified
