@@ -3,6 +3,7 @@ import { Mail, MapPin } from "lucide-react";
 
 import { GithubMark } from "@/components/icons/github-icon";
 import { LinkedinIcon, XIcon, YoutubeIcon } from "@/components/icons/social-icons";
+import { NewsletterForm } from "@/components/patterns/newsletter-form";
 
 const GITHUB_URL = "https://github.com/CodeWithEugene/HackVillage";
 const CONTACT_EMAIL = "info@hackvillage.xyz";
@@ -88,6 +89,15 @@ export function SiteFooter() {
               </li>
             ))}
           </ul>
+          <div className="mt-8">
+            <p className="font-display text-sm font-semibold text-ink">
+              Subscribe To Our Newsletter
+            </p>
+            <p className="mt-1 mb-3 text-xs text-body-copy">
+              New hackathons and guides, straight to your inbox.
+            </p>
+            <NewsletterForm tone="light" />
+          </div>
         </div>
 
         {FOOTER_SECTIONS.map((section) => (

@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import { BlogCard } from "@/components/patterns/blog-card";
-import { CtaBanner } from "@/components/patterns/cta-banner";
 import { LegalToc } from "@/components/patterns/legal-toc";
 import { allPosts, formatPostDate, getPost, morePosts } from "@/lib/blog";
 
@@ -99,8 +98,6 @@ export default async function BlogPostPage({ params }: PageProps) {
           </div>
         </section>
       ) : null}
-
-      <CtaBanner photoSide="left" />
     </>
   );
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { BlogCard } from "@/components/patterns/blog-card";
-import { CtaBanner } from "@/components/patterns/cta-banner";
 import { allPosts } from "@/lib/blog";
 
 export const metadata: Metadata = {
@@ -34,7 +33,6 @@ export default function BlogPage() {
           ))}
         </div>
       </div>
-      <CtaBanner photoSide="left" />
     </>
   );
 }

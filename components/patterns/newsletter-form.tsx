@@ -5,20 +5,24 @@ import { Loader2 } from "lucide-react";
 
 import { subscribeAction, type SubscribeState } from "@/lib/newsletter/actions";
 
-/** Email capture for the CTA banner — a real, working newsletter signup. */
-export function NewsletterForm() {
+/**
+ * A real, working newsletter signup. `tone="light"` is for light backgrounds
+ * (the footer); the default suits the navy CTA banner.
+ */
+export function NewsletterForm({ tone = "dark" }: { tone?: "dark" | "light" }) {
+  const toneClass = tone === "light" ? " newsletter-light" : "";
   const [state, action, pending] = useActionState<SubscribeState, FormData>(subscribeAction, {});
 
   if (state.message === "subscribed") {
     return (
-      <p className="newsletter-success" role="status">
+      <p className={`newsletter-success${toneClass}`} role="status">
         You&apos;re on the list. Check your inbox for a welcome note.
       </p>
     );
   }
 
   return (
-    <form action={action} className="newsletter-form" noValidate>
+    <form action={action} className={`newsletter-form${toneClass}`} noValidate>
       <div className="newsletter-field">
         <input
           type="email"

@@ -609,6 +609,30 @@
     font-size: 13px;
     color: #ffd2d2;
   }
+  /* On light backgrounds (footer): compact, with readable error and success text. */
+  .newsletter-light.newsletter-form {
+    max-width: 340px;
+  }
+  .newsletter-light .newsletter-field {
+    padding: 5px 5px 5px 16px;
+  }
+  .newsletter-light .newsletter-input {
+    font-size: 14px;
+  }
+  .newsletter-light .newsletter-submit {
+    height: 34px;
+    min-width: 88px;
+    padding-inline: 14px;
+  }
+  .newsletter-light .newsletter-error {
+    color: var(--color-danger);
+  }
+  .newsletter-light.newsletter-success {
+    max-width: 340px;
+    background: color-mix(in srgb, var(--color-brand) 12%, transparent);
+    color: var(--color-ink);
+    font-size: 14px;
+  }
   .newsletter-success {
     max-width: 440px;
     padding: 14px 20px;
