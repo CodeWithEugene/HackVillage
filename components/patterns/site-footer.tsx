@@ -101,6 +101,13 @@ export function SiteFooter() {
               </span>
             </li>
           </ul>
+          <p className="mt-6 text-sm text-body-copy">In partnership with:</p>
+          {/* eslint-disable-next-line @next/next/no-img-element -- SVG wordmark, no raster source */}
+          <img
+            src="/images/salamander-logo-yellow.svg"
+            alt="Salamander Tech Hub"
+            className="mt-3 h-9 w-auto"
+          />
         </div>
       </div>
 
