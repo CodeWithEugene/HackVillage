@@ -3,12 +3,8 @@
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { FormError, FormSuccess, Label, Textarea } from "@/components/ui/input";
-import {
-  initiateDepositAction,
-  requestKybAction,
-  type EscrowActionState,
-} from "@/services/escrow/actions";
+import { FormError } from "@/components/ui/input";
+import { initiateDepositAction, type EscrowActionState } from "@/services/escrow/actions";
 
 export function FundVaultForm({
   eventId,
@@ -38,37 +34,12 @@ export function FundVaultForm({
         </p>
       )}
       {state.error === "KYB_REQUIRED" ? (
-        <FormError message="Your organization needs verified KYB first. Request it below." />
+        <FormError message="Your organization needs to be verified first. Open Verification from your organizer page." />
       ) : (
         <FormError message={state.error} />
       )}
       <Button type="submit" loading={pending} disabled={Boolean(disabled)}>
         Fund The Prize Vault
-      </Button>
-    </form>
-  );
-}
-
-export function KybRequestForm({ orgId }: { orgId: string }) {
-  const [state, action, pending] = useActionState<EscrowActionState, FormData>(
-    requestKybAction,
-    {}
-  );
-
-  return (
-    <form action={action} className="space-y-4">
-      <input type="hidden" name="orgId" value={orgId} />
-      <p className="text-sm text-muted">
-        Business verification (KYB) is required before your first deposit. It is a Central Bank of
-        Kenya compliance step handled through our licensed payment partner. Platform staff review
-        requests within 48 hours.
-      </p>
-      <Label htmlFor={`kyb-note-${orgId}`}>Anything that helps the review (optional)</Label>
-      <Textarea id={`kyb-note-${orgId}`} name="note" maxLength={2000} placeholder="Registration number, website, socials…" />
-      <FormError message={state.error} />
-      <FormSuccess message={state.message} />
-      <Button type="submit" variant="secondary" loading={pending}>
-        Request KYB Review
       </Button>
     </form>
   );

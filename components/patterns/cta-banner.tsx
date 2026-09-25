@@ -5,13 +5,13 @@ import { NewsletterForm } from "@/components/patterns/newsletter-form";
 /**
  * Final marketing CTA: a solid navy card split in half, the platform's core
  * promise plus a working newsletter signup on the left, a full-bleed photo
- * on the right. Browse Events and the build plan are already one click away
+ * on the right (or the left, with photoSide). Browse Events and the build plan are already one click away
  * from the nav and footer, so this section's one job is the list.
  */
-export function CtaBanner() {
+export function CtaBanner({ photoSide = "right" }: { photoSide?: "left" | "right" }) {
   return (
     <section className="site-container pb-20">
-      <div className="cta-banner">
+      <div className={`cta-banner${photoSide === "left" ? " cta-banner-photo-left" : ""}`}>
         <div className="cta-banner-content">
           <p className="cta-banner-eyebrow">Stay In The Loop</p>
           <h2 className="cta-banner-heading">

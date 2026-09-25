@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormError, Input, Label } from "@/components/ui/input";
 import { signUpAction, type AuthActionState } from "@/lib/auth/actions";
+import type { SignUpRole } from "@/lib/auth/signup-links";
 
 const ROLES = [
   {
@@ -26,26 +27,31 @@ const ROLES = [
 ] as const;
 
 export function SignUpForm({
+  initialRole = "DEVELOPER",
   googleEnabled,
   githubEnabled,
 }: {
+  initialRole?: SignUpRole;
   googleEnabled: boolean;
   githubEnabled: boolean;
 }) {
   const [state, action, pending] = useActionState<AuthActionState, FormData>(signUpAction, {});
-  const [role, setRole] = useState<"DEVELOPER" | "ORGANIZER">("DEVELOPER");
+  const [role, setRole] = useState<SignUpRole>(initialRole);
 
   return (
     <Card>
       <h1 className="font-display text-2xl font-bold text-ink">Create Your Account</h1>
       <p className="mt-1 text-sm text-muted">
-        One account, many roles: you can add organizer or judge access later.
+        {role === "ORGANIZER"
+          ? "Start with your own account. Next, you'll set up your organization."
+          : "One account, many roles: you can add organizer or judge access later."}
       </p>
 
       <OAuthButtons
         googleEnabled={googleEnabled}
         githubEnabled={githubEnabled}
-        redirectTo="/dashboard"
+        // OAuth accounts start as developers; organizer setup grants the organizer role.
+        redirectTo={role === "ORGANIZER" ? "/onboarding/organizer" : "/dashboard"}
       />
 
       <form action={action} className="mt-6 space-y-5">
@@ -84,19 +90,23 @@ export function SignUpForm({
           <Input id="email" name="email" type="email" autoComplete="email" required />
         </div>
 
-        <div>
-          <Label htmlFor="handle">Handle (optional)</Label>
-          <Input
-            id="handle"
-            name="handle"
-            placeholder="your public profile address"
-            maxLength={30}
-          />
-          <p className="mt-1.5 text-xs text-muted">
-            hackvillage.xyz/developers/<span className="font-mono">your-handle</span>. Leave blank
-            and we&apos;ll suggest one from your email.
-          </p>
-        </div>
+        {/* Organizers appear under their organization, so they skip the builder handle;
+            the server still suggests one from the email. */}
+        {role === "DEVELOPER" ? (
+          <div>
+            <Label htmlFor="handle">Handle (optional)</Label>
+            <Input
+              id="handle"
+              name="handle"
+              placeholder="your public profile address"
+              maxLength={30}
+            />
+            <p className="mt-1.5 text-xs text-muted">
+              hackvillage.xyz/developers/<span className="font-mono">your-handle</span>. Leave blank
+              and we&apos;ll suggest one from your email.
+            </p>
+          </div>
+        ) : null}
 
         <div>
           <Label htmlFor="password">Password</Label>

@@ -56,11 +56,7 @@ export default async function AdminOrganizationsPage() {
                   <Badge variant="neutral">Trust {org.trustScore}</Badge>
                 </div>
               </div>
-              <OrgProfileForm
-                org={{ id: org.id, name: org.name, about: org.about }}
-                mode="admin"
-                nameEditable
-              />
+              <OrgProfileForm org={org} mode="admin" nameEditable />
             </Card>
           </li>
         ))}

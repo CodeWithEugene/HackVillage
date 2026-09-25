@@ -4,13 +4,22 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardTitle } from "@/components/ui/card";
 import { KybDecisionForm } from "@/components/admin/kyb-decision-form";
 import { prisma } from "@/lib/db";
+import { formatOrgLocation, isOrgKind, ORG_KIND_LABELS } from "@/lib/orgs/details";
+import { KYB_REQUIREMENTS } from "@/lib/orgs/kyb";
 
 export const metadata: Metadata = { title: "Admin · KYB" };
 
 export default async function AdminKybPage() {
   const orgs = await prisma.organization.findMany({
     where: { kycStatus: { in: ["PENDING", "FAILED"] } },
-    include: { members: { where: { role: "OWNER", status: "ACTIVE" }, take: 1, include: { user: { select: { email: true } } } } },
+    include: {
+      members: {
+        where: { role: "OWNER", status: "ACTIVE" },
+        take: 1,
+        include: { user: { select: { email: true } } },
+      },
+      kybSubmission: true,
+    },
     orderBy: [{ kycStatus: "desc" }, { updatedAt: "desc" }],
   });
 
@@ -50,12 +59,75 @@ export default async function AdminKybPage() {
                     {org.kycStatus.toLowerCase()}
                   </Badge>
                 </div>
+                <SubmissionDetails org={org} />
                 <KybDecisionForm orgId={org.id} />
               </Card>
             </li>
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+interface ReviewOrg {
+  kind: string | null;
+  city: string | null;
+  country: string | null;
+  website: string | null;
+  socialUrl: string | null;
+  contactPhone: string | null;
+  kybSubmission: {
+    legalName: string;
+    registrationNumber: string;
+    kraPin: string | null;
+    signatoryName: string;
+    signatoryRole: string;
+    notes: string | null;
+    submittedAt: Date;
+    reviewNote: string | null;
+  } | null;
+}
+
+/** What the organizer sent, next to their profile details, for the reviewer to check. */
+function SubmissionDetails({ org }: { org: ReviewOrg }) {
+  const kind = isOrgKind(org.kind) ? org.kind : null;
+  const submission = org.kybSubmission;
+  const rows: Array<[string, string | null]> = [
+    ["Kind", kind ? ORG_KIND_LABELS[kind] : null],
+    ["Location", formatOrgLocation(org)],
+    ["Contact phone", org.contactPhone],
+    ["Website", org.website],
+    ["Social", org.socialUrl],
+  ];
+  if (submission) {
+    rows.push(
+      ["Legal name", submission.legalName],
+      [kind ? KYB_REQUIREMENTS[kind].registrationLabel : "Registration number", submission.registrationNumber],
+      ["KRA PIN", submission.kraPin],
+      ["Signatory", `${submission.signatoryName}, ${submission.signatoryRole}`],
+      ["Submitted", submission.submittedAt.toISOString().slice(0, 16).replace("T", " ") + " UTC"],
+      ["Organizer notes", submission.notes],
+      ["Last review note", submission.reviewNote],
+    );
+  }
+
+  return (
+    <div className="mt-4">
+      {submission ? null : (
+        <p className="mb-2 text-xs font-semibold text-warning">
+          Requested before structured details existed. Reject with a note asking for their
+          details, and they can resubmit from their Verification page.
+        </p>
+      )}
+      <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+        {rows.map(([label, value]) => (
+          <div key={label} className="min-w-0">
+            <dt className="text-xs text-muted">{label}</dt>
+            <dd className="break-words text-ink">{value ?? "Not given"}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   );
 }

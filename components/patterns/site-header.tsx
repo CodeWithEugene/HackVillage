@@ -5,6 +5,7 @@ import { MobileNav } from "@/components/patterns/mobile-nav";
 import { NavDropdown } from "@/components/patterns/nav-dropdown";
 import { NavLink } from "@/components/patterns/nav-link";
 import { ThemeSwitcher } from "@/components/patterns/theme-switcher";
+import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -19,11 +20,14 @@ const NAV_LINKS: NavItem[] = [
 ];
 
 const ORGANIZER_LINKS: NavItem[] = [
-  { href: "/onboarding/organizer", label: "Host A Hackathon" },
+  { href: HOST_HACKATHON_HREF, label: "Host A Hackathon" },
   { href: "/how-escrow-works", label: "How Escrow Works" },
 ];
 
-const CONTRIBUTE_LINK: NavItem = { href: "/contribute", label: "Contribute" };
+const TRAILING_LINKS: NavItem[] = [
+  { href: "/contribute", label: "Contribute" },
+  { href: "/blog", label: "Blog" },
+];
 
 export function SiteHeader({ className }: { className?: string }) {
   return (
@@ -45,9 +49,11 @@ export function SiteHeader({ className }: { className?: string }) {
             </NavLink>
           ))}
           <NavDropdown label="Organizers" items={ORGANIZER_LINKS} />
-          <NavLink href={CONTRIBUTE_LINK.href} className="site-nav-link">
-            {CONTRIBUTE_LINK.label}
-          </NavLink>
+          {TRAILING_LINKS.map((link) => (
+            <NavLink key={link.href} href={link.href} className="site-nav-link">
+              {link.label}
+            </NavLink>
+          ))}
         </nav>
         <div className="site-header-actions">
           <a
@@ -71,7 +77,7 @@ export function SiteHeader({ className }: { className?: string }) {
           <MobileNav
             navLinks={NAV_LINKS}
             organizerLinks={ORGANIZER_LINKS}
-            contributeLink={CONTRIBUTE_LINK}
+            trailingLinks={TRAILING_LINKS}
           />
         </div>
       </div>

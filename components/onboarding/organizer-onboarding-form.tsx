@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 
+import { OrgDetailsFields } from "@/components/organizer/org-details-fields";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormError, Input, Label, Textarea } from "@/components/ui/input";
@@ -35,8 +36,8 @@ export function OrganizerOnboardingForm({
           {existingOrgName ? `Welcome, ${name.split(" ")[0]}` : "Set up your organization"}
         </h1>
         <p className="mt-1 text-sm text-muted">
-          Organizations run hackathons and hold escrowed prize pools. Your KYB (business verification)
-          is collected later, only when you fund your first hackathon.
+          Organizations run hackathons and hold escrowed prize pools. Tell us who you are here. Next,
+          you can verify your organization so you&apos;re ready to fund your first hackathon.
         </p>
 
         {existingOrgName ? (
@@ -87,6 +88,7 @@ export function OrganizerOnboardingForm({
                 This is the public name participants see on your hackathons and trust page.
               </p>
             </div>
+            <OrgDetailsFields />
             <div>
               <Label htmlFor="about">About (optional)</Label>
               <Textarea

@@ -29,6 +29,15 @@ enum Role {
   ADMIN
 }
 
+/// What kind of body an organization is; decides which verification details apply.
+enum OrgKind {
+  COMPANY
+  UNIVERSITY
+  COMMUNITY
+  NGO
+  GOVERNMENT
+}
+
 /// Organizer organization KYB status — gate for the first deposit (Phase 3).
 enum KycStatus {
   NONE
@@ -227,6 +236,13 @@ model Organization {
   slug       String    @unique
   logoUrl    String?
   about      String?
+  kind       OrgKind?
+  city       String?
+  country    String?
+  website    String?
+  socialUrl  String?
+  /// Private: for the HackVillage team only, never shown on public pages.
+  contactPhone String?
   ownerId    String
   kycStatus  KycStatus @default(NONE)
   // 100 + Σ TrustEvents (floor 0) — maintained by the trust service (Phase 7).
@@ -239,6 +255,30 @@ model Organization {
   invitations OrgInvitation[]
   events Event[]
   trustEvents TrustEvent[]
+  kybSubmission KybSubmission?
+}
+
+/// The business details an organization submits for KYB review. One per
+/// organization, replaced on resubmission; the audit log keeps the history.
+/// Private: shown only to the organization's owners/admins and HackVillage admins.
+model KybSubmission {
+  id                 String    @id @default(cuid())
+  orgId              String    @unique
+  legalName          String
+  registrationNumber String
+  kraPin             String?
+  signatoryName      String
+  signatoryRole      String
+  notes              String?
+  submittedById      String
+  submittedAt        DateTime
+  reviewedAt         DateTime?
+  /// The reviewer's note back to the organizer (always set on rejection).
+  reviewNote         String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 }
 
 model OrgMember {

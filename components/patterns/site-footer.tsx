@@ -3,6 +3,8 @@ import { Mail, MapPin } from "lucide-react";
 
 import { GithubMark } from "@/components/icons/github-icon";
 import { LinkedinIcon, XIcon, YoutubeIcon } from "@/components/icons/social-icons";
+import { NewsletterForm } from "@/components/patterns/newsletter-form";
+import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 
 const GITHUB_URL = "https://github.com/CodeWithEugene/HackVillage";
 const CONTACT_EMAIL = "info@hackvillage.xyz";
@@ -36,6 +38,7 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
     links: [
       { label: "GitHub", href: GITHUB_URL },
       { label: "Contributing", href: "/contribute" },
+      { label: "Blog", href: "/blog" },
       { label: "Code of Conduct", href: `${GITHUB_URL}/blob/main/CODE_OF_CONDUCT.md` },
       { label: "Security", href: `${GITHUB_URL}/blob/main/SECURITY.md` },
       { label: "License", href: `${GITHUB_URL}/blob/main/LICENSE` },
@@ -46,7 +49,7 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
     links: [
       { label: "Sign in", href: "/signin" },
       { label: "Create an account", href: "/signup" },
-      { label: "Host a hackathon", href: "/onboarding/organizer" },
+      { label: "Host a hackathon", href: HOST_HACKATHON_HREF },
     ],
   },
 ];
@@ -87,6 +90,15 @@ export function SiteFooter() {
               </li>
             ))}
           </ul>
+          <div className="mt-8">
+            <p className="font-display text-sm font-semibold text-ink">
+              Subscribe To Our Newsletter
+            </p>
+            <p className="mt-1 mb-3 text-xs text-body-copy">
+              New hackathons and guides, straight to your inbox.
+            </p>
+            <NewsletterForm tone="light" />
+          </div>
         </div>
 
         {FOOTER_SECTIONS.map((section) => (

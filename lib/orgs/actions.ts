@@ -21,8 +21,14 @@ function revalidateOrgSurfaces(): void {
   revalidatePath("/hackathons", "layout");
 }
 
+const DETAIL_FIELDS = ["kind", "city", "country", "website", "socialUrl", "contactPhone"];
+
 function profileInput(formData: FormData) {
-  return { about: formData.get("about"), name: formData.get("name") ?? undefined };
+  // The profile form always sends the details block; its presence is marked by "city".
+  const details = formData.has("city")
+    ? Object.fromEntries(DETAIL_FIELDS.map((field) => [field, formData.get(field) ?? undefined]))
+    : undefined;
+  return { about: formData.get("about"), name: formData.get("name") ?? undefined, details };
 }
 
 async function runProfileUpdate(

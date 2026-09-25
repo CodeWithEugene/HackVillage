@@ -46,6 +46,11 @@ export async function decideKybAction(
       where: { id: orgId },
       data: { kycStatus: decision === "APPROVE" ? "VERIFIED" : "FAILED" },
     }),
+    // Organizations that asked before structured submissions have no row; updateMany skips them.
+    prisma.kybSubmission.updateMany({
+      where: { orgId },
+      data: { reviewedAt: new Date(), reviewNote: reason || null },
+    }),
     prisma.auditLog.create({
       data: {
         actorId: admin.id,

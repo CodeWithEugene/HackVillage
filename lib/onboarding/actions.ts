@@ -11,6 +11,7 @@ import { prisma } from "@/lib/db";
 import { sendMail } from "@/lib/ports/mail";
 import { orgInviteEmail, orgMemberJoinedEmail } from "@/lib/notifications/templates/organizations";
 import { appUrl } from "@/lib/url";
+import { parseOrgDetails } from "@/lib/orgs/details";
 
 async function notifyOwnerOfNewMember(orgId: string, memberName: string): Promise<void> {
   const org = await prisma.organization.findUnique({
@@ -133,6 +134,17 @@ const createOrgSchema = z.object({
   about: z.string().trim().max(2000).optional(),
 });
 
+function orgDetailsInput(formData: FormData) {
+  return {
+    kind: formData.get("kind"),
+    city: formData.get("city"),
+    country: formData.get("country"),
+    website: formData.get("website"),
+    socialUrl: formData.get("socialUrl"),
+    contactPhone: formData.get("contactPhone"),
+  };
+}
+
 const RESERVED_ORG_SLUGS = new Set([
   "admin", "api", "auth", "dashboard", "developers", "events", "hackathons", "hiring",
   "judge", "organizer", "orgs", "settings", "signin", "signup", "support", "trust",
@@ -164,10 +176,15 @@ export async function createOrganizationAction(
   formData: FormData
 ): Promise<OnboardingActionState> {
   const user = await requireUser();
-  const parsed = createOrgSchema.safeParse(Object.fromEntries(formData));
+  const parsed = createOrgSchema.safeParse({
+    name: formData.get("name"),
+    about: formData.get("about") ?? undefined,
+  });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Check the form and try again." };
   }
+  const details = parseOrgDetails(orgDetailsInput(formData));
+  if (!details.ok) return { error: details.error };
 
   const existingMembership = await prisma.orgMember.findFirst({
     where: { userId: user.id, status: "ACTIVE" },
@@ -188,6 +205,7 @@ export async function createOrganizationAction(
         name: parsed.data.name,
         slug,
         about: parsed.data.about || null,
+        ...details.data,
         ownerId: user.id,
       },
     });
@@ -205,7 +223,7 @@ export async function createOrganizationAction(
     });
   });
 
-  redirect("/organizer");
+  redirect("/organizer/verification?welcome=1");
 }
 
 export async function joinOrganizationAction(

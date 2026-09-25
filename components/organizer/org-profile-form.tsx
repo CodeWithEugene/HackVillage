@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 
+import { OrgDetailsFields, type OrgDetailsValues } from "@/components/organizer/org-details-fields";
 import { Button } from "@/components/ui/button";
 import { FormError, FormSuccess, Input, Label, Textarea } from "@/components/ui/input";
 import {
@@ -12,13 +13,15 @@ import {
 import { ORG_ABOUT_MAX } from "@/lib/orgs/profile";
 
 interface OrgProfileFormProps {
-  org: { id: string; name: string; about: string | null };
+  org: { id: string; name: string; about: string | null } & OrgDetailsValues;
   /** "admin" is the HackVillage team editing on an organizer's behalf. */
   mode: "organizer" | "admin";
   nameEditable: boolean;
+  /** Verified organizations keep the kind KYB checked. */
+  kindLocked?: boolean;
 }
 
-export function OrgProfileForm({ org, mode, nameEditable }: OrgProfileFormProps) {
+export function OrgProfileForm({ org, mode, nameEditable, kindLocked = false }: OrgProfileFormProps) {
   const [state, action, pending] = useActionState<OrgProfileState, FormData>(
     mode === "admin" ? adminUpdateOrgProfileAction : updateOrgProfileAction,
     {}
@@ -35,6 +38,13 @@ export function OrgProfileForm({ org, mode, nameEditable }: OrgProfileFormProps)
           <Input id={fieldId("name")} name="name" defaultValue={org.name} maxLength={80} required />
         </div>
       ) : null}
+
+      <OrgDetailsFields
+        values={org}
+        idSuffix={`-${org.id}`}
+        kindLocked={kindLocked}
+        allowBlank={mode === "admin"}
+      />
 
       <div className="space-y-1.5">
         <Label htmlFor={fieldId("about")}>About</Label>

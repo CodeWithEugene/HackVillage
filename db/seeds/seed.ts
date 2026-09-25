@@ -36,16 +36,24 @@ async function main(): Promise<void> {
 
   const ORG_ABOUT =
     "Technetium Kenya runs community-first hackathons across Nairobi, Kisumu, and Mombasa. We partner with local hubs, universities, and employers so every build tackles a real Kenyan problem.\n\nEvery prize pool is escrowed before a hackathon goes live, winners are paid on the day, and every team leaves with feedback from the judges.";
+  const orgDetails = {
+    kind: "COMPANY",
+    city: "Nairobi",
+    country: "Kenya",
+    website: "https://www.technetium.co.ke/",
+  } as const;
   const org = await prisma.organization.upsert({
     where: { slug: "technetium-kenya" },
     create: {
       name: "Technetium Kenya",
       slug: "technetium-kenya",
       about: ORG_ABOUT,
+      ...orgDetails,
       ownerId: organizer.id,
       kycStatus: "VERIFIED",
     },
-    update: {},
+    // Reseeding fills in the public details on an existing demo organization.
+    update: orgDetails,
   });
   await prisma.orgMember.upsert({
     where: { orgId_userId: { orgId: org.id, userId: organizer.id } },

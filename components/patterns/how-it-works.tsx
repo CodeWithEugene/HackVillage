@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { Sparkle } from "@/components/patterns/sparkle";
+import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 
 const STEPS = [
   {
@@ -75,7 +76,7 @@ export function HowItWorks({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2"
               Browse Hackathons <ArrowUpRight aria-hidden="true" size={17} className="btn-arrow" />
             </span>
           </Link>
-          <Link href="/onboarding/organizer" className="hero-action-secondary btn-pill">
+          <Link href={HOST_HACKATHON_HREF} className="hero-action-secondary btn-pill">
             Host A Hackathon <ArrowUpRight aria-hidden="true" size={16} className="btn-arrow" />
           </Link>
         </div>

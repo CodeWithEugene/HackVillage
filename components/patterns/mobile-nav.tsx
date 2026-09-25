@@ -15,7 +15,7 @@ interface NavLinkItem {
 interface MobileNavProps {
   navLinks: NavLinkItem[];
   organizerLinks: NavLinkItem[];
-  contributeLink: NavLinkItem;
+  trailingLinks: NavLinkItem[];
 }
 
 /**
@@ -31,7 +31,7 @@ interface MobileNavProps {
  * otherwise shrink the overlay down to the header's own height instead
  * of covering the full viewport (and break click-outside-to-close).
  */
-export function MobileNav({ navLinks, organizerLinks, contributeLink }: MobileNavProps) {
+export function MobileNav({ navLinks, organizerLinks, trailingLinks }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -131,15 +131,17 @@ export function MobileNav({ navLinks, organizerLinks, contributeLink }: MobileNa
                 </ul>
 
                 <ul className="mobile-nav-list">
-                  <li>
-                    <NavLink
-                      href={contributeLink.href}
-                      className="mobile-nav-link"
-                      onClick={() => setOpen(false)}
-                    >
-                      {contributeLink.label}
-                    </NavLink>
-                  </li>
+                  {trailingLinks.map((link) => (
+                    <li key={link.href}>
+                      <NavLink
+                        href={link.href}
+                        className="mobile-nav-link"
+                        onClick={() => setOpen(false)}
+                      >
+                        {link.label}
+                      </NavLink>
+                    </li>
+                  ))}
                 </ul>
               </nav>
             </>,
