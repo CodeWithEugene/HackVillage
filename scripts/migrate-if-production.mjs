@@ -16,8 +16,9 @@ import { execSync } from "node:child_process";
  * pooler the unlock can land on a different server connection, so the lock
  * leaked onto a pooled connection (later used by pg-boss) and the next deploy
  * timed out with P1002. The direct URL is derived from DATABASE_URL itself
- * (Neon's pooled host is the direct host plus "-pooler"). DATABASE_URL_UNPOOLED
- * is not used: on this project it points at a different database.
+ * (Neon's pooled host is the direct host plus "-pooler"), not from a separate
+ * variable: the old DATABASE_URL_UNPOOLED pointed at a different database and
+ * was removed.
  */
 export function directDatabaseUrl(databaseUrl) {
   const url = new URL(databaseUrl);
