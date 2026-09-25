@@ -13,7 +13,7 @@ const TYPE_LABELS: Record<string, { title: string; detail: (payload: Record<stri
   "media.penalty": {
     title: "Trust Penalty: Media Deadline",
     detail: (p) =>
-      `−10 for missing the 48-hour gallery on ${String(p.eventTitle ?? "an event")}.`,
+      `−10 for missing the 48-hour gallery on ${String(p.eventTitle ?? "a hackathon")}.`,
   },
 };
 

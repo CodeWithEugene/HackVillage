@@ -112,7 +112,7 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
         <div className={visible(0)}>
           <Card className="space-y-5">
             <div>
-              <Label htmlFor="title">Event title</Label>
+              <Label htmlFor="title">Hackathon title</Label>
               <Input id="title" name="title" required maxLength={120} defaultValue={defaults?.title ?? ""} placeholder="Fintech for Matatu Culture" />
             </div>
             <div>
@@ -236,7 +236,7 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
               <Plus aria-hidden className="size-4" /> Add place
             </Button>
             <p className="text-xs text-muted">
-              The prize pool is the sum of all places. It is deposited in full before the event
+              The prize pool is the sum of all places. It is deposited in full before the hackathon
               goes live, plus a 5% organizer platform fee at deposit time.
             </p>
           </Card>
@@ -287,7 +287,7 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
             </Button>
           ) : (
             <Button type="submit" loading={pending}>
-              {defaults?.eventId ? "Save Draft" : "Create Draft Event"}
+              {defaults?.eventId ? "Save Draft" : "Create Draft Hackathon"}
             </Button>
           )}
         </div>

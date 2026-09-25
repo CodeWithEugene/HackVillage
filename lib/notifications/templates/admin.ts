@@ -16,14 +16,14 @@ export function ledgerReconciliationDigestEmail(
       preheader: "The nightly reconciliation sweep needs a look.",
       section: {
         heading: "Reconciliation Findings",
-        bodyHtml: `<p style="margin:0;">Last night's ledger reconciliation checked ${checkedEvents} events and found ${findingCount} issue${findingCount === 1 ? "" : "s"}.</p>
+        bodyHtml: `<p style="margin:0;">Last night's ledger reconciliation checked ${checkedEvents} hackathons and found ${findingCount} issue${findingCount === 1 ? "" : "s"}.</p>
           <ul style="margin:12px 0 0;padding-left:20px;text-align:left;">${rows}</ul>`,
         ctaUrl: url,
         ctaLabel: "Open The Trust Ledger",
       },
     }),
     text: renderText([
-      `Last night's ledger reconciliation checked ${checkedEvents} events and found ${findingCount} issues.`,
+      `Last night's ledger reconciliation checked ${checkedEvents} hackathons and found ${findingCount} issues.`,
       ...findings.map((f) => `${f.kind}: ${f.detail}`),
       url,
     ]),

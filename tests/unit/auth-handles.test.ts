@@ -30,6 +30,7 @@ describe("validateHandle", () => {
     expect(validateHandle("trust")).toContain("reserved");
     expect(validateHandle("dashboard")).toContain("reserved");
     expect(RESERVED_HANDLES.has("events")).toBe(true);
+    expect(validateHandle("hackathons")).toContain("reserved");
   });
 });
 

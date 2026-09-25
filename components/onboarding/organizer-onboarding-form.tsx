@@ -35,8 +35,8 @@ export function OrganizerOnboardingForm({
           {existingOrgName ? `Welcome, ${name.split(" ")[0]}` : "Set up your organization"}
         </h1>
         <p className="mt-1 text-sm text-muted">
-          Organizations run events and hold escrowed prize pools. Your KYB (business verification)
-          is collected later, only when you fund your first event.
+          Organizations run hackathons and hold escrowed prize pools. Your KYB (business verification)
+          is collected later, only when you fund your first hackathon.
         </p>
 
         {existingOrgName ? (
@@ -84,7 +84,7 @@ export function OrganizerOnboardingForm({
                 placeholder="Technetium Kenya"
               />
               <p className="mt-1.5 text-xs text-muted">
-                This is the public name participants see on your events and trust page.
+                This is the public name participants see on your hackathons and trust page.
               </p>
             </div>
             <div>

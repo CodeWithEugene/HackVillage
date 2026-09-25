@@ -18,9 +18,9 @@ export function CtaBanner() {
             Organizers ghost winners. <span>We fixed that.</span>
           </h2>
           <p className="cta-banner-text">
-            Deposits are locked before the event starts, payouts are recorded on a public ledger,
+            Deposits are locked before the hackathon starts, payouts are recorded on a public ledger,
             and every submission builds a permanent Proof-of-Work portfolio. Subscribe for new
-            Prize Verified events as they open.
+            Prize Verified hackathons as they open.
           </p>
           <NewsletterForm />
         </div>

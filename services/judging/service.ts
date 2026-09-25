@@ -38,7 +38,7 @@ async function requireOrgAdmin(eventId: string, userId: string) {
     where: { id: eventId },
     include: { org: { include: { members: { where: { userId, status: "ACTIVE" } } } } },
   });
-  if (!event) throw new JudgingError("Event not found.", "NOT_FOUND");
+  if (!event) throw new JudgingError("Hackathon not found.", "NOT_FOUND");
   const membership = event.org.members[0];
   if (!membership || membership.role === "MEMBER") {
     throw new JudgingError("Only organization admins can manage judging.", "FORBIDDEN");
@@ -51,7 +51,7 @@ async function requireActiveJudge(eventId: string, userId: string) {
     where: { eventId, userId, status: "ACTIVE" },
   });
   if (!assignment) {
-    throw new JudgingError("You're not an active judge for this event.", "NOT_ACTIVE_JUDGE");
+    throw new JudgingError("You're not an active judge for this hackathon.", "NOT_ACTIVE_JUDGE");
   }
   return assignment;
 }
@@ -77,7 +77,7 @@ export async function inviteJudge(
   });
   if (participation) {
     throw new JudgingError(
-      "That developer is participating — judges can't judge their own event.",
+      "That developer is participating, and judges can't judge their own hackathon.",
       "WRONG_STATE"
     );
   }
@@ -152,7 +152,7 @@ export async function saveRubric(
   }
   const total = criteria.reduce((sum, criterion) => sum + criterion.weight, 0);
   if (total !== 100) {
-    throw new JudgingError(`Weights add up to ${total} — they must total 100.`, "WRONG_STATE");
+    throw new JudgingError(`Weights add up to ${total}, but they must total 100.`, "WRONG_STATE");
   }
 
   await prisma.rubric.upsert({
@@ -165,10 +165,10 @@ export async function saveRubric(
 export async function openJudging(eventId: string, organizerId: string): Promise<void> {
   const event = await requireOrgAdmin(eventId, organizerId);
   if (event.status !== "LIVE" && event.status !== "IN_PROGRESS") {
-    throw new JudgingError("Judging opens after a live event.", "WRONG_STATE");
+    throw new JudgingError("Judging opens after a live hackathon.", "WRONG_STATE");
   }
   if (event.endsAt.getTime() > Date.now()) {
-    throw new JudgingError("The event hasn't ended yet.", "WRONG_STATE");
+    throw new JudgingError("The hackathon hasn't ended yet.", "WRONG_STATE");
   }
 
   await prisma.$transaction(async (tx) => {
@@ -204,7 +204,7 @@ async function requireScoreable(teamId: string, judgeId: string) {
   });
   if (!team) throw new JudgingError("Team not found.", "NOT_FOUND");
   if (team.event.status !== "JUDGING") {
-    throw new JudgingError("Judging isn't open for this event.", "WRONG_STATE");
+    throw new JudgingError("Judging isn't open for this hackathon.", "WRONG_STATE");
   }
   await requireActiveJudge(team.event.id, judgeId);
 
@@ -212,7 +212,7 @@ async function requireScoreable(teamId: string, judgeId: string) {
     where: { judgeId_teamId: { judgeId, teamId } },
   });
   if (progress?.finalizedAt) {
-    throw new JudgingError("Your review is finalized — it's locked.", "ALREADY_FINALIZED");
+    throw new JudgingError("Your review is finalized, so it's locked.", "ALREADY_FINALIZED");
   }
   return team;
 }
@@ -225,7 +225,7 @@ export async function saveScores(
   const team = await requireScoreable(teamId, judgeId);
 
   const rubric = await prisma.rubric.findUnique({ where: { eventId: team.event.id } });
-  if (!rubric) throw new JudgingError("No rubric for this event.", "WRONG_STATE");
+  if (!rubric) throw new JudgingError("No rubric for this hackathon.", "WRONG_STATE");
   const criteria = (rubric.criteria as unknown as Criterion[]) ?? [];
   const validIds = new Set(criteria.map((c) => c.id));
   for (const entry of values) {
@@ -282,7 +282,7 @@ export async function finalizeReview(teamId: string, judgeId: string): Promise<v
   });
   if (!team) throw new JudgingError("Team not found.", "NOT_FOUND");
   if (team.event.status !== "JUDGING") {
-    throw new JudgingError("Judging isn't open for this event.", "WRONG_STATE");
+    throw new JudgingError("Judging isn't open for this hackathon.", "WRONG_STATE");
   }
   await requireActiveJudge(team.event.id, judgeId);
 
@@ -298,14 +298,14 @@ export async function finalizeReview(teamId: string, judgeId: string): Promise<v
     prisma.score.findMany({ where: { judgeId, teamId } }),
     prisma.feedback.findMany({ where: { judgeId, teamId } }),
   ]);
-  if (!rubric) throw new JudgingError("No rubric for this event.", "WRONG_STATE");
+  if (!rubric) throw new JudgingError("No rubric for this hackathon.", "WRONG_STATE");
 
   const criteria = (rubric.criteria as unknown as Criterion[]) ?? [];
   const scoredIds = new Set(scores.map((score) => score.criterionId));
   const missing = criteria.filter((criterion) => !scoredIds.has(criterion.id));
   if (missing.length > 0) {
     throw new JudgingError(
-      `Score every criterion first — missing: ${missing.map((m) => m.label).join(", ")}.`,
+      `Score every criterion first. Missing: ${missing.map((m) => m.label).join(", ")}.`,
       "SCORES_INCOMPLETE"
     );
   }

@@ -13,5 +13,5 @@ export async function POST(
 ) {
   const { slug } = await params;
   await registerForEventAction(slug);
-  return NextResponse.redirect(new URL(`/events/${slug}/workspace`, _request.url), 303);
+  return NextResponse.redirect(new URL(`/hackathons/${slug}/workspace`, _request.url), 303);
 }

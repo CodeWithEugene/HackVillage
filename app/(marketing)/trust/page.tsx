@@ -60,8 +60,8 @@ export default async function TrustPage() {
       {entries.length === 0 ? (
         <EmptyState
           icon={ShieldCheck}
-          title="The ledger starts with the first deposit"
-          description="When an organizer funds a Prize Vault, the lock lands here: event, amount, payment reference, and chain transaction, for anyone to audit."
+          title="The Ledger Starts With The First Deposit"
+          description="When an organizer funds a Prize Vault, the lock lands here: hackathon, amount, payment reference, and chain transaction, for anyone to audit."
         />
       ) : (
         <ul className="space-y-3">
@@ -73,7 +73,7 @@ export default async function TrustPage() {
                   <div>
                     <p className="font-semibold text-ink">{TYPE_LABELS[entry.type] ?? entry.type}</p>
                     <p className="mt-0.5 text-sm text-muted">
-                      <Link href={`/events/${entry.event.slug}`} className="underline hover:text-ink">
+                      <Link href={`/hackathons/${entry.event.slug}`} className="underline hover:text-ink">
                         {entry.event.title}
                       </Link>{" "}
                       · {entry.event.org.name}
@@ -116,7 +116,7 @@ export default async function TrustPage() {
           </li>
           <li>
             <strong className="text-on-inverse">2.</strong> The payment confirmation triggers an on-chain
-            attestation. The vault <span className="text-brand">locks</span>, the event goes live,
+            attestation. The vault <span className="text-brand">locks</span>, the hackathon goes live,
             and the deposit lands here with its payment reference.
           </li>
           <li>

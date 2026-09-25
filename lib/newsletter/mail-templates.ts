@@ -18,14 +18,14 @@ export function newsletterWelcomeEmail(): EmailTemplate {
         heading: "Welcome To HackVillage",
         bodyHtml: `<p style="margin:0;">You're subscribed. We'll send you new Prize Verified hackathons, product updates, and the occasional story from a winner, straight to this inbox.</p>
           <p style="margin:12px 0 0;">No spam, and you can unsubscribe anytime from the link at the bottom of every email.</p>`,
-        ctaUrl: "https://www.hackvillage.xyz/events",
+        ctaUrl: "https://www.hackvillage.xyz/hackathons",
         ctaLabel: "Browse Open Hackathons",
       },
     }),
     text: renderText([
       "You're subscribed to the HackVillage newsletter.",
       "We'll send you new Prize Verified hackathons, product updates, and the occasional story from a winner.",
-      "Browse open hackathons: https://www.hackvillage.xyz/events",
+      "Browse open hackathons: https://www.hackvillage.xyz/hackathons",
     ]),
   };
 }

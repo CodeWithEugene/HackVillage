@@ -31,7 +31,7 @@ async function requireOrgAdmin(eventId: string, userId: string) {
       org: { include: { members: { where: { userId, status: "ACTIVE" } } } },
     },
   });
-  if (!event) throw new MediaError("Event not found.", "NOT_FOUND");
+  if (!event) throw new MediaError("Hackathon not found.", "NOT_FOUND");
   const membership = event.org.members[0];
   if (!membership || membership.role === "MEMBER") {
     throw new MediaError("Only organization admins manage the media vault.", "FORBIDDEN");

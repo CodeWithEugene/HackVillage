@@ -32,12 +32,12 @@ export async function changePasswordAction(
   }
 
   const limit = rateLimit(`pwchange:${user.id}`, 5, 60 * 60 * 1000);
-  if (!limit.ok) return { error: "Too many attempts — try again later." };
+  if (!limit.ok) return { error: "Too many attempts. Try again later." };
 
   const { verify } = await import("@node-rs/argon2");
   const record = await prisma.user.findUnique({ where: { id: user.id } });
   if (!record?.passwordHash) {
-    return { error: "This account signs in with Google or GitHub — no password to change." };
+    return { error: "This account signs in with Google or GitHub, so there is no password to change." };
   }
   const valid = await verify(record.passwordHash, parsed.data.currentPassword).catch(() => false);
   if (!valid) return { error: "Your current password doesn't match." };

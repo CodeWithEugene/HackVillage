@@ -13,7 +13,8 @@ export function StatusTimeline({ status }: { status: Parameters<typeof currentPh
   const reachedIndex = EVENT_PHASES.findIndex((phase) => phase.key === reached);
 
   return (
-    <ol className="flex items-center gap-2" aria-label="Event status">
+    // w-max + mx-auto: centered when it fits, scrolls (instead of clipping) when it doesn't.
+    <ol className="mx-auto flex w-max items-center gap-2" aria-label="Hackathon status">
       {EVENT_PHASES.map((phase, index) => {
         const done = index <= reachedIndex;
         return (

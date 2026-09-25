@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
  * globals.css). `arrow` marks a button that navigates to another page: it
  * gets a trailing arrow that nudges further up-right on hover/active.
  */
-const buttonVariants = cva(
+export const buttonVariants = cva(
   "btn-pill group relative isolate inline-flex items-center justify-center gap-2 overflow-hidden rounded-full font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {

@@ -20,7 +20,7 @@ export async function registerForEventAction(eventSlug: string): Promise<void> {
 
   const event = await prisma.event.findUnique({ where: { slug: eventSlug } });
   if (!event || !registrationOpen(event)) {
-    redirect(`/events/${eventSlug}?registration=closed`);
+    redirect(`/hackathons/${eventSlug}?registration=closed`);
   }
 
   await prisma.registration.upsert({
@@ -33,18 +33,18 @@ export async function registerForEventAction(eventSlug: string): Promise<void> {
     userId: user.id,
     to: user.email,
     category: "eventUpdates",
-    template: registrationConfirmedEmail(event.title, appUrl(`/events/${eventSlug}`)),
+    template: registrationConfirmedEmail(event.title, appUrl(`/hackathons/${eventSlug}`)),
   });
 
-  revalidatePath(`/events/${eventSlug}`);
-  redirect(`/events/${eventSlug}/workspace`);
+  revalidatePath(`/hackathons/${eventSlug}`);
+  redirect(`/hackathons/${eventSlug}/workspace`);
 }
 
 export async function cancelRegistrationAction(eventSlug: string): Promise<void> {
   const user = await requireUser();
 
   const event = await prisma.event.findUnique({ where: { slug: eventSlug } });
-  if (!event) redirect("/dashboard/events");
+  if (!event) redirect("/dashboard/hackathons");
 
   // Active team membership blocks cancellation — leave the team first.
   const activeTeam = await prisma.teamMember.findFirst({
@@ -56,7 +56,7 @@ export async function cancelRegistrationAction(eventSlug: string): Promise<void>
     select: { id: true },
   });
   if (activeTeam) {
-    redirect(`/events/${eventSlug}/workspace?leave=team-first`);
+    redirect(`/hackathons/${eventSlug}/workspace?leave=team-first`);
   }
 
   await prisma.registration.updateMany({
@@ -71,6 +71,6 @@ export async function cancelRegistrationAction(eventSlug: string): Promise<void>
     template: registrationCancelledEmail(event.title),
   });
 
-  revalidatePath(`/events/${eventSlug}`);
-  redirect("/dashboard/events");
+  revalidatePath(`/hackathons/${eventSlug}`);
+  redirect("/dashboard/hackathons");
 }

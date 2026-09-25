@@ -7,11 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { InviteCodeManager } from "@/components/organizer/invite-code-manager";
+import { OrgProfileForm } from "@/components/organizer/org-profile-form";
 import { requireSurface } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
+import { canEditOrgProfile } from "@/lib/orgs/profile";
 import { formatKes } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Organize" };
+
+const KYB_BADGE = {
+  NONE: { label: "KYB: Not Started", tone: "warning" },
+  PENDING: { label: "KYB: In Review", tone: "warning" },
+  VERIFIED: { label: "Verified Organizer", tone: "success" },
+  FAILED: { label: "KYB: Needs Attention", tone: "danger" },
+} as const;
 
 export default async function OrganizerPage() {
   const user = await requireSurface("organizer");
@@ -26,7 +35,7 @@ export default async function OrganizerPage() {
       <EmptyState
         icon={ShieldCheck}
         title="You need an organization"
-        description="Organizations hold escrowed prize pools and run events. Create one to start organizing; it takes a minute."
+        description="Organizations hold escrowed prize pools and run hackathons. Create one to start organizing; it takes a minute."
         action={
           <Link href="/onboarding/organizer">
             <Button arrow>Create Organization</Button>
@@ -60,12 +69,12 @@ export default async function OrganizerPage() {
         <div>
           <h1 className="font-display text-2xl font-bold text-ink">{org.name}</h1>
           <p className="mt-1 text-sm text-muted">
-            {membership.role.toLowerCase()} · hackvillage.app/organizers/{org.slug}
+            {membership.role.toLowerCase()} · hackvillage.xyz/organizers/{org.slug}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Badge variant="success">Trust score {org.trustScore}</Badge>
-          <Badge variant="warning">KYB: not started</Badge>
+          <Badge variant={KYB_BADGE[org.kycStatus].tone}>{KYB_BADGE[org.kycStatus].label}</Badge>
         </div>
       </div>
 
@@ -73,22 +82,22 @@ export default async function OrganizerPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Plus aria-hidden className="size-5" /> Run An Event
+              <Plus aria-hidden className="size-5" /> Run A Hackathon
             </CardTitle>
             <CardDescription>
               Five steps to a draft; publishing declares the prize pool. The vault deposit flow
               (Phase 3) flips it live with the Prize Verified badge.
             </CardDescription>
           </div>
-          <Link href="/organizer/events/new">
-            <Button arrow>Create Event</Button>
+          <Link href="/organizer/hackathons/new">
+            <Button arrow>Create Hackathon</Button>
           </Link>
         </div>
       </Card>
 
       {eventsWithPools.length > 0 ? (
         <Card>
-          <CardTitle>Events</CardTitle>
+          <CardTitle>Hackathons</CardTitle>
           <ul className="mt-3 divide-y divide-ink/5">
             {eventsWithPools.map((event) => (
               <li key={event.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
@@ -98,7 +107,7 @@ export default async function OrganizerPage() {
                   <Badge variant={event.status === "DRAFT" ? "neutral" : event.status === "PENDING_DEPOSIT" ? "warning" : "success"}>
                     {event.status === "PENDING_DEPOSIT" ? "pending deposit" : event.status.toLowerCase()}
                   </Badge>
-                  <Link href={`/organizer/events/${event.slug}`}>
+                  <Link href={`/organizer/hackathons/${event.slug}`}>
                     <Button size="sm" variant="secondary" arrow>Manage</Button>
                   </Link>
                 </span>
@@ -107,6 +116,30 @@ export default async function OrganizerPage() {
           </ul>
         </Card>
       ) : null}
+
+      <Card>
+        <CardTitle>Public Profile</CardTitle>
+        <CardDescription>
+          Hackathon pages show this in the Organizer card, next to your trust score and track
+          record.
+          {org.kycStatus === "VERIFIED"
+            ? " Your name is locked because KYB verified it; contact HackVillage to change it."
+            : null}
+        </CardDescription>
+        <div className="mt-4">
+          {canEditOrgProfile(membership.role) ? (
+            <OrgProfileForm
+              org={{ id: org.id, name: org.name, about: org.about }}
+              mode="organizer"
+              nameEditable={org.kycStatus !== "VERIFIED"}
+            />
+          ) : (
+            <p className="text-sm leading-6 whitespace-pre-line text-body-copy">
+              {org.about ?? "No about text yet. Ask an owner or admin to add one."}
+            </p>
+          )}
+        </div>
+      </Card>
 
       <InviteCodeManager
         codes={activeInvites.map((invite) => ({

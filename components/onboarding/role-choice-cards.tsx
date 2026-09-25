@@ -10,14 +10,14 @@ const CHOICES = [
     icon: Code2,
     title: "Developer",
     description:
-      "Join Prize Verified events, build with a team, submit projects, and receive instant payouts when you win.",
+      "Join Prize Verified hackathons, build with a team, submit projects, and receive instant payouts when you win.",
   },
   {
     role: "ORGANIZER" as const,
     icon: Building2,
     title: "Organizer",
     description:
-      "Create an organization, run events with escrowed prize pools, and prove your credibility with the Prize Verified badge.",
+      "Create an organization, run hackathons with escrowed prize pools, and prove your credibility with the Prize Verified badge.",
   },
 ];
 

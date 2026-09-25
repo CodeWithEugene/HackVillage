@@ -17,13 +17,13 @@ const ROLES = [
     value: "DEVELOPER",
     icon: Code2,
     title: "Developer",
-    description: "Join verified events, build with a team, win and get paid instantly.",
+    description: "Join verified hackathons, build with a team, win and get paid instantly.",
   },
   {
     value: "ORGANIZER",
     icon: Building2,
     title: "Organizer",
-    description: "Run Prize Verified events with escrowed prize pools.",
+    description: "Run Prize Verified hackathons with escrowed prize pools.",
   },
 ] as const;
 
@@ -124,7 +124,7 @@ export function SignUpForm({
           <Label htmlFor="handle">Handle (optional)</Label>
           <Input id="handle" name="handle" placeholder="your public profile address" maxLength={30} />
           <p className="mt-1.5 text-xs text-muted">
-            hackvillage.app/developers/<span className="font-mono">your-handle</span>. Leave blank and
+            hackvillage.xyz/developers/<span className="font-mono">your-handle</span>. Leave blank and
             we&apos;ll suggest one from your email.
           </p>
         </div>

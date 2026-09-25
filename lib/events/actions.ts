@@ -27,7 +27,7 @@ async function requireEventOrganizer(eventId: string) {
     where: { id: eventId },
     select: { id: true, orgId: true, status: true, slug: true },
   });
-  if (!event) return { error: "Event not found." } as const;
+  if (!event) return { error: "Hackathon not found." } as const;
 
   const membership = await prisma.orgMember.findFirst({
     where: {
@@ -38,7 +38,7 @@ async function requireEventOrganizer(eventId: string) {
     },
     select: { id: true },
   });
-  if (!membership) return { error: "Only organization admins can edit this event." } as const;
+  if (!membership) return { error: "Only organization admins can edit this hackathon." } as const;
 
   return { user, event } as const;
 }
@@ -58,7 +58,7 @@ export async function saveEventAction(
     select: { orgId: true, role: true },
   });
   if (!membership || membership.role === "MEMBER") {
-    return { error: "Create an organization first — events belong to organizations." };
+    return { error: "Create an organization first, since hackathons belong to organizations." };
   }
 
   const rawPrizes = String(formData.get("prizes") ?? "[]");
@@ -66,7 +66,7 @@ export async function saveEventAction(
   try {
     prizesJson = JSON.parse(rawPrizes);
   } catch {
-    return { error: "The prize breakdown didn't submit correctly — try again." };
+    return { error: "The prize breakdown didn't submit correctly. Try again." };
   }
 
   const parsed = wizardFormSchema.safeParse({
@@ -75,12 +75,12 @@ export async function saveEventAction(
     eventId: String(formData.get("eventId") ?? ""),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Check the event details and try again." };
+    return { error: parsed.error.issues[0]?.message ?? "Check the hackathon details and try again." };
   }
   const data = parsed.data;
 
   if (!placesAreUnique(data.prizes)) {
-    return { error: "Prize places must be unique — 1st, 2nd, 3rd…" };
+    return { error: "Prize places must be unique: 1st, 2nd, 3rd…" };
   }
 
   // Editing an existing draft, or creating a new one.
@@ -88,7 +88,7 @@ export async function saveEventAction(
     const guard = await requireEventOrganizer(data.eventId);
     if ("error" in guard) return { error: guard.error };
     if (guard.event.status !== "DRAFT") {
-      return { error: "Only draft events can be edited. Published events are locked." };
+      return { error: "Only draft hackathons can be edited. Published hackathons are locked." };
     }
 
     await prisma.$transaction(async (tx) => {
@@ -125,8 +125,8 @@ export async function saveEventAction(
       });
     });
 
-    revalidatePath(`/organizer/events/${guard.event.slug}`);
-    redirect(`/organizer/events/${guard.event.slug}`);
+    revalidatePath(`/organizer/hackathons/${guard.event.slug}`);
+    redirect(`/organizer/hackathons/${guard.event.slug}`);
   }
 
   // New draft: pick a unique slug.
@@ -137,7 +137,7 @@ export async function saveEventAction(
   });
   const takenSet = new Set(taken.map((t) => t.slug.toLowerCase()));
   const slug = candidates.find((c) => !takenSet.has(c));
-  if (!slug) return { error: "Slug collision — adjust the title slightly." };
+  if (!slug) return { error: "Slug collision. Adjust the title slightly." };
 
   const event = await prisma.$transaction(async (tx) => {
     const created = await tx.event.create({
@@ -177,21 +177,21 @@ export async function saveEventAction(
   });
 
   revalidatePath("/organizer");
-  redirect(`/organizer/events/${event.slug}`);
+  redirect(`/organizer/hackathons/${event.slug}`);
 }
 
 export async function publishEventAction(eventId: string): Promise<EventActionState> {
   const guard = await requireEventOrganizer(eventId);
   if ("error" in guard) return { error: guard.error };
   if (guard.event.status !== "DRAFT") {
-    return { error: "This event is already published." };
+    return { error: "This hackathon is already published." };
   }
 
   const event = await prisma.event.findUnique({
     where: { id: eventId },
     include: { prizes: true },
   });
-  if (!event) return { error: "Event not found." };
+  if (!event) return { error: "Hackathon not found." };
 
   const poolKes = event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0);
   const { ok, reason } = canPublishDraft(
@@ -223,11 +223,11 @@ export async function publishEventAction(eventId: string): Promise<EventActionSt
     userId: guard.user.id,
     to: guard.user.email,
     category: "eventUpdates",
-    template: eventPublishedEmail(event.title, appUrl(`/organizer/events/${event.slug}`)),
+    template: eventPublishedEmail(event.title, appUrl(`/organizer/hackathons/${event.slug}`)),
   });
 
-  revalidatePath("/events");
-  revalidatePath(`/events/${event.slug}`);
-  revalidatePath(`/organizer/events/${event.slug}`);
+  revalidatePath("/hackathons");
+  revalidatePath(`/hackathons/${event.slug}`);
+  revalidatePath(`/organizer/hackathons/${event.slug}`);
   return {};
 }

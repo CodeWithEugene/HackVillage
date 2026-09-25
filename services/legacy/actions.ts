@@ -19,7 +19,7 @@ export interface LegacyActionState {
 function toState(error: unknown): LegacyActionState {
   if (error instanceof LegacyError) return { error: error.message };
   console.error("[legacy] action failed", error);
-  return { error: "Something went wrong — try again in a moment." };
+  return { error: "Something went wrong. Try again in a moment." };
 }
 
 // ── Developer: legacy outcome + disputes ─────────────────────────────────
@@ -43,7 +43,7 @@ export async function recordLegacyOutcomeAction(
   try {
     await recordLegacyOutcome({ userId: user.id, ...parsed.data });
     revalidatePath("/dashboard");
-    return { message: "Outcome recorded — your portfolio now shows the real trajectory." };
+    return { message: "Outcome recorded. Your portfolio now shows the real trajectory." };
   } catch (error) {
     return toState(error);
   }
@@ -57,7 +57,7 @@ export async function openDisputeAction(
   const parsed = z
     .object({
       winnerId: z.string().cuid(),
-      claim: z.string().trim().min(30, "Describe what happened — at least 30 characters.").max(2000),
+      claim: z.string().trim().min(30, "Describe what happened in at least 30 characters.").max(2000),
       evidenceUrl: z.string().trim().url().optional().or(z.literal("")),
     })
     .safeParse(Object.fromEntries(formData));
@@ -73,7 +73,7 @@ export async function openDisputeAction(
       evidenceUrl: parsed.data.evidenceUrl || undefined,
     });
     revalidatePath("/dashboard/winnings");
-    return { message: "Dispute opened — platform staff review both sides. Funds stay locked until resolution." };
+    return { message: "Dispute opened. Platform staff review both sides, and funds stay locked until resolution." };
   } catch (error) {
     return toState(error);
   }
@@ -103,8 +103,8 @@ export async function resolveDisputeAction(
     return {
       message:
         result.outcome === "released"
-          ? "Milestone released — the final 50% payout is queued."
-          : "Dispute rejected — the organizer's confirmation stands.",
+          ? "Milestone released. The final 50% payout is queued."
+          : "Dispute rejected. The organizer's confirmation stands.",
     };
   } catch (error) {
     return toState(error);

@@ -15,7 +15,7 @@ export function canJoinTeam(
   userAlreadyMember: boolean,
   eventRegistrationOpen: boolean
 ): { ok: boolean; reason?: string } {
-  if (!eventRegistrationOpen) return { ok: false, reason: "Registration for this event has closed." };
+  if (!eventRegistrationOpen) return { ok: false, reason: "Registration for this hackathon has closed." };
   if (team.status === "DISBANDED") return { ok: false, reason: "This team has disbanded." };
   if (team.status === "LOCKED") return { ok: false, reason: "This team is locked and not accepting members." };
   if (userAlreadyMember) return { ok: false, reason: "You are already on this team." };

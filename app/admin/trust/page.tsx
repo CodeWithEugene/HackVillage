@@ -40,7 +40,7 @@ export default async function AdminTrustPage() {
                 <div>
                   <p className="font-semibold text-ink">{org.name}</p>
                   <p className="text-xs text-muted">
-                    {org._count.events} event{org._count.events === 1 ? "" : "s"} · score floor 0, cap 150
+                    {org._count.events} hackathon{org._count.events === 1 ? "" : "s"} · score floor 0, cap 150
                   </p>
                 </div>
                 <Badge variant={org.trustScore >= 90 ? "success" : org.trustScore >= 60 ? "warning" : "danger"}>

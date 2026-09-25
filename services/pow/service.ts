@@ -57,7 +57,7 @@ export async function materializePortfolioForWinner(winnerId: string): Promise<n
     data: {
       submissionId: submission.id,
       developerId: winner.userId, // the leader — authorship credited per the declared split
-      title: `${winner.team.name} — winning submission`,
+      title: `${winner.team.name}: winning submission`,
       summary: submission.description.slice(0, 300),
       repoUrl: submission.repoUrl,
       demoUrl: submission.demoUrl,
@@ -85,10 +85,10 @@ export async function createEndorsement(input: {
     }),
   ]);
   if (!judgeAssignment) {
-    throw new PowError("Only this event's judges can endorse its winners.", "NOT_A_JUDGE");
+    throw new PowError("Only this hackathon's judges can endorse its winners.", "NOT_A_JUDGE");
   }
   if (!winnerExists) {
-    throw new PowError("Endorsements attach to verified winners of the event.", "NOT_A_WINNER");
+    throw new PowError("Endorsements attach to verified winners of the hackathon.", "NOT_A_WINNER");
   }
 
   const existing = await prisma.endorsement.findUnique({
@@ -101,7 +101,7 @@ export async function createEndorsement(input: {
     },
   });
   if (existing) {
-    throw new PowError("You already endorsed this developer for this event.", "ALREADY_EXISTS");
+    throw new PowError("You already endorsed this developer for this hackathon.", "ALREADY_EXISTS");
   }
 
   await prisma.endorsement.create({
@@ -193,7 +193,7 @@ export async function becomeHiringPartner(userId: string, companyName: string): 
     prisma.roleGrant.create({ data: { userId, role: "HIRING" } }),
     prisma.developerProfile.upsert({
       where: { userId },
-      create: { userId, headline: `Hiring partner — ${companyName}` },
+      create: { userId, headline: `Hiring partner at ${companyName}` },
       update: {},
     }),
     // Track the partner's company on their profile via headline (lightweight

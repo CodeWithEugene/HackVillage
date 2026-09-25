@@ -60,7 +60,7 @@ export function BuilderJourney() {
           </Link>
         </div>
         <div className="journey-pair journey-pair-left">
-          <PillPhoto name="speaker" alt="Kenyan tech speaker sharing ideas at a developer event" />
+          <PillPhoto name="speaker" alt="Kenyan tech speaker sharing ideas at a hackathon" />
           <PillPhoto
             name="community"
             alt="Developers exchanging ideas around a table at a Nairobi tech gathering"
@@ -92,7 +92,7 @@ export function BuilderJourney() {
         <div className="journey-pair journey-pair-right">
           <PillPhoto
             name="event-arrival"
-            alt="Kenyan developer arriving at a tech event with his laptop"
+            alt="Kenyan developer arriving at a hackathon with his laptop"
           />
           <PillPhoto
             name="coding-focus"
@@ -113,7 +113,7 @@ export function BuilderJourney() {
               <br />
               Get Hired
             </p>
-            <Link href="/events" className="journey-action btn-pill">
+            <Link href="/hackathons" className="journey-action btn-pill">
               <span className="btn-fill" aria-hidden />
               <span className="btn-content">
                 Explore Hackathons <ArrowUpRight aria-hidden size={16} className="btn-arrow" />

@@ -8,5 +8,5 @@ export async function POST(
 ) {
   const { slug } = await params;
   await cancelRegistrationAction(slug);
-  return NextResponse.redirect(new URL("/dashboard/events", _request.url), 303);
+  return NextResponse.redirect(new URL("/dashboard/hackathons", _request.url), 303);
 }

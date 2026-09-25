@@ -45,7 +45,7 @@ export function validateRubric(criteria: Criterion[]): string | null {
   }
   const total = criteria.reduce((sum, criterion) => sum + criterion.weight, 0);
   if (total !== 100) {
-    return `Criterion weights add up to ${total} — they must total 100.`;
+    return `Criterion weights add up to ${total}, but they must total 100.`;
   }
   return null;
 }
@@ -123,5 +123,5 @@ export const scoreValueSchema = z.coerce.number().int().min(0).max(10);
 export const feedbackPointSchema = z
   .string()
   .trim()
-  .min(10, "Feedback points need at least 10 characters — make them actionable.")
+  .min(10, "Feedback points need at least 10 characters. Make them actionable.")
   .max(600);

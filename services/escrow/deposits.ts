@@ -50,10 +50,10 @@ export async function initiateDeposit(eventId: string, userId: string): Promise<
     },
   });
 
-  if (!event) throw new DepositError("Event not found.", "NOT_FOUND");
+  if (!event) throw new DepositError("Hackathon not found.", "NOT_FOUND");
   if (event.status !== "PENDING_DEPOSIT") {
     throw new DepositError(
-      event.status === "DRAFT" ? "Publish the event first." : "This event is already funded.",
+      event.status === "DRAFT" ? "Publish the hackathon first." : "This hackathon is already funded.",
       "WRONG_STATE"
     );
   }
@@ -63,7 +63,7 @@ export async function initiateDeposit(eventId: string, userId: string): Promise<
   }
   if (event.org.kycStatus !== "VERIFIED") {
     throw new DepositError(
-      "Your organization needs verified KYB before funding an event.",
+      "Your organization needs verified KYB before funding a hackathon.",
       "KYB_REQUIRED"
     );
   }
@@ -210,7 +210,7 @@ async function notifyEventLive(eventId: string): Promise<void> {
   });
   if (!event) return;
 
-  const eventUrl = appUrl(`/events/${event.slug}`);
+  const eventUrl = appUrl(`/hackathons/${event.slug}`);
   await sendMail({ to: event.org.owner.email, ...eventLiveOrganizerEmail(event.title, eventUrl) });
 
   for (const registration of event.registrations) {
@@ -246,7 +246,7 @@ export async function expireStaleDeposits(): Promise<number> {
   for (const deposit of stale) {
     await sendMail({
       to: deposit.event.org.owner.email,
-      ...depositFailedEmail(deposit.event.title, appUrl(`/organizer/events/${deposit.event.slug}`)),
+      ...depositFailedEmail(deposit.event.title, appUrl(`/organizer/hackathons/${deposit.event.slug}`)),
     }).catch((error: unknown) => console.error("[escrow] deposit expired notification failed", error));
   }
 

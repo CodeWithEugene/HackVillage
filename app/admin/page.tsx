@@ -23,7 +23,7 @@ export default async function AdminHomePage() {
           <p className="mt-1 font-display text-3xl font-bold text-ink">{users}</p>
         </Card>
         <Card>
-          <p className="text-xs font-semibold uppercase text-muted">Events</p>
+          <p className="text-xs font-semibold uppercase text-muted">Hackathons</p>
           <p className="mt-1 font-display text-3xl font-bold text-ink">{events}</p>
         </Card>
         <Card>
@@ -43,16 +43,22 @@ export default async function AdminHomePage() {
             <CardDescription>Search accounts, roles, and verification state.</CardDescription>
           </Card>
         </Link>
-        <Link href="/admin/events">
+        <Link href="/admin/hackathons">
           <Card className="transition-shadow hover:shadow-lg">
-            <CardTitle>Events</CardTitle>
-            <CardDescription>All events across organizations, with lifecycle status.</CardDescription>
+            <CardTitle>Hackathons</CardTitle>
+            <CardDescription>All hackathons across organizations, with lifecycle status.</CardDescription>
           </Card>
         </Link>
         <Link href="/admin/kyb">
           <Card className="transition-shadow hover:shadow-lg">
             <CardTitle>KYB Review</CardTitle>
             <CardDescription>Business verification queue that gates first deposits.</CardDescription>
+          </Card>
+        </Link>
+        <Link href="/admin/organizations">
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardTitle>Organizations</CardTitle>
+            <CardDescription>Fill in or correct organizer profiles, with an audit trail.</CardDescription>
           </Card>
         </Link>
         <Link href="/admin/payments">

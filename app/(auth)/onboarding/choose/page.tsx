@@ -26,7 +26,7 @@ export default async function OnboardingChoosePage() {
       </header>
       <RoleChoiceCards currentRole={user.primaryRole} />
       <p className="mt-6 flex items-center justify-center gap-2 text-center text-xs text-muted">
-        <Building2 aria-hidden className="size-4" /> Organizers deposit prize pools and run events
+        <Building2 aria-hidden className="size-4" /> Organizers deposit prize pools and run hackathons
         <span aria-hidden>·</span>
         <Code2 aria-hidden className="size-4" /> Developers win and get paid instantly
       </p>

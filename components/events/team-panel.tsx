@@ -58,7 +58,7 @@ export function TeamPanel({
               {status === "OPEN" ? "Open to members" : status === "LOCKED" ? "Locked" : "Disbanded"}
             </Badge>
           </CardTitle>
-          <CardDescription>Your team for this event, up to 5 members.</CardDescription>
+          <CardDescription>Your team for this hackathon, up to 5 members.</CardDescription>
         </div>
         {canManage && status !== "DISBANDED" ? (
           <span className="flex items-center gap-2 rounded-control bg-paper px-3 py-2">

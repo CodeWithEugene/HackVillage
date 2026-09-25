@@ -47,7 +47,7 @@ export function AcceptInvitationClient({
       </h1>
       <p className="mt-2 text-sm text-muted">
         Accepting adds the organizer role to your account ({email}) and gives you access to the
-        organization&apos;s events.
+        organization&apos;s hackathons.
       </p>
       <Button
         className="mt-6 w-full"

@@ -4,17 +4,17 @@ export function mediaPenaltyEmail(eventTitle: string, orgName: string, url: stri
   return {
     subject: `Trust Penalty: Media Deadline Missed For ${eventTitle}`,
     html: renderEmail({
-      preheader: "Your event missed its media deadline.",
+      preheader: "Your hackathon missed its media deadline.",
       section: {
         heading: "Trust Penalty Applied",
-        bodyHtml: `<p style="margin:0;">Your event <strong>${eventTitle}</strong> passed its forty eight hour media deadline with no approved gallery.</p>
+        bodyHtml: `<p style="margin:0;">Your hackathon <strong>${eventTitle}</strong> passed its forty eight hour media deadline with no approved gallery.</p>
           <p style="margin:12px 0 0;">A ten point trust penalty was applied to <strong>${orgName}</strong>. Upload and approve a gallery, and you can appeal from your organizer page.</p>`,
         ctaUrl: url,
         ctaLabel: "Go To Your Organizer Page",
       },
     }),
     text: renderText([
-      `Your event ${eventTitle} passed its forty eight hour media deadline with no approved gallery.`,
+      `Your hackathon ${eventTitle} passed its forty eight hour media deadline with no approved gallery.`,
       `A ten point trust penalty was applied to ${orgName}.`,
       url,
     ]),

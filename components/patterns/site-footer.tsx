@@ -18,7 +18,7 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
   {
     title: "Platform",
     links: [
-      { label: "Hackathons", href: "/events" },
+      { label: "Hackathons", href: "/hackathons" },
       { label: "Developers", href: "/developers" },
       { label: "Trust & escrow", href: "/trust" },
       { label: "How it works", href: "/#how-it-works" },
@@ -62,7 +62,7 @@ export function SiteFooter() {
             />
           </Link>
           <p className="mt-5 max-w-xs text-sm leading-6 text-body-copy">
-            Open-source infrastructure for high-impact tech events, built for the African developer
+            Open-source infrastructure for high-impact hackathons, built for the African developer
             community.
           </p>
           <ul className="mt-6 flex items-center gap-5">

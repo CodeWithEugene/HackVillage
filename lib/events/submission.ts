@@ -34,7 +34,7 @@ export function validateSplit(
 
   const total = split.reduce((sum, entry) => sum + entry.percent, 0);
   if (total !== 100) {
-    return { ok: false, reason: `Split percentages add up to ${total} — they must total 100.` };
+    return { ok: false, reason: `Split percentages add up to ${total}, but they must total 100.` };
   }
 
   return { ok: true };

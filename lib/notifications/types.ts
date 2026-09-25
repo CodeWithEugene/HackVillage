@@ -15,7 +15,7 @@ export const NOTIFICATION_CATEGORIES = [
 export type NotificationCategory = (typeof NOTIFICATION_CATEGORIES)[number];
 
 export const CATEGORY_LABELS: Record<NotificationCategory, string> = {
-  eventUpdates: "Event updates",
+  eventUpdates: "Hackathon updates",
   teamActivity: "Team activity",
   judging: "Judging notifications",
   reminders: "Reminders and check ins",

@@ -54,7 +54,7 @@ const developerProfileSchema = z.object({
   headline: z
     .string()
     .trim()
-    .min(4, "Add a short headline — e.g. “Full-stack developer, React & Node”.")
+    .min(4, "Add a short headline, e.g. “Full-stack developer, React & Node”.")
     .max(120),
   bio: z.string().trim().max(2000).optional(),
   location: z.string().trim().max(80).optional(),
@@ -134,8 +134,8 @@ const createOrgSchema = z.object({
 });
 
 const RESERVED_ORG_SLUGS = new Set([
-  "admin", "api", "auth", "dashboard", "developers", "events", "hiring", "judge",
-  "organizer", "orgs", "settings", "signin", "signup", "support", "trust",
+  "admin", "api", "auth", "dashboard", "developers", "events", "hackathons", "hiring",
+  "judge", "organizer", "orgs", "settings", "signin", "signup", "support", "trust",
 ]);
 
 function slugifyStem(name: string): string {
@@ -179,7 +179,7 @@ export async function createOrganizationAction(
 
   const slug = await uniqueOrgSlug(parsed.data.name);
   if (!slug) {
-    return { error: "That name doesn't produce a usable address — try different words." };
+    return { error: "That name doesn't produce a usable address. Try different words." };
   }
 
   await prisma.$transaction(async (tx) => {
@@ -368,7 +368,7 @@ export async function updateDeveloperProfileAction(
     where: { handle: { equals: handle, mode: "insensitive" }, id: { not: user.id } },
     select: { id: true },
   });
-  if (taken) return { error: "That handle is taken — try another." };
+  if (taken) return { error: "That handle is taken. Try another." };
 
   const skillList = (skills ?? "")
     .split(",")
