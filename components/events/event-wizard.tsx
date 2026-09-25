@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormError, Input, Label, Textarea } from "@/components/ui/input";
 import { HACKATHON_CATEGORIES, MAX_CATEGORIES } from "@/lib/events/categories";
+import { COVER_HEIGHT, COVER_WIDTH } from "@/lib/events/cover-upload";
 import { formatKes } from "@/lib/utils";
 import { saveEventAction, type EventActionState } from "@/lib/events/actions";
 
@@ -299,12 +300,16 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
             <p className="font-display text-lg font-bold text-ink">Review &amp; create draft</p>
             <p className="text-sm text-muted">
               Publishing checks the pool, dates, and problem statement. The draft then waits for
-              the Prize Vault deposit before going live. Developers see it as
-              &ldquo;pending verification&rdquo;.
+              the Prize Vault deposit, and developers only see it once the deposit confirms.
+            </p>
+            <p className="text-sm text-muted">
+              After you save, add a {COVER_WIDTH} × {COVER_HEIGHT} px cover image from the
+              hackathon page. Until then it uses a photo that matches its first category.
             </p>
             <dl className="grid gap-2 rounded-control bg-paper p-4 text-sm">
               <div className="flex justify-between"><dt className="text-muted">Prize pool</dt><dd className="font-bold text-ink">{formatKes(total)}</dd></div>
               <div className="flex justify-between"><dt className="text-muted">Prize places</dt><dd className="font-semibold text-ink">{prizes.filter((p) => Number(p.amount) > 0).length}</dd></div>
+              <div className="flex justify-between gap-4"><dt className="text-muted">Categories</dt><dd className="text-right font-semibold text-ink">{categories.length > 0 ? categories.map((key) => HACKATHON_CATEGORIES.find((c) => c.key === key)?.label ?? key).join(", ") : "None yet"}</dd></div>
               <div className="flex justify-between"><dt className="text-muted">Venue</dt><dd className="font-semibold text-ink capitalize">{venueType.toLowerCase()}</dd></div>
             </dl>
           </Card>

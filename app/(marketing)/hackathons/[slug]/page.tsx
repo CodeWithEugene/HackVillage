@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CalendarDays, Clock, MapPin, Users } from "lucide-react";
 
@@ -12,6 +13,7 @@ import { currentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
 import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
 import { categoryLabel, isCategory } from "@/lib/events/categories";
+import { coverFor } from "@/lib/events/covers";
 import { registrationOpen } from "@/lib/events/lifecycle";
 import { formatKes } from "@/lib/utils";
 import Link from "next/link";
@@ -80,6 +82,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
   const poolKes = event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0);
   const open = registrationOpen(event);
   const categories = event.categories.filter(isCategory);
+  const cover = coverFor(event);
   const gallery = event.media;
 
   const registration_ = viewer
@@ -160,6 +163,17 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
         </div>
 
         <aside className="space-y-6" aria-label="Hackathon details">
+          <div className="relative aspect-[16/9] overflow-hidden rounded-card bg-brand/10 shadow-card">
+            <Image
+              src={cover}
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1024px) 400px, 100vw"
+              unoptimized={!cover.startsWith("/")}
+              className="object-cover"
+            />
+          </div>
           <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
             <Card>
               <p className="text-xs font-semibold tracking-wide text-muted uppercase">Prize pool</p>

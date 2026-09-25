@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Lock } from "lucide-react";
 
+import { CoverUploader } from "@/components/organizer/cover-uploader";
 import { PublishGate } from "@/components/organizer/publish-gate";
 import { JudgingSection } from "@/components/judging/judging-section";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
+import { coverFor } from "@/lib/events/covers";
 import { STATUS_LABELS } from "@/lib/events/lifecycle";
 import { formatKes } from "@/lib/utils";
 
@@ -116,15 +118,20 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
             <Lock aria-hidden className="size-5 text-warning" /> Waiting On The Prize Vault
           </CardTitle>
           <CardDescription>
-            This hackathon is public as <strong>pending deposit</strong>, visible but not live.
-            Fund the vault ({formatKes(poolKes)} pool + 5% fee) and the hackathon flips LIVE with the
-            Prize Verified badge the moment the deposit confirms.
+            This hackathon isn&apos;t public yet. Fund the vault ({formatKes(poolKes)} pool + 5%
+            fee) and it goes live on HackVillage the moment the deposit confirms.
           </CardDescription>
           <Link href={`/organizer/hackathons/${event.slug}/vault`} className="mt-4 inline-block">
             <Button arrow>Open The Prize Vault</Button>
           </Link>
         </Card>
       ) : null}
+
+      <CoverUploader
+        eventId={event.id}
+        previewUrl={coverFor(event)}
+        hasCustomCover={Boolean(event.coverUrl)}
+      />
 
       {/* Judging section — LIVE events past their end, and JUDGING events */}
       {(event.status === "LIVE" ||

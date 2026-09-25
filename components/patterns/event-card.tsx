@@ -43,6 +43,7 @@ function registrationNote(event: EventCardData, open: boolean): string {
 export function EventCard({ event }: { event: EventCardData }) {
   const open = registrationOpen(event);
   const categories = event.categories.filter(isCategory);
+  const cover = coverFor(event);
 
   return (
     <Link
@@ -51,7 +52,9 @@ export function EventCard({ event }: { event: EventCardData }) {
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-brand/10">
         <Image
-          src={coverFor(event)}
+          src={cover}
+          // Uploaded covers live on R2 and are already sized to 1600x900.
+          unoptimized={!cover.startsWith("/")}
           alt=""
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
