@@ -39,7 +39,7 @@ async function main(): Promise<void> {
     create: {
       name: "Technetium Kenya",
       slug: "technetium-kenya",
-      about: "Community-first tech events for the Nairobi ecosystem.",
+      about: "Community-first hackathons for the Nairobi ecosystem.",
       ownerId: organizer.id,
       kycStatus: "VERIFIED",
     },

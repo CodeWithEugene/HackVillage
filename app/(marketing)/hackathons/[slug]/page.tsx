@@ -113,8 +113,8 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
         <div className="mt-6 rounded-card border border-warning/40 bg-warning/10 p-4">
           <p className="text-sm leading-6 text-ink">
             <strong>Prize pending verification.</strong> The organizer has declared a{" "}
-            {formatKes(poolKes)} pool. This hackathon goes live only after 100% of it is locked in the
-            Prize Vault, and your build is never chasing money that doesn&apos;t exist yet.
+            {formatKes(poolKes)} pool. This hackathon goes live only after 100% of it is locked in
+            the Prize Vault, and your build is never chasing money that doesn&apos;t exist yet.
           </p>
         </div>
       ) : null}
@@ -149,6 +149,67 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
               </div>
             ) : null}
           </Card>
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Card>
+              <CardTitle>Prize Breakdown</CardTitle>
+              <ul className="mt-3 text-sm">
+                {event.prizes.map((prize) => {
+                  const winner = event.winners.find((w) => w.place === prize.place);
+                  const instantNote = winner
+                    ? winner.payouts.some(
+                        (p) => p.tranche === "INSTANT" && p.status === "SUCCEEDED",
+                      )
+                      ? "50% paid ✓"
+                      : "paying…"
+                    : "50% on the day";
+                  const restNote = prize.milestoneRequired
+                    ? "50% on milestone"
+                    : "full payout on win";
+                  return (
+                    <li
+                      key={prize.id}
+                      className="flex items-start justify-between gap-4 border-b border-ink/5 py-3 last:border-0"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-semibold text-ink">{prize.label}</p>
+                        {winner ? (
+                          <p className="text-xs text-muted">
+                            won by {winner.team.name} ·{" "}
+                            <Link href={`/developers/${winner.user.handle}`} className="underline">
+                              @{winner.user.handle}
+                            </Link>
+                          </p>
+                        ) : null}
+                        <p className="mt-0.5 text-xs text-muted">
+                          {instantNote} · {restNote}
+                        </p>
+                      </div>
+                      <p className="shrink-0 font-display text-base font-bold whitespace-nowrap text-ink">
+                        {formatKes(prize.amountKes)}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+              <CardDescription>
+                Winners receive 50% instantly on the day; the rest releases on verified milestone
+                completion.
+              </CardDescription>
+            </Card>
+
+            <Card>
+              <CardTitle>Organizer</CardTitle>
+              <p className="mt-2 text-lg font-bold text-ink">{event.org.name}</p>
+              <p className="text-sm text-muted">{event.org.about}</p>
+              <div className="mt-3">
+                <Badge variant="success">Trust score {event.org.trustScore}</Badge>
+              </div>
+              <CardDescription>
+                Trust scores move with payout speed, media delivery, and milestone honesty.
+              </CardDescription>
+            </Card>
+          </div>
 
           {/* Public gallery — 48-hour media vault */}
           {gallery.length > 0 ? (
@@ -237,61 +298,6 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
               </Button>
             )}
           </div>
-
-          <Card>
-            <CardTitle>Prize Breakdown</CardTitle>
-            <ul className="mt-3 text-sm">
-              {event.prizes.map((prize) => {
-                const winner = event.winners.find((w) => w.place === prize.place);
-                const instantNote = winner
-                  ? winner.payouts.some((p) => p.tranche === "INSTANT" && p.status === "SUCCEEDED")
-                    ? "50% paid ✓"
-                    : "paying…"
-                  : "50% on the day";
-                const restNote = prize.milestoneRequired ? "50% on milestone" : "full payout on win";
-                return (
-                  <li
-                    key={prize.id}
-                    className="flex items-start justify-between gap-4 border-b border-ink/5 py-3 last:border-0"
-                  >
-                    <div className="min-w-0">
-                      <p className="font-semibold text-ink">{prize.label}</p>
-                      {winner ? (
-                        <p className="text-xs text-muted">
-                          won by {winner.team.name} ·{" "}
-                          <Link href={`/developers/${winner.user.handle}`} className="underline">
-                            @{winner.user.handle}
-                          </Link>
-                        </p>
-                      ) : null}
-                      <p className="mt-0.5 text-xs text-muted">
-                        {instantNote} · {restNote}
-                      </p>
-                    </div>
-                    <p className="shrink-0 font-display text-base font-bold whitespace-nowrap text-ink">
-                      {formatKes(prize.amountKes)}
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-            <CardDescription>
-              Winners receive 50% instantly on the day; the rest releases on verified milestone
-              completion.
-            </CardDescription>
-          </Card>
-
-          <Card>
-            <CardTitle>Organizer</CardTitle>
-            <p className="mt-2 text-lg font-bold text-ink">{event.org.name}</p>
-            <p className="text-sm text-muted">{event.org.about}</p>
-            <div className="mt-3">
-              <Badge variant="success">Trust score {event.org.trustScore}</Badge>
-            </div>
-            <CardDescription>
-              Trust scores move with payout speed, media delivery, and milestone honesty.
-            </CardDescription>
-          </Card>
         </aside>
       </div>
     </div>
