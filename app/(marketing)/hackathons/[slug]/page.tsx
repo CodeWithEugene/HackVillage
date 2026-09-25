@@ -4,6 +4,7 @@ import { CalendarDays, Clock, MapPin, Users } from "lucide-react";
 
 import { PrizeVerifiedBadge } from "@/components/patterns/prize-verified-badge";
 import { KeyDatesCard } from "@/components/patterns/key-dates-card";
+import { OrganizerCard } from "@/components/patterns/organizer-card";
 import { StatusTimeline } from "@/components/patterns/status-timeline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,7 +52,16 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
   const event = await prisma.event.findFirst({
     where: { slug, publishedAt: { not: null } },
     include: {
-      org: { select: { name: true, slug: true, trustScore: true, about: true } },
+      org: {
+        select: {
+          name: true,
+          slug: true,
+          trustScore: true,
+          about: true,
+          kycStatus: true,
+          createdAt: true,
+        },
+      },
       prizes: { orderBy: { place: "asc" } },
       winners: {
         include: {
@@ -260,17 +270,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           </CardDescription>
         </Card>
 
-        <Card>
-          <CardTitle>Organizer</CardTitle>
-          <p className="mt-2 text-lg font-bold text-ink">{event.org.name}</p>
-          <p className="text-sm text-muted">{event.org.about}</p>
-          <div className="mt-3">
-            <Badge variant="success">Trust score {event.org.trustScore}</Badge>
-          </div>
-          <CardDescription>
-            Trust scores move with payout speed, media delivery, and milestone honesty.
-          </CardDescription>
-        </Card>
+        <OrganizerCard org={{ id: event.orgId, ...event.org }} />
 
         <KeyDatesCard event={event} />
       </div>

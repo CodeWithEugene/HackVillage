@@ -34,12 +34,14 @@ async function main(): Promise<void> {
     update: {},
   });
 
+  const ORG_ABOUT =
+    "Technetium Kenya runs community-first hackathons across Nairobi, Kisumu, and Mombasa. We partner with local hubs, universities, and employers so every build tackles a real Kenyan problem.\n\nEvery prize pool is escrowed before a hackathon goes live, winners are paid on the day, and every team leaves with feedback from the judges.";
   const org = await prisma.organization.upsert({
     where: { slug: "technetium-kenya" },
     create: {
       name: "Technetium Kenya",
       slug: "technetium-kenya",
-      about: "Community-first hackathons for the Nairobi ecosystem.",
+      about: ORG_ABOUT,
       ownerId: organizer.id,
       kycStatus: "VERIFIED",
     },
