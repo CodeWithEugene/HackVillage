@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
+import { NavLink } from "@/components/patterns/nav-link";
+
 interface NavLinkItem {
   href: string;
   label: string;
@@ -102,13 +104,13 @@ export function MobileNav({ navLinks, organizerLinks, trustLink }: MobileNavProp
                 <ul className="mobile-nav-list">
                   {navLinks.map((link) => (
                     <li key={link.href}>
-                      <Link
+                      <NavLink
                         href={link.href}
                         className="mobile-nav-link"
                         onClick={() => setOpen(false)}
                       >
                         {link.label}
-                      </Link>
+                      </NavLink>
                     </li>
                   ))}
                 </ul>
@@ -117,26 +119,26 @@ export function MobileNav({ navLinks, organizerLinks, trustLink }: MobileNavProp
                 <ul className="mobile-nav-list">
                   {organizerLinks.map((link) => (
                     <li key={link.href}>
-                      <Link
+                      <NavLink
                         href={link.href}
                         className="mobile-nav-link"
                         onClick={() => setOpen(false)}
                       >
                         {link.label}
-                      </Link>
+                      </NavLink>
                     </li>
                   ))}
                 </ul>
 
                 <ul className="mobile-nav-list">
                   <li>
-                    <Link
+                    <NavLink
                       href={trustLink.href}
                       className="mobile-nav-link"
                       onClick={() => setOpen(false)}
                     >
                       {trustLink.label}
-                    </Link>
+                    </NavLink>
                   </li>
                 </ul>
               </nav>

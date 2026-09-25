@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
+
+import { isActivePath } from "@/lib/nav";
 
 interface NavDropdownItem {
   href: string;
@@ -11,6 +14,8 @@ interface NavDropdownItem {
 
 export function NavDropdown({ label, items }: { label: string; items: NavDropdownItem[] }) {
   const ref = useRef<HTMLDetailsElement>(null);
+  const pathname = usePathname();
+  const hasActiveItem = items.some((item) => isActivePath(pathname, item.href));
 
   useEffect(() => {
     const closeOutside = (event: PointerEvent) => {
@@ -33,7 +38,7 @@ export function NavDropdown({ label, items }: { label: string; items: NavDropdow
         }
       }}
     >
-      <summary className="nav-dropdown-trigger">
+      <summary className="nav-dropdown-trigger" data-active={hasActiveItem || undefined}>
         {label}
         <ChevronDown aria-hidden className="nav-dropdown-chevron size-3.5" />
       </summary>
@@ -43,6 +48,7 @@ export function NavDropdown({ label, items }: { label: string; items: NavDropdow
             key={item.href}
             href={item.href}
             className="nav-dropdown-link"
+            aria-current={isActivePath(pathname, item.href) ? "page" : undefined}
             onClick={() => ref.current?.removeAttribute("open")}
           >
             {item.label}

@@ -847,6 +847,30 @@
     justify-content: center;
     gap: 28px;
   }
+  /*
+   * Current page: NavLink (components/patterns/nav-link.tsx) sets
+   * aria-current="page", and the Organizers trigger gets data-active when one
+   * of its pages is open. Styling keys off those attributes, so the visual
+   * underline and what screen readers announce can never disagree.
+   */
+  .site-nav-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-ink-soft);
+  }
+  .site-nav-link:hover {
+    color: var(--color-ink);
+  }
+  .site-nav-link[aria-current="page"],
+  .nav-dropdown-trigger[data-active],
+  .nav-dropdown-link[aria-current="page"],
+  .mobile-nav-link[aria-current="page"] {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--color-brand);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
   .nav-dropdown {
     position: relative;
   }
