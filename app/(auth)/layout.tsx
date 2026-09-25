@@ -19,8 +19,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
       <main className="auth-main">
         <div className="auth-topbar">
-          <Link href="/" className="header-icon" aria-label="Back to home" title="Back to home">
+          <Link href="/" className="auth-home">
             <ArrowLeft aria-hidden className="size-5" />
+            Home
           </Link>
           <ThemeSwitcher />
         </div>
