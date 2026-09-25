@@ -82,7 +82,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
   const isRegistered = registration_?.status === "REGISTERED";
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-12">
+    <div className="site-container py-12">
       {/* Status banner — P1: money state is one glance away */}
       {registration === "closed" ? (
         <div className="mb-6 rounded-card border border-warning/40 bg-warning/10 p-4 text-sm font-semibold text-ink">
@@ -104,7 +104,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
         </Badge>
       </div>
 
-      <h1 className="mt-4 font-display text-3xl font-bold leading-tight text-ink sm:text-4xl">
+      <h1 className="mt-4 font-display text-3xl leading-tight font-bold text-ink sm:text-4xl">
         {event.title}
       </h1>
       {event.summary ? <p className="mt-2 text-lg text-muted">{event.summary}</p> : null}
@@ -119,165 +119,180 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
         </div>
       ) : null}
 
-      <Card className="mt-6">
-        <CardTitle className="text-base font-semibold text-muted">Status</CardTitle>
-        <div className="mt-3 overflow-x-auto">
-          <StatusTimeline status={event.status} />
+      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] xl:gap-8">
+        <div className="min-w-0 space-y-6">
+          <Card>
+            <CardTitle className="text-base font-semibold text-muted">Status</CardTitle>
+            <div className="mt-3 overflow-x-auto">
+              <StatusTimeline status={event.status} />
+            </div>
+          </Card>
+
+          <Card>
+            <CardTitle>Problem Statement</CardTitle>
+            <p className="mt-3 leading-7 whitespace-pre-line text-ink-soft">
+              {event.problemStatement}
+            </p>
+            {event.rules ? (
+              <>
+                <CardTitle className="mt-6 text-base">Rules</CardTitle>
+                <p className="mt-2 text-sm leading-6 whitespace-pre-line text-muted">
+                  {event.rules}
+                </p>
+              </>
+            ) : null}
+            {event.rolesWanted.length > 0 ? (
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {event.rolesWanted.map((tag) => (
+                  <Badge key={tag}>{tag}</Badge>
+                ))}
+              </div>
+            ) : null}
+          </Card>
+
+          {/* Public gallery — 48-hour media vault */}
+          {gallery.length > 0 ? (
+            <Card>
+              <CardTitle>Event Gallery</CardTitle>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+                {gallery.map((asset) => (
+                  <li key={asset.id} className="overflow-hidden rounded-card border border-ink/10">
+                    {asset.kind === "PHOTO" ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- media vault assets from dynamic storage
+                      <img
+                        src={asset.url}
+                        alt={asset.caption ?? "Event photo"}
+                        className="aspect-[4/3] w-full object-cover"
+                      />
+                    ) : (
+                      <video src={asset.url} controls className="aspect-[4/3] w-full" />
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <CardDescription>
+                Delivered within the 48-hour standard: high-resolution, community-first.
+              </CardDescription>
+            </Card>
+          ) : null}
         </div>
-      </Card>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Prize pool</p>
-          <p className="mt-1 font-display text-2xl font-bold text-ink">{formatKes(poolKes)}</p>
-        </Card>
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Runs</p>
-          <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-ink">
-            <CalendarDays aria-hidden className="size-4" />
-            {dateFormat.format(event.startsAt)} to {dateFormat.format(event.endsAt)}
-          </p>
-          <p className="mt-1 flex items-center gap-1.5 text-xs text-muted">
-            <Clock aria-hidden className="size-3.5" />
-            {timeFormat.format(event.startsAt)}
-          </p>
-        </Card>
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Venue</p>
-          <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-ink">
-            <MapPin aria-hidden className="size-4" />
-            {event.venueType === "ONLINE"
-              ? "Online"
-              : (event.location ?? event.venueType.toLowerCase())}
-          </p>
-          <p className="mt-1 text-xs text-muted capitalize">{event.venueType.toLowerCase()}</p>
-        </Card>
-      </div>
-
-      <Card className="mt-6">
-        <CardTitle>Problem Statement</CardTitle>
-        <p className="mt-3 whitespace-pre-line leading-7 text-ink-soft">
-          {event.problemStatement}
-        </p>
-        {event.rules ? (
-          <>
-            <CardTitle className="mt-6 text-base">Rules</CardTitle>
-            <p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted">{event.rules}</p>
-          </>
-        ) : null}
-        {event.rolesWanted.length > 0 ? (
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {event.rolesWanted.map((tag) => (
-              <Badge key={tag}>{tag}</Badge>
-            ))}
+        <aside className="space-y-6" aria-label="Event details">
+          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+            <Card>
+              <p className="text-xs font-semibold tracking-wide text-muted uppercase">Prize pool</p>
+              <p className="mt-1 font-display text-2xl font-bold text-ink">{formatKes(poolKes)}</p>
+            </Card>
+            <Card>
+              <p className="text-xs font-semibold tracking-wide text-muted uppercase">Runs</p>
+              <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-ink">
+                <CalendarDays aria-hidden className="size-4" />
+                {dateFormat.format(event.startsAt)} to {dateFormat.format(event.endsAt)}
+              </p>
+              <p className="mt-1 flex items-center gap-1.5 text-xs text-muted">
+                <Clock aria-hidden className="size-3.5" />
+                {timeFormat.format(event.startsAt)}
+              </p>
+            </Card>
+            <Card>
+              <p className="text-xs font-semibold tracking-wide text-muted uppercase">Venue</p>
+              <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-ink">
+                <MapPin aria-hidden className="size-4" />
+                {event.venueType === "ONLINE"
+                  ? "Online"
+                  : (event.location ?? event.venueType.toLowerCase())}
+              </p>
+              <p className="mt-1 text-xs text-muted capitalize">{event.venueType.toLowerCase()}</p>
+            </Card>
           </div>
-        ) : null}
-      </Card>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <Card>
-          <CardTitle>Prize Breakdown</CardTitle>
-          <table className="mt-3 w-full text-sm">
-            <tbody>
+          {/* CTA */}
+          <div>
+            {isRegistered ? (
+              <div className="space-y-3">
+                <Badge variant="success">Registered ✓</Badge>
+                <Link href={`/events/${event.slug}/workspace`} className="block">
+                  <Button arrow size="lg" className="w-full">
+                    Open Team Workspace
+                  </Button>
+                </Link>
+              </div>
+            ) : open ? (
+              viewer ? (
+                <form action={`/api/events/${event.slug}/register`} method="post">
+                  <Button type="submit" size="lg" className="w-full">
+                    Register For This Event
+                  </Button>
+                </form>
+              ) : (
+                <Link href="/signin" className="block">
+                  <Button size="lg" arrow className="w-full">
+                    Sign In To Register
+                  </Button>
+                </Link>
+              )
+            ) : (
+              <Button size="lg" disabled className="w-full">
+                Registration Closed
+              </Button>
+            )}
+          </div>
+
+          <Card>
+            <CardTitle>Prize Breakdown</CardTitle>
+            <ul className="mt-3 text-sm">
               {event.prizes.map((prize) => {
                 const winner = event.winners.find((w) => w.place === prize.place);
+                const instantNote = winner
+                  ? winner.payouts.some((p) => p.tranche === "INSTANT" && p.status === "SUCCEEDED")
+                    ? "50% paid ✓"
+                    : "paying…"
+                  : "50% on the day";
+                const restNote = prize.milestoneRequired ? "50% on milestone" : "full payout on win";
                 return (
-                  <tr key={prize.id} className="border-b border-ink/5 last:border-0">
-                    <td className="py-2 font-semibold text-ink">
-                      {prize.label}
+                  <li
+                    key={prize.id}
+                    className="flex items-start justify-between gap-4 border-b border-ink/5 py-3 last:border-0"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-semibold text-ink">{prize.label}</p>
                       {winner ? (
-                        <span className="block text-xs font-normal text-muted">
+                        <p className="text-xs text-muted">
                           won by {winner.team.name} ·{" "}
                           <Link href={`/developers/${winner.user.handle}`} className="underline">
                             @{winner.user.handle}
                           </Link>
-                        </span>
+                        </p>
                       ) : null}
-                    </td>
-                    <td className="py-2 text-right font-display text-base font-bold text-ink">
+                      <p className="mt-0.5 text-xs text-muted">
+                        {instantNote} · {restNote}
+                      </p>
+                    </div>
+                    <p className="shrink-0 font-display text-base font-bold whitespace-nowrap text-ink">
                       {formatKes(prize.amountKes)}
-                    </td>
-                    <td className="py-2 pl-3 text-right text-xs text-muted">
-                      {winner
-                        ? winner.payouts.some((p) => p.tranche === "INSTANT" && p.status === "SUCCEEDED")
-                          ? "50% paid ✓"
-                          : "paying…"
-                        : "50% on the day"}
-                      <br />
-                      {prize.milestoneRequired ? "50% on milestone" : "full payout on win"}
-                    </td>
-                  </tr>
+                    </p>
+                  </li>
                 );
               })}
-            </tbody>
-          </table>
-          <CardDescription>
-            Winners receive 50% instantly on the day; the rest releases on verified milestone
-            completion.
-          </CardDescription>
-        </Card>
+            </ul>
+            <CardDescription>
+              Winners receive 50% instantly on the day; the rest releases on verified milestone
+              completion.
+            </CardDescription>
+          </Card>
 
-        <Card>
-          <CardTitle>Organizer</CardTitle>
-          <p className="mt-2 text-lg font-bold text-ink">{event.org.name}</p>
-          <p className="text-sm text-muted">{event.org.about}</p>
-          <div className="mt-3">
-            <Badge variant="success">Trust score {event.org.trustScore}</Badge>
-          </div>
-          <CardDescription>
-            Trust scores move with payout speed, media delivery, and milestone honesty.
-          </CardDescription>
-        </Card>
-      </div>
-
-      {/* Public gallery — 48-hour media vault */}
-      {gallery.length > 0 ? (
-        <Card className="mt-6">
-          <CardTitle>Event Gallery</CardTitle>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-3">
-            {gallery.map((asset) => (
-              <li key={asset.id} className="overflow-hidden rounded-card border border-ink/10">
-                {asset.kind === "PHOTO" ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- media vault assets from dynamic storage
-                  <img src={asset.url} alt={asset.caption ?? "Event photo"} className="aspect-[4/3] w-full object-cover" />
-                ) : (
-                  <video src={asset.url} controls className="aspect-[4/3] w-full" />
-                )}
-              </li>
-            ))}
-          </ul>
-          <CardDescription>
-            Delivered within the 48-hour standard: high-resolution, community-first.
-          </CardDescription>
-        </Card>
-      ) : null}
-
-      {/* CTA */}
-      <div className="mt-8">
-        {isRegistered ? (
-          <div className="flex flex-wrap items-center gap-3">
-            <Badge variant="success">Registered ✓</Badge>
-            <Link href={`/events/${event.slug}/workspace`}>
-              <Button arrow>Open Team Workspace</Button>
-            </Link>
-          </div>
-        ) : open ? (
-          viewer ? (
-            <form action={`/api/events/${event.slug}/register`} method="post">
-              <Button type="submit" size="lg">
-                Register For This Event
-              </Button>
-            </form>
-          ) : (
-            <Link href="/signin">
-              <Button size="lg" arrow>Sign In To Register</Button>
-            </Link>
-          )
-        ) : (
-          <Button size="lg" disabled>
-            Registration Closed
-          </Button>
-        )}
+          <Card>
+            <CardTitle>Organizer</CardTitle>
+            <p className="mt-2 text-lg font-bold text-ink">{event.org.name}</p>
+            <p className="text-sm text-muted">{event.org.about}</p>
+            <div className="mt-3">
+              <Badge variant="success">Trust score {event.org.trustScore}</Badge>
+            </div>
+            <CardDescription>
+              Trust scores move with payout speed, media delivery, and milestone honesty.
+            </CardDescription>
+          </Card>
+        </aside>
       </div>
     </div>
   );
