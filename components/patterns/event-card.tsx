@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, CalendarDays, MapPin, Users } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
-import { eventTiming, formatEventDates, formatShortDate } from "@/lib/events/format";
+import { formatEventDates, formatShortDate } from "@/lib/events/format";
 import { registrationOpen, type EventStatus } from "@/lib/events/lifecycle";
 import { cn, formatKes } from "@/lib/utils";
 
@@ -23,12 +23,6 @@ export interface EventCardData {
   orgTrustScore: number;
 }
 
-const TIMING_DOT = {
-  brand: "bg-brand",
-  success: "bg-success",
-  muted: "bg-ink/30",
-} as const;
-
 function venueLabel(event: EventCardData): string {
   if (event.venueType === "ONLINE") return "Online";
   const place = event.location ?? "Venue to be announced";
@@ -43,7 +37,6 @@ function registrationNote(event: EventCardData, open: boolean): string {
 
 export function EventCard({ event }: { event: EventCardData }) {
   const open = registrationOpen(event);
-  const timing = eventTiming(event);
 
   return (
     <Link
@@ -51,13 +44,7 @@ export function EventCard({ event }: { event: EventCardData }) {
       className="group flex h-full flex-col rounded-card bg-surface p-5 shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
     >
       <div className="text-center">
-        {timing ? (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-soft">
-            <span aria-hidden className={cn("size-1.5 rounded-full", TIMING_DOT[timing.tone])} />
-            {timing.label}
-          </span>
-        ) : null}
-        <h3 className="mt-3 font-display text-xl leading-snug font-bold text-ink">{event.title}</h3>
+        <h3 className="font-display text-xl leading-snug font-bold text-ink">{event.title}</h3>
         <p className="mt-1 text-xs font-medium text-muted">by {event.orgName}</p>
         {event.summary ? (
           <p className="mt-3 line-clamp-2 text-sm leading-6 text-body-copy">{event.summary}</p>

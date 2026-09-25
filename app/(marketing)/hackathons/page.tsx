@@ -5,6 +5,12 @@ import { EventCard } from "@/components/patterns/event-card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { prisma } from "@/lib/db";
+import {
+  defaultPhase,
+  HACKATHON_PHASES,
+  hackathonPhase,
+  type HackathonPhase,
+} from "@/lib/events/format";
 import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
 import { CalendarX2 } from "lucide-react";
 
@@ -13,13 +19,28 @@ export const metadata: Metadata = {
   description: "Browse hackathons on HackVillage, every one with its full prize pool secured.",
 };
 
-const FILTERS = [
-  { key: "all", label: "All" },
+const TABS: { key: HackathonPhase; label: string }[] = [
+  { key: "ongoing", label: "Ongoing" },
   { key: "upcoming", label: "Upcoming" },
   { key: "past", label: "Past" },
-] as const;
+];
 
-type FilterKey = (typeof FILTERS)[number]["key"];
+function isPhase(value: string | undefined): value is HackathonPhase {
+  return HACKATHON_PHASES.some((phase) => phase === value);
+}
+
+/** Ongoing: ends soonest first. Upcoming: starts soonest first. Past: most recent first. */
+function sortForPhase<T extends { startsAt: Date; endsAt: Date }>(
+  events: T[],
+  phase: HackathonPhase,
+): T[] {
+  const sorted = [...events];
+  if (phase === "ongoing") return sorted.sort((a, b) => a.endsAt.getTime() - b.endsAt.getTime());
+  if (phase === "upcoming") {
+    return sorted.sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
+  }
+  return sorted.sort((a, b) => b.endsAt.getTime() - a.endsAt.getTime());
+}
 
 export default async function EventsPage({
   searchParams,
@@ -27,9 +48,6 @@ export default async function EventsPage({
   searchParams: Promise<{ filter?: string }>;
 }) {
   const { filter: filterParam } = await searchParams;
-  const filter: FilterKey = FILTERS.some((f) => f.key === filterParam)
-    ? (filterParam as FilterKey)
-    : "all";
   const now = new Date();
 
   const events = await prisma.event.findMany({
@@ -43,34 +61,29 @@ export default async function EventsPage({
     take: 60,
   });
 
-  const cards = events
-    .map((event) => ({
-      slug: event.slug,
-      title: event.title,
-      summary: event.summary,
-      venueType: event.venueType,
-      location: event.location,
-      startsAt: event.startsAt,
-      endsAt: event.endsAt,
-      registrationDeadline: event.registrationDeadline,
-      publishedAt: event.publishedAt,
-      status: event.status,
-      poolKes: event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0),
-      teamCount: event._count.teams,
-      orgName: event.org.name,
-      orgTrustScore: event.org.trustScore,
-    }))
-    .filter((event) => {
-      const past = event.endsAt < now;
-      switch (filter) {
-        case "upcoming":
-          return !past;
-        case "past":
-          return past;
-        default:
-          return true;
-      }
-    });
+  const allCards = events.map((event) => ({
+    slug: event.slug,
+    title: event.title,
+    summary: event.summary,
+    venueType: event.venueType,
+    location: event.location,
+    startsAt: event.startsAt,
+    endsAt: event.endsAt,
+    registrationDeadline: event.registrationDeadline,
+    publishedAt: event.publishedAt,
+    status: event.status,
+    poolKes: event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0),
+    teamCount: event._count.teams,
+    orgName: event.org.name,
+    orgTrustScore: event.org.trustScore,
+  }));
+  const counts = { ongoing: 0, upcoming: 0, past: 0 };
+  for (const card of allCards) counts[hackathonPhase(card, now)] += 1;
+  const phase = isPhase(filterParam) ? filterParam : defaultPhase(counts);
+  const cards = sortForPhase(
+    allCards.filter((card) => hackathonPhase(card, now) === phase),
+    phase,
+  );
 
   return (
     <div className="site-container py-16">
@@ -83,12 +96,13 @@ export default async function EventsPage({
       </header>
 
       <nav aria-label="Filter hackathons" className="mb-8 flex flex-wrap justify-center gap-2">
-        {FILTERS.map((option) => (
+        {TABS.map((option) => (
           <Link
             key={option.key}
-            href={option.key === "all" ? "/hackathons" : `/hackathons?filter=${option.key}`}
+            href={`/hackathons?filter=${option.key}`}
+            aria-current={option.key === phase ? "page" : undefined}
             className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
-              option.key === filter ? "bg-brand text-ink" : "bg-ink/5 text-ink-soft hover:bg-ink/10"
+              option.key === phase ? "bg-brand text-ink" : "bg-ink/5 text-ink-soft hover:bg-ink/10"
             }`}
           >
             {option.label}
