@@ -1,22 +1,14 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+import { AuthVisual } from "@/components/patterns/auth-visual";
 import { ThemeSwitcher } from "@/components/patterns/theme-switcher";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="auth-shell">
-      <div className="auth-visual" aria-hidden>
-        <Image
-          src="/marketing/hero/kenya/center-developer.webp"
-          alt=""
-          fill
-          priority
-          sizes="50vw"
-          className="object-cover object-top"
-        />
-      </div>
+      {/* The form comes first in the DOM so keyboard users reach it first; CSS
+          places the photo in the left column. */}
       <main className="auth-main">
         <div className="auth-topbar">
           <Link href="/" className="auth-home">
@@ -35,6 +27,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </Link>
         <div className="w-full max-w-md">{children}</div>
       </main>
+      <AuthVisual />
     </div>
   );
 }
