@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
-import { formatPostDate } from "@/lib/blog";
+import { formatPostDate } from "@/lib/blog/format";
 import type { BlogPostMeta } from "@/lib/blog/types";
 
 /** A post in the blog grid. */

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 
 import { BlogCard } from "@/components/patterns/blog-card";
+import { Pagination } from "@/components/patterns/pagination";
 import { allPosts } from "@/lib/blog";
+import { pageCount, pageSlice, parsePage } from "@/lib/blog/pagination";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -9,8 +11,18 @@ export const metadata: Metadata = {
     "Guides and stories from HackVillage: escrowed prizes, instant payouts, and running hackathons builders trust.",
 };
 
-export default function BlogPage() {
+interface PageProps {
+  searchParams: Promise<{ page?: string | string[] }>;
+}
+
+function blogPageHref(page: number): string {
+  return page === 1 ? "/blog" : `/blog?page=${page}`;
+}
+
+export default async function BlogPage({ searchParams }: PageProps) {
   const posts = allPosts();
+  const count = pageCount(posts.length);
+  const page = parsePage((await searchParams).page, count);
   return (
     <>
       <div className="site-container py-16">
@@ -28,10 +40,11 @@ export default function BlogPage() {
         </header>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
+          {pageSlice(posts, page).map((post) => (
             <BlogCard key={post.meta.slug} post={post.meta} />
           ))}
         </div>
+        <Pagination page={page} pageCount={count} label="Blog pages" hrefFor={blogPageHref} />
       </div>
     </>
   );

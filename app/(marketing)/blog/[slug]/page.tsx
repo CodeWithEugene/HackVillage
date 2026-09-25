@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
-import { BlogCard } from "@/components/patterns/blog-card";
+import { KeepReading } from "@/components/patterns/keep-reading";
 import { LegalToc } from "@/components/patterns/legal-toc";
 import { allPosts, formatPostDate, getPost, morePosts } from "@/lib/blog";
 
@@ -86,18 +86,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         </div>
       </article>
 
-      {more.length > 0 ? (
-        <section className="site-container pb-16" aria-labelledby="keep-reading-heading">
-          <h2 id="keep-reading-heading" className="font-display text-2xl font-bold text-ink">
-            Keep Reading
-          </h2>
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {more.map((other) => (
-              <BlogCard key={other.meta.slug} post={other.meta} />
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <KeepReading posts={more.map((other) => other.meta)} />
     </>
   );
 }
