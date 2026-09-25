@@ -112,9 +112,21 @@ export function SiteFooter() {
       </div>
 
       <div className="site-container">
-        <div className="flex flex-col items-center gap-3 border-t border-ink/10 py-6 text-sm text-body-copy sm:flex-row sm:justify-between">
-          <p>Copyright © {year} HackVillage</p>
+        <div className="grid justify-items-center gap-3 border-t border-ink/10 py-6 text-center text-sm text-body-copy xl:grid-cols-[1fr_auto_1fr] xl:items-center xl:gap-6">
+          <p className="xl:justify-self-start">Copyright © {year} HackVillage</p>
           <p>
+            A{" "}
+            <a
+              href="https://codewitheugene.top/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-ink-soft underline underline-offset-2 hover:text-ink"
+            >
+              CodeWithEugene
+            </a>{" "}
+            Creation.
+          </p>
+          <p className="xl:justify-self-end">
             Apache-2.0 licensed |{" "}
             <Link href="/terms" className="text-ink-soft underline underline-offset-2 hover:text-ink">
               Terms of Service
