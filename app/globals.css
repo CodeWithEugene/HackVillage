@@ -175,12 +175,13 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
+  /* Same scale as the home page hero heading (.hero-heading), at every breakpoint below. */
   .how-it-works-title {
     max-width: 1100px;
-    font-size: clamp(28px, 2.6vw, 40px);
+    font-size: clamp(2.75rem, 4.6vw, 5.5rem);
     font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.15;
+    letter-spacing: -0.045em;
+    line-height: 1.06;
     text-wrap: balance;
   }
   .how-it-works-title span {
@@ -1264,7 +1265,8 @@
       padding-bottom: 3vh;
       gap: 4vh;
     }
-    .hero-heading {
+    .hero-heading,
+    .how-it-works-title {
       font-size: clamp(4rem, 5vw, 6rem);
     }
     .hero-description {
@@ -1276,7 +1278,8 @@
     .hero-copy {
       max-width: 70%;
     }
-    .hero-heading {
+    .hero-heading,
+    .how-it-works-title {
       font-size: clamp(2.5rem, 5.3vw, 3.4rem);
     }
     .hero-actions {
@@ -1306,6 +1309,10 @@
     }
     .hero-heading {
       margin-top: 13px;
+      font-size: clamp(2rem, 8.8vw, 3.5rem);
+      line-height: 1.1;
+    }
+    .how-it-works-title {
       font-size: clamp(2rem, 8.8vw, 3.5rem);
       line-height: 1.1;
     }
