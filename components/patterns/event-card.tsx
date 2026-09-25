@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, CalendarDays, Clock, Lock, MapPin, Users } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { PrizeVerifiedBadge } from "@/components/patterns/prize-verified-badge";
 import { eventTiming, formatEventDates, formatShortDate } from "@/lib/events/format";
 import {
@@ -121,12 +122,13 @@ export function EventCard({ event }: { event: EventCardData }) {
         <span className={cn("font-semibold", open ? "text-success" : "text-muted")}>
           {registrationNote(event, open)}
         </span>
-        <span className="inline-flex items-center gap-1 font-semibold text-ink">
-          View Hackathon
-          <ArrowUpRight
-            aria-hidden
-            className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          />
+        {/* The whole card is the link, so this is a span dressed as the pill button. */}
+        <span className={cn(buttonVariants({ size: "sm" }), "shrink-0")}>
+          <span className="btn-fill" aria-hidden />
+          <span className="btn-content">
+            View Hackathon
+            <ArrowUpRight aria-hidden className="btn-arrow size-4" />
+          </span>
         </span>
       </div>
     </Link>
