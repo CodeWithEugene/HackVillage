@@ -26,10 +26,10 @@ export default async function OrganizerPage() {
       <EmptyState
         icon={ShieldCheck}
         title="You need an organization"
-        description="Organizations hold escrowed prize pools and run events. Create one to start organizing — it takes a minute."
+        description="Organizations hold escrowed prize pools and run events. Create one to start organizing; it takes a minute."
         action={
           <Link href="/onboarding/organizer">
-            <Button>Create Organization</Button>
+            <Button arrow>Create Organization</Button>
           </Link>
         }
       />
@@ -81,7 +81,7 @@ export default async function OrganizerPage() {
             </CardDescription>
           </div>
           <Link href="/organizer/events/new">
-            <Button>Create Event</Button>
+            <Button arrow>Create Event</Button>
           </Link>
         </div>
       </Card>
@@ -99,7 +99,7 @@ export default async function OrganizerPage() {
                     {event.status === "PENDING_DEPOSIT" ? "pending deposit" : event.status.toLowerCase()}
                   </Badge>
                   <Link href={`/organizer/events/${event.slug}`}>
-                    <Button size="sm" variant="secondary">Manage</Button>
+                    <Button size="sm" variant="secondary" arrow>Manage</Button>
                   </Link>
                 </span>
               </li>

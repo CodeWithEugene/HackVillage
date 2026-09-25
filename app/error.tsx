@@ -26,7 +26,7 @@ export default function Error({
       <div>
         <h1 className="font-display text-2xl font-bold text-ink">Something Went Wrong</h1>
         <p className="mt-2 max-w-md text-muted">
-          The page hit an unexpected error. Your data is safe — money operations
+          The page hit an unexpected error. Your data is safe. Money operations
           fail closed on this platform. Try again, and if it persists, contact
           support with the reference below.
         </p>
@@ -37,7 +37,7 @@ export default function Error({
       <div className="flex gap-3">
         <Button onClick={reset}>Try Again</Button>
         <Link href="/">
-          <Button variant="secondary">Back Home</Button>
+          <Button variant="secondary" arrow>Back Home</Button>
         </Link>
       </div>
     </div>

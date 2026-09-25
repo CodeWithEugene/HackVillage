@@ -30,15 +30,18 @@ export function LandingHero() {
           </h1>
           <p className="hero-description">
             From team formation to judging and payouts, bring your hackathon together in one place.
-            Every event is <strong>Prize Verified</strong> — with funds secured before the building
+            Every event is <strong>Prize Verified</strong>, with funds secured before the building
             begins.
           </p>
           <div className="hero-actions">
-            <Link href="/events" className="hero-action-primary">
-              Browse Hackathons <ArrowUpRight aria-hidden="true" size={17} />
+            <Link href="/events" className="hero-action-primary btn-pill">
+              <span className="btn-fill" aria-hidden />
+              <span className="btn-content">
+                Browse Hackathons <ArrowUpRight aria-hidden="true" size={17} className="btn-arrow" />
+              </span>
             </Link>
-            <Link href="/onboarding/organizer" className="hero-action-secondary">
-              Host a Hackathon <ArrowUpRight aria-hidden="true" size={16} />
+            <Link href="/onboarding/organizer" className="hero-action-secondary btn-pill">
+              Host a Hackathon <ArrowUpRight aria-hidden="true" size={16} className="btn-arrow" />
             </Link>
           </div>
         </div>

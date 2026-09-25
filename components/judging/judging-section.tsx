@@ -39,7 +39,7 @@ export async function JudgingSection({
       })
     : [];
   const nameFor = (teamId: string) =>
-    teamNames.find((team) => team.id === teamId)?.name ?? "—";
+    teamNames.find((team) => team.id === teamId)?.name ?? "N/A";
 
   return (
     <Card>
@@ -52,14 +52,14 @@ export async function JudgingSection({
           <CardDescription>
             {ended
               ? "The event has ended. Opening judging locks the rubric and gives your judges the team queue."
-              : "Judging opens after the event ends — invite judges and tune the rubric meanwhile."}
+              : "Judging opens after the event ends. Invite judges and tune the rubric meanwhile."}
           </CardDescription>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Link href={`/organizer/events/${slug}/judges`}>
-              <Button variant="secondary">Manage Judges</Button>
+              <Button variant="secondary" arrow>Manage Judges</Button>
             </Link>
             <Link href={`/organizer/events/${slug}/rubric`}>
-              <Button variant="secondary">Edit Rubric</Button>
+              <Button variant="secondary" arrow>Edit Rubric</Button>
             </Link>
             {ended ? <OpenJudgingButton eventId={eventId} /> : null}
           </div>
@@ -73,28 +73,28 @@ export async function JudgingSection({
         <>
           <CardDescription>
             All {readiness.teamsWithSubmission} submitted team
-            {readiness.teamsWithSubmission === 1 ? "" : "s"} fully judged — winners can be
+            {readiness.teamsWithSubmission === 1 ? "" : "s"} fully judged. Winners can be
             announced. Announcing triggers the instant 50% payouts immediately.
           </CardDescription>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link href={`/organizer/events/${slug}/winners`}>
-              <Button>Announce Winners →</Button>
+              <Button arrow>Announce Winners</Button>
             </Link>
             <Link href={`/organizer/events/${slug}/judges`}>
-              <Button variant="secondary">Judges &amp; Readiness</Button>
+              <Button variant="secondary" arrow>Judges &amp; Readiness</Button>
             </Link>
           </div>
         </>
       ) : (
         <>
           <CardDescription>
-            Live standings from <strong>finalized</strong> reviews only — {readiness.fullyJudgedTeams}/
+            Live standings from <strong>finalized</strong> reviews only: {readiness.fullyJudgedTeams}/
             {readiness.teamsWithSubmission} teams fully judged by all {readiness.activeJudges} active
             judge{readiness.activeJudges === 1 ? "" : "s"}.
           </CardDescription>
           <div className="mt-3 flex flex-wrap gap-3">
             <Link href={`/organizer/events/${slug}/judges`}>
-              <Button size="sm" variant="secondary">
+              <Button size="sm" variant="secondary" arrow>
                 Judges &amp; Readiness
               </Button>
             </Link>
@@ -126,7 +126,7 @@ export async function JudgingSection({
             </table>
           ) : (
             <p className="mt-3 text-sm text-muted">
-              No finalized reviews yet — standings appear as judges finalize.
+              No finalized reviews yet. Standings appear as judges finalize.
             </p>
           )}
           <CardDescription>

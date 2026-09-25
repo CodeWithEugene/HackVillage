@@ -114,7 +114,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           <p className="text-sm leading-6 text-ink">
             <strong>Prize pending verification.</strong> The organizer has declared a{" "}
             {formatKes(poolKes)} pool. This event goes live only after 100% of it is locked in the
-            Prize Vault — your build is never chasing money that doesn&apos;t exist yet.
+            Prize Vault, and your build is never chasing money that doesn&apos;t exist yet.
           </p>
         </div>
       ) : null}
@@ -135,7 +135,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           <p className="text-xs font-semibold uppercase tracking-wide text-muted">Runs</p>
           <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-ink">
             <CalendarDays aria-hidden className="size-4" />
-            {dateFormat.format(event.startsAt)} – {dateFormat.format(event.endsAt)}
+            {dateFormat.format(event.startsAt)} to {dateFormat.format(event.endsAt)}
           </p>
           <p className="mt-1 flex items-center gap-1.5 text-xs text-muted">
             <Clock aria-hidden className="size-3.5" />
@@ -247,7 +247,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
             ))}
           </ul>
           <CardDescription>
-            Delivered within the 48-hour standard — high-resolution, community-first.
+            Delivered within the 48-hour standard: high-resolution, community-first.
           </CardDescription>
         </Card>
       ) : null}
@@ -258,7 +258,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           <div className="flex flex-wrap items-center gap-3">
             <Badge variant="success">Registered ✓</Badge>
             <Link href={`/events/${event.slug}/workspace`}>
-              <Button>Open Team Workspace</Button>
+              <Button arrow>Open Team Workspace</Button>
             </Link>
           </div>
         ) : open ? (
@@ -270,7 +270,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
             </form>
           ) : (
             <Link href="/signin">
-              <Button size="lg">Sign In To Register</Button>
+              <Button size="lg" arrow>Sign In To Register</Button>
             </Link>
           )
         ) : (

@@ -81,7 +81,7 @@ export default async function EventsPage({
           Prize Verified Events
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted">
-          Every event here published with 100% of its prize pool declared — the vault locks it
+          Every event here published with 100% of its prize pool declared, and the vault locks it
           before the event goes live.
         </p>
       </header>
@@ -107,7 +107,7 @@ export default async function EventsPage({
           description="Events land here as organizers publish them. The first Prize Verified pilot lands with the platform launch."
           action={
             <Link href="/onboarding/organizer">
-              <Button>Host The First Event</Button>
+              <Button arrow>Host The First Event</Button>
             </Link>
           }
         />

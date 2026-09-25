@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Github } from "lucide-react";
 
+import { MobileNav } from "@/components/patterns/mobile-nav";
 import { NavDropdown } from "@/components/patterns/nav-dropdown";
 import { ThemeSwitcher } from "@/components/patterns/theme-switcher";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,7 @@ interface NavLink {
 }
 
 const NAV_LINKS: NavLink[] = [
+  { href: "/", label: "Home" },
   { href: "/events", label: "Hackathons" },
   { href: "/developers", label: "Developers" },
 ];
@@ -19,6 +21,8 @@ const ORGANIZER_LINKS: NavLink[] = [
   { href: "/onboarding/organizer", label: "Host A Hackathon" },
   { href: "/#how-it-works", label: "How Escrow Works" },
 ];
+
+const TRUST_LINK: NavLink = { href: "/trust", label: "Trust" };
 
 export function SiteHeader({ className }: { className?: string }) {
   return (
@@ -44,8 +48,8 @@ export function SiteHeader({ className }: { className?: string }) {
             </Link>
           ))}
           <NavDropdown label="Organizers" items={ORGANIZER_LINKS} />
-          <Link href="/trust" className="text-sm font-medium text-ink-soft hover:text-ink">
-            Trust
+          <Link href={TRUST_LINK.href} className="text-sm font-medium text-ink-soft hover:text-ink">
+            {TRUST_LINK.label}
           </Link>
         </nav>
         <div className="site-header-actions">
@@ -57,12 +61,15 @@ export function SiteHeader({ className }: { className?: string }) {
             <Github aria-hidden className="size-4" />
           </a>
           <ThemeSwitcher />
-          <Link href="/signin" className="header-signin">
-            Sign In
+          <Link href="/signin" className="header-signin btn-pill">
+            <span className="btn-fill" aria-hidden />
+            <span className="btn-content">Sign In</span>
           </Link>
-          <Link href="/signup" className="header-signup">
-            Sign Up
+          <Link href="/signup" className="header-signup btn-pill">
+            <span className="btn-fill" aria-hidden />
+            <span className="btn-content">Sign Up</span>
           </Link>
+          <MobileNav navLinks={NAV_LINKS} organizerLinks={ORGANIZER_LINKS} trustLink={TRUST_LINK} />
         </div>
       </div>
     </header>

@@ -39,7 +39,7 @@ export default async function DashboardEventsPage() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold text-ink">My Events</h1>
         <Link href="/events">
-          <Button variant="secondary">Browse Events</Button>
+          <Button variant="secondary" arrow>Browse Events</Button>
         </Link>
       </header>
 
@@ -47,10 +47,10 @@ export default async function DashboardEventsPage() {
         <EmptyState
           icon={CalendarDays}
           title="You haven't registered for any events"
-          description="Find a Prize Verified event that matches your skills — your Proof-of-Work record starts with your first one."
+          description="Find a Prize Verified event that matches your skills. Your Proof-of-Work record starts with your first one."
           action={
             <Link href="/events">
-              <Button>Browse Events</Button>
+              <Button arrow>Browse Events</Button>
             </Link>
           }
         />
@@ -89,7 +89,7 @@ export default async function DashboardEventsPage() {
                       </form>
                     ) : null}
                     <Link href={`/events/${event.slug}/workspace`}>
-                      <Button size="sm">{open ? "Workspace" : "View"}</Button>
+                      <Button size="sm" arrow>{open ? "Workspace" : "View"}</Button>
                     </Link>
                   </div>
                 </Card>

@@ -65,14 +65,14 @@ export default async function JudgeEventPage({
         <Card>
           <p className="text-sm text-muted">
             Judging opens when the event ends and the organizer opens the review window. Come back
-            then — you can review the submissions below in the meantime.
+            then. You can review the submissions below in the meantime.
           </p>
         </Card>
       ) : null}
 
       {teams.length === 0 ? (
         <Card>
-          <p className="text-sm text-muted">No submissions yet — the queue fills as teams submit.</p>
+          <p className="text-sm text-muted">No submissions yet. The queue fills as teams submit.</p>
         </Card>
       ) : (
         <ul className="space-y-3">
@@ -103,7 +103,7 @@ export default async function JudgeEventPage({
                     </p>
                   </div>
                   <Link href={`/judge/events/${event.slug}/teams/${team.id}`}>
-                    <Button size="sm" variant={finalized ? "secondary" : "primary"}>
+                    <Button size="sm" variant={finalized ? "secondary" : "primary"} arrow>
                       {finalized ? "Review" : "Score Team"}
                     </Button>
                   </Link>
