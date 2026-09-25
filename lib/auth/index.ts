@@ -7,6 +7,7 @@ import { verify } from "@node-rs/argon2";
 import { z } from "zod";
 
 import { HackVillageAdapter } from "@/lib/auth/adapter";
+import { queueSignInAlert } from "@/lib/auth/sign-in-alert";
 import type { PrimaryRole, Role } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/db";
 
@@ -87,6 +88,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: { signIn: "/signin", error: "/signin" },
   trustHost: true,
   providers,
+  events: {
+    // Security alert for every sign in, whichever method was used. A brand
+    // new OAuth account is skipped: that "sign in" is the account being created.
+    async signIn({ user, account, isNewUser }) {
+      if (!user.email || isNewUser) return;
+      await queueSignInAlert({ email: user.email, provider: account?.provider });
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       // First sign-in: capture the DB id so the session callback never has to

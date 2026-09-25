@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
     // Developer profiles (/developers/:handle) still exist; only the listing is gone.
     const removed = [
       { source: "/developers", destination: "/hackathons", permanent: false },
-      { source: "/trust", destination: "/#how-it-works", permanent: false },
+      { source: "/trust", destination: "/how-escrow-works", permanent: false },
     ];
     return removed.concat(
       RENAMED_SECTIONS.flatMap((section) => [

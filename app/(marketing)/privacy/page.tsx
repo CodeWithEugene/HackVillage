@@ -57,6 +57,9 @@ export default function PrivacyPolicyPage() {
       <p>
         We use session cookies to keep you signed in (via Auth.js), and we log request metadata
         (IP address, user agent, timestamps) for security, rate-limiting, and abuse prevention.
+        Each time you sign in, we email you the time, device, browser, IP address, and approximate
+        location (estimated from your IP address) of that sign in, so you can spot one that
+        wasn&apos;t you.
         We use Vercel Analytics for aggregate, privacy-respecting traffic metrics; it does not
         use cookies or track individuals across sites.
       </p>

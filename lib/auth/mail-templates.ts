@@ -3,6 +3,7 @@
  * the account deactivation notice. These are security critical, so they
  * always send and never carry an unsubscribe link.
  */
+import type { SignInContext } from "@/lib/auth/sign-in-context";
 import { renderEmail, renderText, type EmailTemplate } from "@/lib/notifications/layout";
 
 export type { EmailTemplate };
@@ -56,6 +57,49 @@ export function passwordChangedEmail(): EmailTemplate {
     text: renderText([
       "Your HackVillage password was just changed.",
       "If this was not you, reset your password right away and contact info@hackvillage.xyz.",
+    ]),
+  };
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/** Sent on every successful sign in so the owner spots one that wasn't them. */
+export function signInAlertEmail(context: SignInContext, resetUrl: string): EmailTemplate {
+  const details = [
+    { label: "Time", value: context.time },
+    { label: "Device", value: context.device },
+    { label: "Browser", value: context.browser },
+    { label: "Approximate location", value: context.location },
+    { label: "IP address", value: context.ip },
+    { label: "Signed in with", value: context.method },
+  ];
+  return {
+    subject: "New Sign In To Your HackVillage Account",
+    html: renderEmail({
+      preheader: `New sign in from ${escapeHtml(context.device)} in ${escapeHtml(context.location)}.`,
+      section: {
+        heading: "New Sign In",
+        bodyHtml: `<p style="margin:0;">Your HackVillage account was just signed in to. Here are the details we saw.</p>
+          <p style="margin:12px 0 0;">If this was you, there is nothing else to do. If it wasn't, reset your password right away and contact us at info@hackvillage.xyz.</p>`,
+        details: details.map((row) => ({ label: row.label, value: escapeHtml(row.value) })),
+        ctaUrl: resetUrl,
+        ctaLabel: "Reset My Password",
+      },
+      footerHtml:
+        "You are receiving this because your HackVillage account was signed in to. We send it for every sign in, and it can't be turned off.",
+    }),
+    text: renderText([
+      "Your HackVillage account was just signed in to.",
+      ...details.map((row) => `${row.label}: ${row.value}`),
+      "If this was you, there is nothing else to do.",
+      `If it wasn't you, reset your password right away and contact info@hackvillage.xyz: ${resetUrl}`,
     ]),
   };
 }

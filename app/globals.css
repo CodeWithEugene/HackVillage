@@ -1387,8 +1387,61 @@
   /* Long-form legal document typography (Privacy Policy, Terms of Service) —
      no @tailwindcss/typography plugin installed, so this scopes plain
      semantic markup instead of repeating utility classes per element. */
+  /* Full width text pages: contents sidebar on large screens, one column below. */
+  .legal-layout {
+    display: grid;
+    gap: 2.5rem;
+  }
+  .legal-aside {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .legal-layout {
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: clamp(2.5rem, 5vw, 5rem);
+    }
+    .legal-aside {
+      display: block;
+    }
+    .legal-toc {
+      position: sticky;
+      top: calc(var(--site-header-height, 64px) + 2rem);
+      max-height: calc(100dvh - var(--site-header-height, 64px) - 4rem);
+      overflow-y: auto;
+    }
+  }
+  .legal-toc-title {
+    margin-bottom: 0.75rem;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+  }
+  .legal-toc ol {
+    border-left: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+  }
+  .legal-toc-link {
+    display: block;
+    margin-left: -1px;
+    padding: 0.375rem 0 0.375rem 0.875rem;
+    border-left: 2px solid transparent;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-muted);
+  }
+  .legal-toc-link:hover {
+    color: var(--color-ink);
+  }
+  .legal-toc-link.is-active {
+    border-left-color: var(--color-brand);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
   .legal h2 {
     @apply mt-10 font-display text-xl font-bold text-ink first:mt-0;
+    scroll-margin-top: calc(var(--site-header-height, 64px) + 1.5rem);
   }
 
   .legal h3 {
