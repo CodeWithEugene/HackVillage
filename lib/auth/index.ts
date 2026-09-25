@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { HackVillageAdapter } from "@/lib/auth/adapter";
 import { pickVerifiedGithubEmail } from "@/lib/auth/github-email";
+import { oauthSignInAllowed } from "@/lib/auth/oauth-linking";
 import { sendSignInAlert, sendWelcomeEmail } from "@/lib/auth/sign-in-alert";
 import type { PrimaryRole, Role } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/db";
@@ -67,6 +68,10 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      // Joins the existing HackVillage account with the same email instead of
+      // failing with OAuthAccountNotLinked. Safe only because the signIn
+      // callback refuses Google profiles whose email Google hasn't verified.
+      allowDangerousEmailAccountLinking: true,
     })
   );
 }
@@ -124,11 +129,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   callbacks: {
-    // GitHub accounts with no verified email can't be matched to anyone
-    // safely, so that sign-in is refused (shown as AccessDenied).
-    async signIn({ user, account }) {
-      if (account?.provider === "github" && !user.email) return false;
-      return true;
+    // Google and GitHub sign-ins join existing accounts by email, so the email
+    // must be one the provider verified. Otherwise the sign-in is refused
+    // (shown as AccessDenied).
+    async signIn({ user, account, profile }) {
+      return oauthSignInAllowed({ provider: account?.provider, email: user.email, profile });
     },
     async jwt({ token, user }) {
       // First sign-in: capture the DB id so the session callback never has to
