@@ -15,7 +15,6 @@ interface NavLinkItem {
 interface MobileNavProps {
   navLinks: NavLinkItem[];
   organizerLinks: NavLinkItem[];
-  trustLink: NavLinkItem;
 }
 
 /**
@@ -31,7 +30,7 @@ interface MobileNavProps {
  * otherwise shrink the overlay down to the header's own height instead
  * of covering the full viewport (and break click-outside-to-close).
  */
-export function MobileNav({ navLinks, organizerLinks, trustLink }: MobileNavProps) {
+export function MobileNav({ navLinks, organizerLinks }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -71,7 +70,7 @@ export function MobileNav({ navLinks, organizerLinks, trustLink }: MobileNavProp
         ? createPortal(
             <>
               <div
-                className={`mobile-nav-overlay${open ? " mobile-nav-overlay-open" : ""}`}
+                className={`mobile-nav-overlay${open ? "mobile-nav-overlay-open" : ""}`}
                 aria-hidden="true"
                 onClick={() => setOpen(false)}
               />
@@ -79,7 +78,7 @@ export function MobileNav({ navLinks, organizerLinks, trustLink }: MobileNavProp
               <nav
                 id="mobile-nav-panel"
                 aria-label="Mobile"
-                className={`mobile-nav-panel${open ? " mobile-nav-panel-open" : ""}`}
+                className={`mobile-nav-panel${open ? "mobile-nav-panel-open" : ""}`}
                 inert={!open}
               >
                 <div className="mobile-nav-panel-header">
@@ -129,21 +128,9 @@ export function MobileNav({ navLinks, organizerLinks, trustLink }: MobileNavProp
                     </li>
                   ))}
                 </ul>
-
-                <ul className="mobile-nav-list">
-                  <li>
-                    <NavLink
-                      href={trustLink.href}
-                      className="mobile-nav-link"
-                      onClick={() => setOpen(false)}
-                    >
-                      {trustLink.label}
-                    </NavLink>
-                  </li>
-                </ul>
               </nav>
             </>,
-            document.body
+            document.body,
           )
         : null}
     </>

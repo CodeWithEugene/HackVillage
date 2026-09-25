@@ -15,15 +15,12 @@ interface NavItem {
 const NAV_LINKS: NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/hackathons", label: "Hackathons" },
-  { href: "/developers", label: "Developers" },
 ];
 
 const ORGANIZER_LINKS: NavItem[] = [
   { href: "/onboarding/organizer", label: "Host A Hackathon" },
   { href: "/#how-it-works", label: "How Escrow Works" },
 ];
-
-const TRUST_LINK: NavItem = { href: "/trust", label: "Trust" };
 
 export function SiteHeader({ className }: { className?: string }) {
   return (
@@ -45,9 +42,6 @@ export function SiteHeader({ className }: { className?: string }) {
             </NavLink>
           ))}
           <NavDropdown label="Organizers" items={ORGANIZER_LINKS} />
-          <NavLink href={TRUST_LINK.href} className="site-nav-link">
-            {TRUST_LINK.label}
-          </NavLink>
         </nav>
         <div className="site-header-actions">
           <a
@@ -66,7 +60,7 @@ export function SiteHeader({ className }: { className?: string }) {
             <span className="btn-fill" aria-hidden />
             <span className="btn-content">Sign Up</span>
           </Link>
-          <MobileNav navLinks={NAV_LINKS} organizerLinks={ORGANIZER_LINKS} trustLink={TRUST_LINK} />
+          <MobileNav navLinks={NAV_LINKS} organizerLinks={ORGANIZER_LINKS} />
         </div>
       </div>
     </header>

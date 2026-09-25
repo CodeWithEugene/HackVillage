@@ -68,7 +68,7 @@ export default function PrivacyPolicyPage() {
       <ul>
         <li>Developer Proof-of-Work profiles (handle, verified win rate, hackathons, endorsements).</li>
         <li>
-          The public trust ledger at <a href="/trust">/trust</a>: every prize deposit and payout,
+          The public trust ledger: every prize deposit and payout,
           with amount and a payment-provider reference, attested to a public blockchain.
         </li>
         <li>Organizer trust scores and hackathon history.</li>

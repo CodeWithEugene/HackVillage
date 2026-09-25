@@ -10,14 +10,22 @@ const nextConfig: NextConfig = {
 
   // Old links (emails already sent, bookmarks, shared URLs) keep working.
   async redirects() {
-    return RENAMED_SECTIONS.flatMap((section) => [
-      { source: `${section}/events`, destination: `${section}/hackathons`, permanent: true },
-      {
-        source: `${section}/events/:path*`,
-        destination: `${section}/hackathons/:path*`,
-        permanent: true,
-      },
-    ]);
+    // Removed pages: send old links somewhere useful. Temporary, in case they return.
+    // Developer profiles (/developers/:handle) still exist; only the listing is gone.
+    const removed = [
+      { source: "/developers", destination: "/hackathons", permanent: false },
+      { source: "/trust", destination: "/#how-it-works", permanent: false },
+    ];
+    return removed.concat(
+      RENAMED_SECTIONS.flatMap((section) => [
+        { source: `${section}/events`, destination: `${section}/hackathons`, permanent: true },
+        {
+          source: `${section}/events/:path*`,
+          destination: `${section}/hackathons/:path*`,
+          permanent: true,
+        },
+      ]),
+    );
   },
 };
 

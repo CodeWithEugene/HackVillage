@@ -27,12 +27,12 @@ export function TrustImpact() {
           Trust Is Built Into Every Step.
         </h2>
         <p className="trust-impact-text">
-          From the first deposit to the final payout, every action is verifiable, on the record,
-          and impossible to fake.
+          From the first deposit to the final payout, every action is verifiable, on the record, and
+          impossible to fake.
         </p>
-        <Link href="/trust">
+        <Link href="/#how-it-works">
           <Button arrow className="whitespace-nowrap">
-            View The Trust Ledger
+            How Escrow Works
           </Button>
         </Link>
       </div>
