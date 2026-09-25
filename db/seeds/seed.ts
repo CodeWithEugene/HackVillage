@@ -83,7 +83,7 @@ async function main(): Promise<void> {
       where: { userId: user.id },
       create: {
         userId: user.id,
-        headline: `${dev.name.split(" ")[0]} — full-stack developer, React & Node`,
+        headline: `${dev.name.split(" ")[0]}, full-stack developer, React & Node`,
         skills: ["react", "typescript", "node", "postgres"],
         location: "Nairobi, Kenya",
       },
@@ -99,11 +99,11 @@ async function main(): Promise<void> {
       orgId: org.id,
       slug: "fintech-for-matatu-culture",
       title: "Fintech for Matatu Culture",
-      summary: "Build the rails Nairobi's matatu economy runs on — payments, savings, crew tools.",
+      summary: "Build the payments, savings, and crew tools that Nairobi's matatu economy runs on.",
       problemStatement:
         "Nairobi's matatu industry moves 3+ million riders daily, yet crews still run on cash boxes and riders have no digital proof of payment. Build open fintech rails for the matatu ecosystem: instant crew-to-rider payments, savings circles for vehicle owners, or data tools that respect crew realities (offline-first, low-end Android).",
       rules:
-        "Teams of 2–5. Offline-first is a hard requirement — the demo must work without network. Winners retain their IP; organizers get a demo license.",
+        "Teams of 2 to 5. Offline-first is a hard requirement: the demo must work without network. Winners retain their IP; organizers get a demo license.",
       venueType: "HYBRID",
       location: "iHub, Nairobi",
       startsAt: new Date(now + 2 * DAY),
@@ -195,9 +195,9 @@ async function main(): Promise<void> {
       orgId: org.id,
       slug: "ai-for-health-records",
       title: "AI for Health Records",
-      summary: "Interoperable patient records for community clinics — privacy-first AI tooling.",
+      summary: "Privacy-first AI tooling that connects patient records across community clinics.",
       problemStatement:
-        "Community clinics keep patient records in paper files that never talk to each other. Build privacy-first tooling that lets clinics exchange records with consent — AI triage assistants, referral pipelines, or audit tools for Data Protection Act compliance.",
+        "Community clinics keep patient records in paper files that never talk to each other. Build privacy-first tooling that lets clinics exchange records with consent, such as AI triage assistants, referral pipelines, or audit tools for Data Protection Act compliance.",
       venueType: "PHYSICAL",
       location: "Kisumu Innovation Hub",
       startsAt: new Date(now + 20 * DAY),
