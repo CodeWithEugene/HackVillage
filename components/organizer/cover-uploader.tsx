@@ -131,7 +131,8 @@ export function CoverUploader({ eventId, previewUrl, hasCustomCover }: CoverUplo
       <CardDescription>
         Shown on your hackathon card and page. Covers are {COVER_WIDTH} × {COVER_HEIGHT} px (16:9).
         Upload a JPEG, PNG, or WebP of at least {COVER_MIN_WIDTH} × {COVER_MIN_HEIGHT} px, up to
-        10MB. We crop it to 16:9 around the center and resize it for you.
+        10MB. We crop it to 16:9 around the center and resize it for you. Cards show a wider slice,
+        so keep the main subject near the middle.
       </CardDescription>
 
       <div className="mt-4 overflow-hidden rounded-card bg-brand/10">

@@ -50,7 +50,7 @@ export function EventCard({ event }: { event: EventCardData }) {
       href={`/hackathons/${event.slug}`}
       className="group flex h-full flex-col overflow-hidden rounded-card bg-surface shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
     >
-      <div className="relative aspect-[16/9] overflow-hidden bg-brand/10">
+      <div className="relative aspect-[21/9] overflow-hidden bg-brand/10">
         <Image
           src={cover}
           // Uploaded covers live on R2 and are already sized to 1600x900.
@@ -74,26 +74,26 @@ export function EventCard({ event }: { event: EventCardData }) {
         ) : null}
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <div className="text-center">
-          <h3 className="font-display text-xl leading-snug font-bold text-ink">{event.title}</h3>
-          <p className="mt-1 text-xs font-medium text-muted">by {event.orgName}</p>
-          {event.summary ? (
-            <p className="mt-3 line-clamp-2 text-sm leading-6 text-body-copy">{event.summary}</p>
-          ) : null}
-
-          <div className="mt-4 rounded-2xl bg-brand/10 px-4 py-3">
-            <p className="text-[11px] font-semibold tracking-[0.14em] text-ink-soft uppercase">
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h3 className="line-clamp-2 font-display text-lg leading-snug font-bold text-ink">
+              {event.title}
+            </h3>
+            <p className="mt-0.5 truncate text-xs font-medium text-muted">by {event.orgName}</p>
+          </div>
+          <div className="shrink-0 text-right">
+            <p className="text-[10px] font-semibold tracking-[0.14em] text-ink-soft uppercase">
               Prize Pool
             </p>
-            <p className="mt-0.5 font-display text-2xl font-bold text-ink">
+            <p className="mt-0.5 font-display text-lg font-bold whitespace-nowrap text-ink">
               {formatKes(event.poolKes)}
             </p>
           </div>
         </div>
 
         {/* One row: dates and team count keep their width; a long venue truncates. */}
-        <ul className="mt-4 mb-5 flex items-center justify-center gap-x-3 text-xs text-body-copy">
+        <ul className="mt-3 mb-4 flex items-center gap-x-3 text-xs text-body-copy">
           <li className="flex shrink-0 items-center gap-1.5 whitespace-nowrap">
             <CalendarDays aria-hidden className="size-3.5 shrink-0 text-ink-soft" />
             {formatEventDates(event.startsAt, event.endsAt)}
@@ -108,7 +108,7 @@ export function EventCard({ event }: { event: EventCardData }) {
           </li>
         </ul>
 
-        <div className="mt-auto flex items-center justify-between gap-3 border-t border-ink/10 pt-4 text-sm">
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-ink/10 pt-3 text-sm">
           <span className={cn("font-semibold", open ? "text-success" : "text-muted")}>
             {registrationNote(event, open)}
           </span>
