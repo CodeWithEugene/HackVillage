@@ -1476,6 +1476,7 @@
 
   /* Auth pages: full height photo on the left half, form on the right. */
   .auth-shell {
+    --auth-corner: 1.5rem;
     display: grid;
     min-height: 100dvh;
     background: var(--color-paper);
@@ -1501,15 +1502,15 @@
       top: 0;
       height: 100dvh;
       overflow: hidden;
-      /* Inverted (concave) top right and bottom right corners. */
-      --auth-corner: 2.5rem;
-      mask:
-        radial-gradient(var(--auth-corner) at 100% 0, #0000 98%, #000) top / 100% 51% no-repeat,
-        radial-gradient(var(--auth-corner) at 100% 100%, #0000 98%, #000) bottom / 100% 51%
-          no-repeat;
+      /* Runs under the form panel so the photo shows through its rounded corners. */
+      width: calc(100% + var(--auth-corner));
     }
     .auth-main {
+      position: relative;
+      z-index: 1;
       padding: 3rem 2rem;
+      background: var(--color-paper);
+      border-radius: var(--auth-corner) 0 0 var(--auth-corner);
     }
   }
 }
