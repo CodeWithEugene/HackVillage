@@ -42,7 +42,9 @@ export function SignUpForm({
     <Card>
       <h1 className="font-display text-2xl font-bold text-ink">Create Your Account</h1>
       <p className="mt-1 text-sm text-muted">
-        One account, many roles: you can add organizer or judge access later.
+        {role === "ORGANIZER"
+          ? "Start with your own account. Next, you'll set up your organization."
+          : "One account, many roles: you can add organizer or judge access later."}
       </p>
 
       <OAuthButtons
@@ -88,19 +90,23 @@ export function SignUpForm({
           <Input id="email" name="email" type="email" autoComplete="email" required />
         </div>
 
-        <div>
-          <Label htmlFor="handle">Handle (optional)</Label>
-          <Input
-            id="handle"
-            name="handle"
-            placeholder="your public profile address"
-            maxLength={30}
-          />
-          <p className="mt-1.5 text-xs text-muted">
-            hackvillage.xyz/developers/<span className="font-mono">your-handle</span>. Leave blank
-            and we&apos;ll suggest one from your email.
-          </p>
-        </div>
+        {/* Organizers appear under their organization, so they skip the builder handle;
+            the server still suggests one from the email. */}
+        {role === "DEVELOPER" ? (
+          <div>
+            <Label htmlFor="handle">Handle (optional)</Label>
+            <Input
+              id="handle"
+              name="handle"
+              placeholder="your public profile address"
+              maxLength={30}
+            />
+            <p className="mt-1.5 text-xs text-muted">
+              hackvillage.xyz/developers/<span className="font-mono">your-handle</span>. Leave blank
+              and we&apos;ll suggest one from your email.
+            </p>
+          </div>
+        ) : null}
 
         <div>
           <Label htmlFor="password">Password</Label>

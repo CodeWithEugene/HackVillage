@@ -22,6 +22,24 @@ const KYB_BADGE = {
   FAILED: { label: "KYB: Needs Attention", tone: "danger" },
 } as const;
 
+const KYB_NEXT_STEP = {
+  NONE: {
+    title: "Verify Your Organization",
+    description: "Needed before your first deposit. Review takes up to 48 hours, so start early.",
+    action: "Start Verification",
+  },
+  PENDING: {
+    title: "Verification In Review",
+    description: "We'll email you as soon as there's a decision. Keep drafting hackathons meanwhile.",
+    action: "View Details",
+  },
+  FAILED: {
+    title: "Verification Needs Attention",
+    description: "The reviewer needs something fixed before you can fund a hackathon.",
+    action: "Fix And Resubmit",
+  },
+} as const;
+
 export default async function OrganizerPage() {
   const user = await requireSurface("organizer");
 
@@ -74,9 +92,29 @@ export default async function OrganizerPage() {
         </div>
         <div className="flex items-center gap-3">
           <Badge variant="success">Trust score {org.trustScore}</Badge>
-          <Badge variant={KYB_BADGE[org.kycStatus].tone}>{KYB_BADGE[org.kycStatus].label}</Badge>
+          <Link href="/organizer/verification" className="rounded-full focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none">
+            <Badge variant={KYB_BADGE[org.kycStatus].tone}>{KYB_BADGE[org.kycStatus].label}</Badge>
+          </Link>
         </div>
       </div>
+
+      {org.kycStatus !== "VERIFIED" ? (
+        <Card>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <ShieldCheck aria-hidden className="size-5" /> {KYB_NEXT_STEP[org.kycStatus].title}
+              </CardTitle>
+              <CardDescription>{KYB_NEXT_STEP[org.kycStatus].description}</CardDescription>
+            </div>
+            <Link href="/organizer/verification">
+              <Button variant={org.kycStatus === "PENDING" ? "secondary" : "primary"} arrow>
+                {KYB_NEXT_STEP[org.kycStatus].action}
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      ) : null}
 
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -117,7 +155,7 @@ export default async function OrganizerPage() {
         </Card>
       ) : null}
 
-      <Card>
+      <Card id="public-profile" className="scroll-mt-24">
         <CardTitle>Public Profile</CardTitle>
         <CardDescription>
           Hackathon pages show this in the Organizer card, next to your trust score and track
@@ -129,9 +167,10 @@ export default async function OrganizerPage() {
         <div className="mt-4">
           {canEditOrgProfile(membership.role) ? (
             <OrgProfileForm
-              org={{ id: org.id, name: org.name, about: org.about }}
+              org={org}
               mode="organizer"
               nameEditable={org.kycStatus !== "VERIFIED"}
+              kindLocked={org.kycStatus === "VERIFIED" && org.kind !== null}
             />
           ) : (
             <p className="text-sm leading-6 whitespace-pre-line text-body-copy">

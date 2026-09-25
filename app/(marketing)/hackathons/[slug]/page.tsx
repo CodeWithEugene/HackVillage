@@ -59,6 +59,12 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           about: true,
           kycStatus: true,
           createdAt: true,
+          // Public details only: contactPhone stays private.
+          kind: true,
+          city: true,
+          country: true,
+          website: true,
+          socialUrl: true,
         },
       },
       prizes: { orderBy: { place: "asc" } },

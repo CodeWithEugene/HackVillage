@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { parseOrgDetails, type OrgDetails, type OrgKind } from "@/lib/orgs/details";
 import { canEditOrgProfile, parseOrgProfile } from "@/lib/orgs/profile";
 
 export class OrgProfileError extends Error {}
@@ -6,6 +7,33 @@ export class OrgProfileError extends Error {}
 interface OrgProfileInput {
   about: unknown;
   name?: unknown;
+  /** Kind, location, links, and contact phone; left out by callers that only edit the text. */
+  details?: Record<string, unknown>;
+}
+
+/**
+ * Validates the optional details block. `lockedKind` keeps a verified
+ * organization's kind: KYB checked it, so it can't change it itself.
+ */
+function detailsUpdate(
+  details: Record<string, unknown> | undefined,
+  lockedKind: OrgKind | null,
+  { allowBlank = false }: { allowBlank?: boolean } = {},
+): Partial<OrgDetails> {
+  if (!details) return {};
+  const parsed = parseOrgDetails(
+    {
+      kind: lockedKind ?? details.kind,
+      city: details.city,
+      country: details.country,
+      website: details.website,
+      socialUrl: details.socialUrl,
+      contactPhone: details.contactPhone,
+    },
+    { allowBlank },
+  );
+  if (!parsed.ok) throw new OrgProfileError(parsed.error);
+  return parsed.data;
 }
 
 /**
@@ -19,26 +47,29 @@ export async function updateOrgProfileAsMember(
 ): Promise<void> {
   const membership = await prisma.orgMember.findFirst({
     where: { orgId, userId: actorId, status: "ACTIVE" },
-    select: { role: true, org: { select: { kycStatus: true } } },
+    select: { role: true, org: { select: { kycStatus: true, kind: true } } },
   });
   if (!membership || !canEditOrgProfile(membership.role)) {
     throw new OrgProfileError("Only organization owners and admins can edit the profile.");
   }
 
-  const parsed = parseOrgProfile(input, {
-    allowNameChange: membership.org.kycStatus !== "VERIFIED",
-  });
+  const verified = membership.org.kycStatus === "VERIFIED";
+  const parsed = parseOrgProfile(input, { allowNameChange: !verified });
   if (!parsed.ok) throw new OrgProfileError(parsed.error);
+  const data = {
+    ...parsed.data,
+    ...detailsUpdate(input.details, verified ? membership.org.kind : null),
+  };
 
   await prisma.$transaction([
-    prisma.organization.update({ where: { id: orgId }, data: parsed.data }),
+    prisma.organization.update({ where: { id: orgId }, data }),
     prisma.auditLog.create({
       data: {
         actorId,
         action: "org.profile_updated",
         entity: "Organization",
         entityId: orgId,
-        meta: { fields: Object.keys(parsed.data), by: "organizer" },
+        meta: { fields: Object.keys(data), by: "organizer" },
       },
     }),
   ]);
@@ -66,12 +97,14 @@ export async function updateOrgProfileAsAdmin(
 
   const parsed = parseOrgProfile(input, { allowNameChange: true });
   if (!parsed.ok) throw new OrgProfileError(parsed.error);
+  // The team may not know every detail yet, so blanks are allowed here.
+  const data = { ...parsed.data, ...detailsUpdate(input.details, null, { allowBlank: true }) };
 
   const org = await prisma.organization.findUnique({ where: { id: orgId }, select: { id: true } });
   if (!org) throw new OrgProfileError("Organization not found.");
 
   await prisma.$transaction([
-    prisma.organization.update({ where: { id: orgId }, data: parsed.data }),
+    prisma.organization.update({ where: { id: orgId }, data }),
     prisma.auditLog.create({
       data: {
         actorId: adminId,
@@ -79,7 +112,7 @@ export async function updateOrgProfileAsAdmin(
         entity: "Organization",
         entityId: orgId,
         reason: trimmedReason,
-        meta: { fields: Object.keys(parsed.data), by: "admin" },
+        meta: { fields: Object.keys(data), by: "admin" },
       },
     }),
   ]);

@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Lock } from "lucide-react";
 
-import { FundVaultForm, KybRequestForm } from "@/components/escrow/vault-forms";
+import { FundVaultForm } from "@/components/escrow/vault-forms";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { requireUser } from "@/lib/auth/guards";
 import { getEnv } from "@/lib/env";
@@ -135,7 +136,20 @@ export default async function VaultPage({
                 }
               />
             ) : (
-              <KybRequestForm orgId={event.org.id} />
+              <div className="space-y-3">
+                <p className="text-sm text-muted">
+                  {event.org.kycStatus === "PENDING"
+                    ? "Your organization's details are in review. You can fund the vault as soon as they're approved, usually within 48 hours."
+                    : "Your organization needs to be verified before its first deposit. Review takes up to 48 hours."}
+                </p>
+                <Link href="/organizer/verification">
+                  <Button variant="secondary" arrow>
+                    {event.org.kycStatus === "PENDING"
+                      ? "View Verification"
+                      : "Verify Your Organization"}
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
         </Card>
