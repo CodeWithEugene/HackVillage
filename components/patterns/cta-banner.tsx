@@ -3,22 +3,15 @@ import Image from "next/image";
 import { NewsletterForm } from "@/components/patterns/newsletter-form";
 
 /**
- * Final marketing CTA: a gradient banner (brand blues, blurred color blobs,
- * a grain overlay) carrying the platform's core promise plus a working
- * newsletter signup. Browse Events and the build plan are already one click
- * away from the nav and footer, so this section's one job is the list.
+ * Final marketing CTA: a solid navy card split in half, the platform's core
+ * promise plus a working newsletter signup on the left, a full-bleed photo
+ * on the right. Browse Events and the build plan are already one click away
+ * from the nav and footer, so this section's one job is the list.
  */
 export function CtaBanner() {
   return (
     <section className="site-container pb-20">
       <div className="cta-banner">
-        <div className="cta-banner-blobs" aria-hidden="true">
-          <span className="cta-blob cta-blob-1" />
-          <span className="cta-blob cta-blob-2" />
-          <span className="cta-blob cta-blob-3" />
-          <span className="cta-banner-noise" />
-        </div>
-
         <div className="cta-banner-content">
           <p className="cta-banner-eyebrow">Stay In The Loop</p>
           <h2 className="cta-banner-heading">
@@ -37,7 +30,7 @@ export function CtaBanner() {
             src="/marketing/hero/kenya/hackathon-pair.webp"
             alt="Two Kenyan engineers sharing a laugh while coding together"
             fill
-            sizes="(max-width: 1023px) 90vw, 420px"
+            sizes="(max-width: 1023px) 100vw, 50vw"
             className="object-cover"
           />
         </div>

@@ -462,66 +462,20 @@
   }
 
   /*
-   * Final CTA banner: a gradient card (brand blues, blurred blobs, a grain
-   * overlay) carrying the platform's promise and a working newsletter
-   * signup. All decorative layers are transform/opacity/filter only, so the
-   * global prefers-reduced-motion rule doesn't need to touch this section —
-   * nothing here animates.
+   * Final CTA banner: a solid logo-navy card split in half, the platform's
+   * promise and a working newsletter signup on the left, and a photo that
+   * fills the right half edge to edge (the card's overflow and radius clip
+   * it). brand-ink stays navy in both themes; ink flips light in dark mode.
    */
   .cta-banner {
     position: relative;
     isolation: isolate;
     overflow: hidden;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(340px, 520px);
-    align-items: center;
-    gap: clamp(24px, 3vw, 48px);
-    min-height: clamp(360px, 38vw, 460px);
-    padding: clamp(32px, 5vw, 64px) clamp(28px, 6vw, 100px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: clamp(360px, 38vw, 480px);
     border-radius: clamp(24px, 2.6vw, 40px);
-    background: var(--color-ink);
-  }
-  .cta-banner-blobs {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-  .cta-blob {
-    position: absolute;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    filter: blur(80px);
-  }
-  .cta-blob-1 {
-    width: 55%;
-    top: -22%;
-    left: -12%;
-    background: var(--color-brand-soft);
-    opacity: 0.55;
-  }
-  .cta-blob-2 {
-    width: 42%;
-    bottom: -26%;
-    right: -6%;
-    background: var(--color-ink-soft);
-    opacity: 0.45;
-  }
-  .cta-blob-3 {
-    width: 30%;
-    top: 8%;
-    right: 18%;
-    background: var(--color-brand);
-    opacity: 0.4;
-    filter: blur(100px);
-  }
-  .cta-banner-noise {
-    position: absolute;
-    inset: 0;
-    opacity: 0.05;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background: var(--color-brand-ink);
   }
   .cta-banner-content {
     position: relative;
@@ -529,8 +483,9 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    justify-content: center;
     gap: 20px;
-    max-width: 500px;
+    padding: clamp(32px, 5vw, 64px) clamp(28px, 5vw, 80px);
   }
   .cta-banner-eyebrow {
     font-size: 12px;
@@ -557,21 +512,15 @@
   }
   .cta-banner-photo {
     position: relative;
-    z-index: 1;
-    aspect-ratio: 420 / 337;
-    overflow: hidden;
-    border-radius: clamp(16px, 1.6vw, 24px);
-    box-shadow: 0 24px 60px rgb(0 0 20 / 35%);
+    min-height: 100%;
   }
   @media (max-width: 1023px) {
     .cta-banner {
       grid-template-columns: minmax(0, 1fr);
     }
-    .cta-banner-content {
-      max-width: none;
-    }
     .cta-banner-photo {
       order: -1;
+      min-height: 0;
       aspect-ratio: 16 / 9;
     }
   }
