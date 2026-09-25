@@ -171,11 +171,11 @@
     pointer-events: none;
   }
   .how-it-works-star-left {
-    top: 22%;
+    top: 58%;
     right: calc(50% + clamp(330px, 26vw, 420px));
   }
   .how-it-works-star-right {
-    top: 58%;
+    top: 22%;
     left: calc(50% + clamp(330px, 26vw, 420px));
   }
   @media (max-width: 1023px) {
