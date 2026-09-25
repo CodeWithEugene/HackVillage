@@ -663,9 +663,9 @@
    */
   .trust-impact {
     display: grid;
-    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr) minmax(110px, 160px);
+    grid-template-columns: minmax(240px, 320px) minmax(0, 1.7fr) minmax(150px, 220px);
     grid-template-rows: auto auto;
-    column-gap: clamp(32px, 4vw, 56px);
+    column-gap: clamp(40px, 5vw, 72px);
     row-gap: clamp(32px, 4vw, 48px);
     align-items: start;
     padding-block: clamp(48px, 6vw, 96px);
@@ -695,8 +695,8 @@
   .trust-impact-heading {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(32px, 3.4vw, 46px);
-    line-height: 1.15;
+    font-size: clamp(34px, 4.4vw, 60px);
+    line-height: 1.08;
     letter-spacing: -0.02em;
     color: var(--color-ink);
   }
@@ -714,28 +714,28 @@
   .trust-impact-star {
     position: absolute;
     z-index: 0;
-    top: -30px;
-    left: -40px;
-    width: clamp(64px, 6vw, 92px);
-    height: clamp(64px, 6vw, 92px);
+    top: -18px;
+    left: -76px;
+    width: clamp(90px, 8vw, 140px);
+    height: clamp(90px, 8vw, 140px);
     fill: var(--color-brand);
-    opacity: 0.55;
+    opacity: 0.6;
   }
   .trust-impact-frame {
     position: relative;
     z-index: 1;
     aspect-ratio: 3 / 4;
-    padding: clamp(12px, 1.6vw, 22px);
+    overflow: hidden;
     background: var(--color-surface);
-    border: 1px solid var(--color-ink);
-    border-radius: 32px;
+    border: 1.5px solid var(--color-ink);
+    /* Arch: browsers cap a too-large radius at 50% of the box, so the top
+       corners always resolve to a perfect half-circle regardless of width. */
+    border-radius: 999px 999px 0 0;
   }
   .trust-impact-photo {
     position: relative;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    border-radius: 20px;
   }
   .trust-impact-strip {
     grid-column: 3;
@@ -750,8 +750,8 @@
     flex: 1;
     min-height: 100px;
     overflow: hidden;
-    border: 1px solid var(--color-ink);
-    border-radius: 24px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 28px;
   }
   .trust-float-card {
     position: absolute;
@@ -785,12 +785,12 @@
     color: var(--color-ink);
   }
   .trust-float-card-top {
-    top: -18px;
-    right: -22px;
+    top: 20%;
+    right: -30px;
   }
   .trust-float-card-bottom {
-    bottom: 16%;
-    left: -32px;
+    top: 54%;
+    left: -38px;
   }
   .trust-stats {
     grid-column: 1 / span 2;
@@ -864,6 +864,7 @@
       right: 0;
     }
     .trust-float-card-bottom {
+      top: auto;
       bottom: 10%;
       left: 0;
     }
