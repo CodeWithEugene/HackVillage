@@ -19,7 +19,7 @@ const NAV_LINKS: NavItem[] = [
 
 const ORGANIZER_LINKS: NavItem[] = [
   { href: "/onboarding/organizer", label: "Host A Hackathon" },
-  { href: "/#how-it-works", label: "How Escrow Works" },
+  { href: "/how-escrow-works", label: "How Escrow Works" },
 ];
 
 export function SiteHeader({ className }: { className?: string }) {

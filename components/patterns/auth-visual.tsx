@@ -39,7 +39,7 @@ export function AuthVisual() {
           of every prize is paid the instant winners are announced. The rest follows at your
           milestone.
         </p>
-        <Link href="/#how-it-works" className="auth-visual-secondary btn-pill">
+        <Link href="/how-escrow-works" className="auth-visual-secondary btn-pill">
           <span className="btn-fill" aria-hidden />
           <span className="btn-content">
             How Escrow Works <ArrowUpRight aria-hidden size={16} className="btn-arrow" />

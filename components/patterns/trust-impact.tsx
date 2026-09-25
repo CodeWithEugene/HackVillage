@@ -30,7 +30,7 @@ export function TrustImpact() {
           From the first deposit to the final payout, every action is verifiable, on the record, and
           impossible to fake.
         </p>
-        <Link href="/#how-it-works">
+        <Link href="/how-escrow-works">
           <Button arrow className="whitespace-nowrap">
             How Escrow Works
           </Button>
