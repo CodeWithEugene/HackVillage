@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { eventTiming, formatEventDates, formatShortDate } from "@/lib/events/format";
+import {
+  eventTiming,
+  formatDateTime,
+  formatEventDates,
+  formatShortDate,
+  keyDates,
+} from "@/lib/events/format";
 
 // Noon in Nairobi, so the calendar day never shifts with the test machine's zone.
 const eat = (iso: string) => new Date(`${iso}T12:00:00+03:00`);
@@ -78,5 +84,50 @@ describe("eventTiming", () => {
   it("has no timing for cancelled or disputed events", () => {
     expect(eventTiming({ ...base, status: "CANCELLED" }, eat("2026-10-01"))).toBeNull();
     expect(eventTiming({ ...base, status: "DISPUTED" }, eat("2026-10-01"))).toBeNull();
+  });
+});
+
+describe("formatDateTime", () => {
+  it("formats a weekday, date, and 24 hour Nairobi time", () => {
+    expect(formatDateTime(new Date("2026-10-13T06:00:00Z"))).toBe("Tue 13 Oct, 09:00");
+  });
+});
+
+describe("keyDates", () => {
+  const event = {
+    registrationDeadline: new Date("2026-10-11T06:00:00Z"),
+    startsAt: new Date("2026-10-13T06:00:00Z"),
+    endsAt: new Date("2026-10-15T15:00:00Z"),
+    mediaDeadlineAt: null,
+  };
+
+  it("lists the four milestones in order", () => {
+    expect(keyDates(event, new Date("2026-10-01T00:00:00Z")).map((d) => d.label)).toEqual([
+      "Registration closes",
+      "Hacking starts",
+      "Submissions close",
+      "Media delivered by",
+    ]);
+  });
+
+  it("marks passed milestones done and highlights only the next one", () => {
+    const states = keyDates(event, new Date("2026-10-14T00:00:00Z")).map((d) => d.state);
+    expect(states).toEqual(["done", "done", "next", "upcoming"]);
+  });
+
+  it("defaults the media deadline to 48 hours after the end", () => {
+    const media = keyDates(event, new Date("2026-10-01T00:00:00Z"))[3];
+    expect(media.at.toISOString()).toBe("2026-10-17T15:00:00.000Z");
+  });
+
+  it("uses the stored media deadline when there is one", () => {
+    const stored = new Date("2026-10-16T12:00:00Z");
+    const media = keyDates({ ...event, mediaDeadlineAt: stored }, new Date("2026-10-01"))[3];
+    expect(media.at).toEqual(stored);
+  });
+
+  it("marks everything done once the media deadline passes", () => {
+    const states = keyDates(event, new Date("2026-11-01T00:00:00Z")).map((d) => d.state);
+    expect(states).toEqual(["done", "done", "done", "done"]);
   });
 });

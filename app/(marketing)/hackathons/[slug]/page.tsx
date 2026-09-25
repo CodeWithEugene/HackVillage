@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CalendarDays, Clock, MapPin, Users } from "lucide-react";
 
 import { PrizeVerifiedBadge } from "@/components/patterns/prize-verified-badge";
+import { KeyDatesCard } from "@/components/patterns/key-dates-card";
 import { StatusTimeline } from "@/components/patterns/status-timeline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -149,93 +150,6 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
               </div>
             ) : null}
           </Card>
-
-          <div className="grid gap-6 sm:grid-cols-2">
-            <Card>
-              <CardTitle>Prize Breakdown</CardTitle>
-              <ul className="mt-3 text-sm">
-                {event.prizes.map((prize) => {
-                  const winner = event.winners.find((w) => w.place === prize.place);
-                  const instantNote = winner
-                    ? winner.payouts.some(
-                        (p) => p.tranche === "INSTANT" && p.status === "SUCCEEDED",
-                      )
-                      ? "50% paid ✓"
-                      : "paying…"
-                    : "50% on the day";
-                  const restNote = prize.milestoneRequired
-                    ? "50% on milestone"
-                    : "full payout on win";
-                  return (
-                    <li
-                      key={prize.id}
-                      className="flex items-start justify-between gap-4 border-b border-ink/5 py-3 last:border-0"
-                    >
-                      <div className="min-w-0">
-                        <p className="font-semibold text-ink">{prize.label}</p>
-                        {winner ? (
-                          <p className="text-xs text-muted">
-                            won by {winner.team.name} ·{" "}
-                            <Link href={`/developers/${winner.user.handle}`} className="underline">
-                              @{winner.user.handle}
-                            </Link>
-                          </p>
-                        ) : null}
-                        <p className="mt-0.5 text-xs text-muted">
-                          {instantNote} · {restNote}
-                        </p>
-                      </div>
-                      <p className="shrink-0 font-display text-base font-bold whitespace-nowrap text-ink">
-                        {formatKes(prize.amountKes)}
-                      </p>
-                    </li>
-                  );
-                })}
-              </ul>
-              <CardDescription>
-                Winners receive 50% instantly on the day; the rest releases on verified milestone
-                completion.
-              </CardDescription>
-            </Card>
-
-            <Card>
-              <CardTitle>Organizer</CardTitle>
-              <p className="mt-2 text-lg font-bold text-ink">{event.org.name}</p>
-              <p className="text-sm text-muted">{event.org.about}</p>
-              <div className="mt-3">
-                <Badge variant="success">Trust score {event.org.trustScore}</Badge>
-              </div>
-              <CardDescription>
-                Trust scores move with payout speed, media delivery, and milestone honesty.
-              </CardDescription>
-            </Card>
-          </div>
-
-          {/* Public gallery — 48-hour media vault */}
-          {gallery.length > 0 ? (
-            <Card>
-              <CardTitle>Hackathon Gallery</CardTitle>
-              <ul className="mt-4 grid gap-3 sm:grid-cols-3">
-                {gallery.map((asset) => (
-                  <li key={asset.id} className="overflow-hidden rounded-card border border-ink/10">
-                    {asset.kind === "PHOTO" ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- media vault assets from dynamic storage
-                      <img
-                        src={asset.url}
-                        alt={asset.caption ?? "Hackathon photo"}
-                        className="aspect-[4/3] w-full object-cover"
-                      />
-                    ) : (
-                      <video src={asset.url} controls className="aspect-[4/3] w-full" />
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <CardDescription>
-                Delivered within the 48-hour standard: high-resolution, community-first.
-              </CardDescription>
-            </Card>
-          ) : null}
         </div>
 
         <aside className="space-y-6" aria-label="Hackathon details">
@@ -300,6 +214,91 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           </div>
         </aside>
       </div>
+
+      <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardTitle>Prize Breakdown</CardTitle>
+          <ul className="mt-3 text-sm">
+            {event.prizes.map((prize) => {
+              const winner = event.winners.find((w) => w.place === prize.place);
+              const instantNote = winner
+                ? winner.payouts.some((p) => p.tranche === "INSTANT" && p.status === "SUCCEEDED")
+                  ? "50% paid ✓"
+                  : "paying…"
+                : "50% on the day";
+              const restNote = prize.milestoneRequired ? "50% on milestone" : "full payout on win";
+              return (
+                <li
+                  key={prize.id}
+                  className="flex items-start justify-between gap-4 border-b border-ink/5 py-3 last:border-0"
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold text-ink">{prize.label}</p>
+                    {winner ? (
+                      <p className="text-xs text-muted">
+                        won by {winner.team.name} ·{" "}
+                        <Link href={`/developers/${winner.user.handle}`} className="underline">
+                          @{winner.user.handle}
+                        </Link>
+                      </p>
+                    ) : null}
+                    <p className="mt-0.5 text-xs text-muted">
+                      {instantNote} · {restNote}
+                    </p>
+                  </div>
+                  <p className="shrink-0 font-display text-base font-bold whitespace-nowrap text-ink">
+                    {formatKes(prize.amountKes)}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+          <CardDescription>
+            Winners receive 50% instantly on the day; the rest releases on verified milestone
+            completion.
+          </CardDescription>
+        </Card>
+
+        <Card>
+          <CardTitle>Organizer</CardTitle>
+          <p className="mt-2 text-lg font-bold text-ink">{event.org.name}</p>
+          <p className="text-sm text-muted">{event.org.about}</p>
+          <div className="mt-3">
+            <Badge variant="success">Trust score {event.org.trustScore}</Badge>
+          </div>
+          <CardDescription>
+            Trust scores move with payout speed, media delivery, and milestone honesty.
+          </CardDescription>
+        </Card>
+
+        <KeyDatesCard event={event} />
+      </div>
+
+      {/* Public gallery — 48-hour media vault */}
+      {gallery.length > 0 ? (
+        <Card className="mt-6">
+          <CardTitle>Hackathon Gallery</CardTitle>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+            {gallery.map((asset) => (
+              <li key={asset.id} className="overflow-hidden rounded-card border border-ink/10">
+                {asset.kind === "PHOTO" ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- media vault assets from dynamic storage
+                  <img
+                    src={asset.url}
+                    alt={asset.caption ?? "Hackathon photo"}
+                    className="aspect-[4/3] w-full object-cover"
+                  />
+                ) : (
+                  <video src={asset.url} controls className="aspect-[4/3] w-full" />
+                )}
+              </li>
+            ))}
+          </ul>
+          <CardDescription>
+            Delivered within the 48-hour standard: high-resolution, community-first.
+          </CardDescription>
+        </Card>
+      ) : null}
     </div>
   );
 }

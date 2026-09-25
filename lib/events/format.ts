@@ -74,3 +74,58 @@ export function eventTiming(
   if (event.startsAt.getTime() <= now.getTime()) return { label: "Happening Now", tone: "success" };
   return { label: "Upcoming", tone: "brand" };
 }
+
+const weekdayDateTime = new Intl.DateTimeFormat("en-KE", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+  timeZone: EVENT_TIME_ZONE,
+});
+
+/** "Tue 13 Oct, 09:00" on Nairobi time. */
+export function formatDateTime(date: Date): string {
+  const parts = weekdayDateTime.formatToParts(date);
+  const pick = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `${pick("weekday")} ${pick("day")} ${pick("month")}, ${pick("hour")}:${pick("minute")}`;
+}
+
+/** Media must be delivered within 48 hours of the end (plan §13 media standard). */
+const MEDIA_WINDOW_MS = 48 * 60 * 60 * 1000;
+
+export interface KeyDate {
+  label: string;
+  at: Date;
+  state: "done" | "next" | "upcoming";
+}
+
+/** The milestones a hackathon commits to, in order, with the next one highlighted. */
+export function keyDates(
+  event: {
+    registrationDeadline: Date;
+    startsAt: Date;
+    endsAt: Date;
+    mediaDeadlineAt?: Date | null;
+  },
+  now: Date = new Date()
+): KeyDate[] {
+  const milestones: [string, Date][] = [
+    ["Registration closes", event.registrationDeadline],
+    ["Hacking starts", event.startsAt],
+    ["Submissions close", event.endsAt],
+    [
+      "Media delivered by",
+      event.mediaDeadlineAt ?? new Date(event.endsAt.getTime() + MEDIA_WINDOW_MS),
+    ],
+  ];
+  const nextIndex = milestones.findIndex(([, at]) => at.getTime() > now.getTime());
+  return milestones.map(([label, at], index) => ({
+    label,
+    at,
+    state:
+      nextIndex === -1 || index < nextIndex ? "done" : index === nextIndex ? "next" : "upcoming",
+  }));
+}
