@@ -43,7 +43,9 @@ export function TrustImpact() {
           and impossible to fake.
         </p>
         <Link href="/trust">
-          <Button size="lg" arrow>View The Trust Ledger</Button>
+          <Button arrow className="whitespace-nowrap">
+            View The Trust Ledger
+          </Button>
         </Link>
       </div>
 
