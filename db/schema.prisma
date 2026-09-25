@@ -881,3 +881,19 @@ model Dispute {
 
   winner Winner @relation(fields: [winnerId], references: [id], onDelete: Cascade)
 }
+
+// ── Newsletter (public marketing signup — no User account required) ────────
+
+/// Public newsletter list. Anonymous by design: no relation to User, since
+/// most subscribers sign up from the landing page before ever creating an
+/// account. Separate from NotificationPreference, which only governs email
+/// categories for people who already have one.
+model NewsletterSubscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  source         String? // where the signup happened, e.g. "landing-cta"
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime?
+
+  @@index([unsubscribedAt])
+}

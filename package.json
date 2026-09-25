@@ -29,7 +29,8 @@
     "db:studio": "prisma studio --schema db/schema.prisma",
     "dev:fund": "tsx --env-file=.env scripts/fund-event.ts",
     "dev:cycle": "tsx --env-file=.env scripts/cycle-event.ts",
-    "load:test": "tsx --env-file=.env scripts/load-test.ts"
+    "load:test": "tsx --env-file=.env scripts/load-test.ts",
+    "newsletter:send": "tsx --env-file=.env scripts/send-newsletter-blast.ts"
   },
   "dependencies": {
     "@auth/core": "0.41.3",
