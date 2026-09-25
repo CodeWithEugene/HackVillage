@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 const FILTERS = [
   { key: "all", label: "All" },
   { key: "verified", label: "Prize Verified" },
-  { key: "pending", label: "Pending deposit" },
+  { key: "pending", label: "Pending Deposit" },
   { key: "past", label: "Past" },
 ] as const;
 
@@ -53,6 +53,7 @@ export default async function EventsPage({
       startsAt: event.startsAt,
       endsAt: event.endsAt,
       registrationDeadline: event.registrationDeadline,
+      publishedAt: event.publishedAt,
       status: event.status,
       prizeVerifiedAt: event.prizeVerifiedAt,
       poolKes: event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0),
