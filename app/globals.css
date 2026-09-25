@@ -656,29 +656,25 @@
 
   /*
    * Trust & Impact — sits between How It Works and the newsletter banner.
-   * Built from the reference frame (1312px of content inside a 1440 frame):
-   * text column 363, photo group 665, photo strip 200, 42px gutters, photo
-   * 500x688, strip photos 200x262. Everything scales as one piece:
-   * - columns are fr units of those widths,
+   * Built from the reference frame's arrangement (text column, photo group,
+   * photo strip; 500x688 photo, 200x262 strip photos), with the photo
+   * columns trimmed so the images sit smaller in a full-width section.
+   * Everything scales as one piece:
+   * - columns are fr units (text 480 : photo group 560 : strip 150),
    * - type, padding and card sizes are container units (cqi) of the
-   *   section's own width, so text shrinks with the photos instead of
-   *   staying viewport-sized,
-   * - the section's width is capped by the viewport height, so the whole
-   *   composition (≈0.64 × its width tall) always fits on one screen.
+   *   section's own width, so text scales with the photos instead of
+   *   staying viewport-sized.
+   * Full width like every other section (site-container gutters only).
    * Stat cards run beneath the text and photo, not under the strip.
    */
   .trust-impact {
     container-type: inline-size;
     display: grid;
-    grid-template-columns: minmax(0, 363fr) minmax(0, 665fr) minmax(0, 200fr);
+    grid-template-columns: minmax(0, 480fr) minmax(0, 560fr) minmax(0, 150fr);
     grid-template-rows: auto auto;
     column-gap: 3.2%;
     align-items: start;
-    max-width: min(
-      1440px,
-      calc((100svh - var(--site-header-height) - 96px) / 0.64 + 2 * clamp(1rem, 3vw, 3.5rem))
-    );
-    padding-block: 48px;
+    padding-block: clamp(48px, 5vw, 80px);
   }
   .trust-impact-content {
     grid-column: 1;
@@ -734,13 +730,13 @@
   .trust-impact-frame {
     position: relative;
     z-index: 1;
-    width: 75%;
+    width: 70%;
     margin-left: 10%;
     aspect-ratio: 500 / 688;
     /* Matte: the photo sits inset inside a larger arch outline. Padding
-       percentages resolve against the photo group's width, matching the
-       reference's 31/43/33/33px insets on a 665px-wide group. */
-    padding: 6.4% 4.9% 4.9% 4.6%;
+       percentages resolve against the photo group's width, sized so the
+       insets keep the reference's ratio to the frame (about 6% / 9%). */
+    padding: 6% 4.6% 4.6% 4.3%;
     border: 1px solid var(--color-ink);
     /* Arch: browsers cap a too-large radius at 50% of the box, so the top
        corners always resolve to a perfect half-circle regardless of width. */
@@ -828,37 +824,31 @@
     gap: clamp(10px, 1.22cqi, 16px);
     min-height: clamp(60px, 6.3cqi, 83px);
     padding: clamp(10px, 1.22cqi, 16px);
-    border: 1px solid var(--color-ink);
+    /* Logo navy fill + logo bright-blue hard shadow. brand-ink stays navy in
+       both themes (ink flips light in dark mode), so the cards keep their
+       fill whichever theme is active. */
+    border: 1px solid var(--color-brand-ink);
     border-radius: clamp(10px, 1.22cqi, 16px);
-    box-shadow: 6px 6px 0 var(--color-ink);
+    background: var(--color-brand-ink);
+    box-shadow: 6px 6px 0 var(--color-brand);
   }
   .trust-stat-value {
     flex-shrink: 0;
     font-family: var(--font-display);
     font-size: clamp(17px, 1.68cqi, 22px);
     font-weight: 600;
-    color: var(--color-ink);
+    color: #ffffff;
   }
   .trust-stat-label {
     font-size: clamp(11px, 1.07cqi, 14px);
     line-height: 1.25;
-    color: color-mix(in srgb, var(--color-ink) 80%, transparent);
-  }
-  .trust-stat-brand {
-    background: var(--color-brand-soft);
-  }
-  .trust-stat-success {
-    background: color-mix(in srgb, var(--color-success) 25%, var(--color-surface));
-  }
-  .trust-stat-warning {
-    background: color-mix(in srgb, var(--color-warning) 25%, var(--color-surface));
+    color: rgb(255 255 255 / 80%);
   }
   @media (max-width: 1023px) {
     .trust-impact {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto;
       row-gap: clamp(32px, 5vw, 48px);
-      max-width: none;
     }
     .trust-impact-content,
     .trust-impact-visual,

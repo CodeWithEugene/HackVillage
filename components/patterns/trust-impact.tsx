@@ -5,21 +5,9 @@ import { Fingerprint, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const STATS = [
-  {
-    value: "100%",
-    label: "Escrowed before an event goes live",
-    tone: "trust-stat-brand",
-  },
-  {
-    value: "50%",
-    label: "Paid the instant winners are announced",
-    tone: "trust-stat-success",
-  },
-  {
-    value: "1hr",
-    label: "Trust Score target to fully settle a prize",
-    tone: "trust-stat-warning",
-  },
+  { value: "100%", label: "Escrowed before an event goes live" },
+  { value: "50%", label: "Paid the instant winners are announced" },
+  { value: "1hr", label: "Trust Score target to fully settle a prize" },
 ] as const;
 
 /**
@@ -113,7 +101,7 @@ export function TrustImpact() {
 
       <ul className="trust-stats">
         {STATS.map((stat) => (
-          <li key={stat.value} className={`trust-stat ${stat.tone}`}>
+          <li key={stat.value} className="trust-stat">
             <span className="trust-stat-value">{stat.value}</span>
             <span className="trust-stat-label">{stat.label}</span>
           </li>
