@@ -1,4 +1,5 @@
 import { renderEmail, renderText, type EmailTemplate } from "@/lib/notifications/layout";
+import { html } from "@/lib/notifications/html";
 
 export function endorsementReceivedEmail(eventTitle: string, url: string): EmailTemplate {
   return {
@@ -7,7 +8,7 @@ export function endorsementReceivedEmail(eventTitle: string, url: string): Email
       preheader: "Your Proof of Work profile just grew.",
       section: {
         heading: "You Got An Endorsement",
-        bodyHtml: `<p style="margin:0;">A judge from <strong>${eventTitle}</strong> endorsed your work. It is now part of your public Proof of Work profile.</p>`,
+        bodyHtml: html`<p style="margin:0;">A judge from <strong>${eventTitle}</strong> endorsed your work. It is now part of your public Proof of Work profile.</p>`,
         ctaUrl: url,
         ctaLabel: "View Your Profile",
       },
@@ -23,7 +24,7 @@ export function introductionRequestedEmail(partnerName: string, eventTitle: stri
       preheader: "A hiring partner noticed your win.",
       section: {
         heading: "A Hiring Partner Wants To Connect",
-        bodyHtml: `<p style="margin:0;"><strong>${partnerName}</strong> saw your result at <strong>${eventTitle}</strong> and requested an introduction.</p>`,
+        bodyHtml: html`<p style="margin:0;"><strong>${partnerName}</strong> saw your result at <strong>${eventTitle}</strong> and requested an introduction.</p>`,
         ctaUrl: url,
         ctaLabel: "Respond To The Request",
       },
@@ -43,7 +44,7 @@ export function introductionAcceptedDeveloperEmail(
       preheader: "Contact details are exchanged.",
       section: {
         heading: "You Are Connected",
-        bodyHtml: `<p style="margin:0;">You accepted the introduction from <strong>${partnerName}</strong> for your work at <strong>${eventTitle}</strong>.</p>`,
+        bodyHtml: html`<p style="margin:0;">You accepted the introduction from <strong>${partnerName}</strong> for your work at <strong>${eventTitle}</strong>.</p>`,
         details: [{ label: "Their email", value: partnerEmail }],
       },
     }),
@@ -62,7 +63,7 @@ export function introductionAcceptedPartnerEmail(
       preheader: "Contact details are exchanged.",
       section: {
         heading: "Introduction Accepted",
-        bodyHtml: `<p style="margin:0;"><strong>${developerName}</strong>, who built something great at <strong>${eventTitle}</strong>, accepted your introduction request.</p>`,
+        bodyHtml: html`<p style="margin:0;"><strong>${developerName}</strong>, who built something great at <strong>${eventTitle}</strong>, accepted your introduction request.</p>`,
         details: [{ label: "Their email", value: developerEmail }],
       },
     }),
@@ -77,7 +78,7 @@ export function introductionDeclinedPartnerEmail(developerName: string): EmailTe
       preheader: "They are not available right now.",
       section: {
         heading: "Introduction Declined",
-        bodyHtml: `<p style="margin:0;"><strong>${developerName}</strong> declined your introduction request this time.</p>`,
+        bodyHtml: html`<p style="margin:0;"><strong>${developerName}</strong> declined your introduction request this time.</p>`,
       },
     }),
     text: renderText([`${developerName} declined your introduction request this time.`]),

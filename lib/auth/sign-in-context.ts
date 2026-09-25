@@ -27,6 +27,11 @@ const METHOD_LABELS: Record<string, string> = {
   github: "GitHub",
 };
 
+/** "Google" for google, "Email and password" for credentials. */
+export function signInMethodLabel(provider?: string): string {
+  return METHOD_LABELS[provider ?? ""] ?? (provider ? provider : "Unknown");
+}
+
 const PLATFORM_LABELS: Record<string, string> = {
   mobile: "Phone",
   tablet: "Tablet",
@@ -128,6 +133,6 @@ export function describeSignIn({
     ...describeDevice(headers.get("user-agent")),
     location: describeLocation(headers),
     ip: describeIp(headers),
-    method: METHOD_LABELS[provider ?? ""] ?? (provider ? provider : "Unknown"),
+    method: signInMethodLabel(provider),
   };
 }

@@ -1,3 +1,5 @@
+import { escapeHtml, type SafeHtml } from "@/lib/notifications/html";
+
 export interface EmailTemplate {
   subject: string;
   html: string;
@@ -18,9 +20,10 @@ const INK = "#000092";
 const MUTED = "#6b6b6b";
 const PAPER = "#fafbf7";
 
+/** Plain text fields are escaped here; the body is SafeHtml built with the `html` tag. */
 export interface EmailSection {
   heading: string;
-  bodyHtml: string;
+  bodyHtml: SafeHtml;
   ctaUrl?: string;
   ctaLabel?: string;
   details?: { label: string; value: string }[];
@@ -31,13 +34,15 @@ function detailsHtml(details?: { label: string; value: string }[]): string {
   const rows = details
     .map(
       (row) =>
-        `<p style="margin:0 0 6px;text-align:center;"><span style="color:${MUTED};font-size:13px;">${row.label}</span><br/><span style="color:${INK};font-size:16px;font-weight:700;">${row.value}</span></p>`
+        `<p style="margin:0 0 6px;text-align:center;"><span style="color:${MUTED};font-size:13px;">${escapeHtml(row.label)}</span><br/><span style="color:${INK};font-size:16px;font-weight:700;">${escapeHtml(row.value)}</span></p>`
     )
     .join("");
   return `<div style="margin:20px 0;padding:16px;background-color:${PAPER};border-radius:8px;">${rows}</div>`;
 }
 
-function buttonHtml(url: string, label: string): string {
+function buttonHtml(rawUrl: string, rawLabel: string): string {
+  const url = escapeHtml(rawUrl);
+  const label = escapeHtml(rawLabel);
   return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto;">
     <tr>
       <td style="background-color:${TITLE_COLOR};border-radius:8px;">
@@ -52,8 +57,8 @@ function buttonHtml(url: string, label: string): string {
 export function renderEmail(options: {
   preheader: string;
   section: EmailSection;
-  /** Replaces the default "If this was not you, you can safely ignore it" footer (HTML). */
-  footerHtml?: string;
+  /** Replaces the default "If this was not you, you can safely ignore it" footer. */
+  footerHtml?: SafeHtml;
 }): string {
   const { preheader, section, footerHtml } = options;
 
@@ -64,7 +69,7 @@ export function renderEmail(options: {
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
   </head>
   <body style="margin:0;padding:0;background-color:${PAPER};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-    <div style="display:none;max-height:0;overflow:hidden;">${preheader}</div>
+    <div style="display:none;max-height:0;overflow:hidden;">${escapeHtml(preheader)}</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${PAPER};padding:32px 16px;">
       <tr>
         <td align="center">
@@ -76,12 +81,12 @@ export function renderEmail(options: {
             </tr>
             <tr>
               <td style="padding:8px 32px 0;text-align:center;">
-                <h1 style="margin:0;color:${TITLE_COLOR};font-size:22px;font-weight:800;">${section.heading}</h1>
+                <h1 style="margin:0;color:${TITLE_COLOR};font-size:22px;font-weight:800;">${escapeHtml(section.heading)}</h1>
               </td>
             </tr>
             <tr>
               <td style="padding:16px 32px 32px;color:${INK};font-size:15px;line-height:24px;text-align:center;">
-                ${section.bodyHtml}
+                ${section.bodyHtml.value}
                 ${detailsHtml(section.details)}
                 ${section.ctaUrl && section.ctaLabel ? buttonHtml(section.ctaUrl, section.ctaLabel) : ""}
               </td>
@@ -90,7 +95,7 @@ export function renderEmail(options: {
               <td style="padding:0 32px 28px;text-align:center;">
                 <p style="margin:0;color:${MUTED};font-size:12px;line-height:18px;">
                   ${
-                    footerHtml ??
+                    footerHtml?.value ??
                     `You are receiving this because an account exists on
                   <a href="https://www.hackvillage.xyz" style="color:${INK};">HackVillage</a>.
                   If this was not you, you can safely ignore it.`

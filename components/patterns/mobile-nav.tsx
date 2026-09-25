@@ -22,8 +22,8 @@ interface MobileNavProps {
  * Mobile-only hamburger menu. Sits to the right of the Sign Up button
  * (rendered inline in the header's action row) and opens a drawer that
  * slides in from the left edge of the screen, with a dimmed backdrop.
- * The desktop inline nav (site-header-links) is hidden below 767px —
- * see the matching @media block in globals.css.
+ * The desktop inline nav (site-header-links) is hidden below 1024px, so
+ * tablets use this menu too. See the matching @media block in globals.css.
  *
  * The overlay + drawer are portaled to document.body: the header has
  * `backdrop-blur`, and `backdrop-filter` on an ancestor makes it the
