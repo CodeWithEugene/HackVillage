@@ -656,53 +656,56 @@
 
   /*
    * Trust & Impact — sits between How It Works and the newsletter banner.
-   * Three zones, left to right: a narrow text column, a framed photo
-   * carrying two floating trust callouts, and a tall strip of small photos
-   * at the far right edge — with the stat cards running full width beneath
-   * the text and photo (not under the strip).
+   * Proportions come straight from the reference frame (1440 wide): text
+   * column 363, photo group 665, photo strip 200, 42px gutters, photo
+   * 500x688, strip photos 200x262. Using those numbers as fr units and
+   * percentages keeps every piece in the same ratio at any width, so the
+   * section reads as one composition instead of each photo growing on its
+   * own. Stat cards run beneath the text and photo, not under the strip.
    */
   .trust-impact {
     display: grid;
-    grid-template-columns: minmax(240px, 320px) minmax(0, 1.7fr) minmax(150px, 220px);
+    grid-template-columns: minmax(0, 363fr) minmax(0, 665fr) minmax(0, 200fr);
     grid-template-rows: auto auto;
-    column-gap: clamp(40px, 5vw, 72px);
-    row-gap: clamp(32px, 4vw, 48px);
+    column-gap: clamp(24px, 2.9vw, 42px);
+    row-gap: clamp(28px, 3.3vw, 48px);
     align-items: start;
-    padding-block: clamp(48px, 6vw, 96px);
+    max-width: 1440px;
+    padding-block: clamp(48px, 5vw, 80px);
   }
   .trust-impact-content {
     grid-column: 1;
     grid-row: 1;
+    align-self: center;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 20px;
-    padding-top: 12px;
+    gap: clamp(18px, 2.2vw, 32px);
   }
   .trust-impact-eyebrow {
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-bottom: calc(-1 * clamp(8px, 1.2vw, 20px));
     font-family: var(--font-body);
-    font-size: 15px;
-    font-weight: 600;
+    font-size: clamp(14px, 1.1vw, 17px);
+    font-weight: 500;
     color: var(--color-ink);
   }
   .trust-impact-eyebrow span {
     color: var(--color-brand);
-    font-size: 16px;
   }
   .trust-impact-heading {
     font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(34px, 4.4vw, 60px);
-    line-height: 1.08;
-    letter-spacing: -0.02em;
+    font-weight: 600;
+    font-size: clamp(32px, 3.9vw, 56px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
     color: var(--color-ink);
   }
   .trust-impact-text {
-    font-size: clamp(15px, 1.1vw, 17px);
-    line-height: 1.6;
+    font-size: clamp(15px, 1.2vw, 18px);
+    line-height: 1.55;
     color: var(--color-body-copy);
   }
   .trust-impact-visual {
@@ -714,20 +717,24 @@
   .trust-impact-star {
     position: absolute;
     z-index: 0;
-    top: -18px;
-    left: -76px;
-    width: clamp(90px, 8vw, 140px);
-    height: clamp(90px, 8vw, 140px);
+    top: 3%;
+    left: -12.5%;
+    width: 21%;
+    height: auto;
+    aspect-ratio: 139 / 150;
     fill: var(--color-brand);
-    opacity: 0.6;
   }
   .trust-impact-frame {
     position: relative;
     z-index: 1;
-    aspect-ratio: 3 / 4;
-    overflow: hidden;
-    background: var(--color-surface);
-    border: 1.5px solid var(--color-ink);
+    width: 75%;
+    margin-left: 10%;
+    aspect-ratio: 500 / 688;
+    /* Matte: the photo sits inset inside a larger arch outline. Padding
+       percentages resolve against the photo group's width, matching the
+       reference's 31/43/33/33px insets on a 665px-wide group. */
+    padding: 6.4% 4.9% 4.9% 4.6%;
+    border: 1px solid var(--color-ink);
     /* Arch: browsers cap a too-large radius at 50% of the box, so the top
        corners always resolve to a perfect half-circle regardless of width. */
     border-radius: 999px 999px 0 0;
@@ -736,41 +743,25 @@
     position: relative;
     width: 100%;
     height: 100%;
-  }
-  .trust-impact-strip {
-    grid-column: 3;
-    grid-row: 1 / span 2;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    height: 100%;
-  }
-  .trust-strip-photo {
-    position: relative;
-    flex: 1;
-    min-height: 100px;
     overflow: hidden;
-    border: 1.5px solid var(--color-ink);
-    border-radius: 28px;
+    border-radius: 999px 999px 0 0;
   }
   .trust-float-card {
     position: absolute;
     z-index: 2;
     display: flex;
     align-items: center;
-    gap: 14px;
-    max-width: 220px;
-    padding: 16px;
+    gap: 16px;
+    padding: clamp(14px, 1.7vw, 24px);
     border: 1px solid var(--color-ink);
     border-radius: 16px;
-    background: color-mix(in srgb, var(--color-surface) 92%, transparent);
-    box-shadow: var(--shadow-card);
-    backdrop-filter: blur(6px);
+    background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+    backdrop-filter: blur(8px);
   }
   .trust-float-card p {
     margin: 0;
-    font-size: 13px;
-    line-height: 1.4;
+    font-size: clamp(12px, 1vw, 14px);
+    line-height: 1.25;
     color: var(--color-ink);
   }
   .trust-float-icon {
@@ -778,52 +769,69 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: clamp(36px, 3.3vw, 48px);
+    height: clamp(36px, 3.3vw, 48px);
     border-radius: 999px;
     background: var(--color-brand-soft);
     color: var(--color-ink);
   }
   .trust-float-card-top {
-    top: 20%;
-    right: -30px;
+    top: 24%;
+    left: 56.5%;
+    width: 40.8%;
   }
   .trust-float-card-bottom {
-    top: 54%;
-    left: -38px;
+    top: 45.5%;
+    left: -0.75%;
+    width: 39.2%;
+  }
+  .trust-impact-strip {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 1.7vw, 24px);
+  }
+  .trust-strip-photo {
+    position: relative;
+    aspect-ratio: 200 / 262;
+    overflow: hidden;
+    border: 1px solid var(--color-ink);
+    border-radius: clamp(20px, 2.2vw, 32px);
   }
   .trust-stats {
     grid-column: 1 / span 2;
     grid-row: 2;
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    gap: clamp(16px, 2.2vw, 32px);
+    width: 90%;
     margin: 0;
     padding: 0;
     list-style: none;
   }
   .trust-stat {
-    flex: 1 1 200px;
+    flex: 1 1 0;
+    min-width: 0;
     display: flex;
-    flex-direction: row;
     align-items: center;
-    gap: 14px;
-    padding: 16px 20px;
-    border: 1.5px solid var(--color-ink);
+    gap: 16px;
+    min-height: 83px;
+    padding: 16px;
+    border: 1px solid var(--color-ink);
     border-radius: 16px;
-    box-shadow: 6px 6px 0 var(--color-ink);
+    box-shadow: 8px 8px 0 var(--color-ink);
   }
   .trust-stat-value {
     flex-shrink: 0;
     font-family: var(--font-display);
-    font-size: 24px;
-    font-weight: 700;
+    font-size: clamp(18px, 1.5vw, 22px);
+    font-weight: 600;
     color: var(--color-ink);
   }
   .trust-stat-label {
-    font-size: 13px;
-    line-height: 1.4;
-    color: color-mix(in srgb, var(--color-ink) 75%, transparent);
+    font-size: clamp(12px, 1vw, 14px);
+    line-height: 1.25;
+    color: color-mix(in srgb, var(--color-ink) 80%, transparent);
   }
   .trust-stat-brand {
     background: var(--color-brand-soft);
@@ -847,31 +855,27 @@
       grid-column: 1;
       grid-row: auto;
     }
-    .trust-impact-frame {
-      max-width: 420px;
+    .trust-impact-visual {
+      width: min(100%, 520px);
       margin-inline: auto;
     }
     .trust-impact-strip {
       flex-direction: row;
-      height: clamp(120px, 22vw, 180px);
     }
-    .trust-float-card {
-      max-width: 190px;
-      padding: 12px;
+    .trust-strip-photo {
+      flex: 1 1 0;
+      min-width: 0;
     }
-    .trust-float-card-top {
-      top: -14px;
-      right: 0;
-    }
-    .trust-float-card-bottom {
-      top: auto;
-      bottom: 10%;
-      left: 0;
+    .trust-stats {
+      width: 100%;
     }
   }
   @media (max-width: 599px) {
     .trust-float-card {
       display: none;
+    }
+    .trust-stats {
+      flex-direction: column;
     }
   }
 
