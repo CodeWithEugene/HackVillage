@@ -279,6 +279,61 @@ async function main(): Promise<void> {
       ],
     },
     {
+      slug: "civic-tech-build-sprint",
+      title: "Civic Tech Build Sprint",
+      summary: "Tools that help Kenyans track public services, report issues, and follow up.",
+      problemStatement:
+        "Residents report broken water points, potholes, and missing services, then never hear back. Over three weeks, build tools that route reports to the right office, track them publicly, and close the loop with the people who raised them.",
+      venueType: "ONLINE",
+      location: null,
+      startDay: -4,
+      lengthDays: 21,
+      status: "LIVE",
+      verified: true,
+      rolesWanted: ["frontend", "backend", "civic"],
+      prizes: [
+        [1, "1st place", 150_000],
+        [2, "2nd place", 75_000],
+      ],
+    },
+    {
+      slug: "clean-energy-hack",
+      title: "Clean Energy Hack",
+      summary: "Solar, metering, and pay as you go tools for off grid homes and small businesses.",
+      problemStatement:
+        "Millions of households rely on small solar kits with no easy way to track usage or pay in small amounts. Build metering dashboards, pay as you go billing, or maintenance tools for installers and the families they serve.",
+      venueType: "PHYSICAL",
+      location: "Dedan Kimathi University, Nyeri",
+      startDay: -2,
+      lengthDays: 14,
+      status: "LIVE",
+      verified: true,
+      rolesWanted: ["hardware", "mobile", "fintech"],
+      prizes: [
+        [1, "1st place", 200_000],
+        [2, "2nd place", 100_000],
+      ],
+    },
+    {
+      slug: "agri-supply-chain-challenge",
+      title: "Agri Supply Chain Challenge",
+      summary: "Traceability and payments from farm gate to market for Kenyan smallholders.",
+      problemStatement:
+        "Smallholder produce changes hands many times before it reaches a buyer, and farmers rarely see fair prices or prompt payment. Build traceability, grading, or instant payment tools that work at the farm gate.",
+      venueType: "HYBRID",
+      location: "Eldoret, Uasin Gishu",
+      startDay: -6,
+      lengthDays: 28,
+      status: "LIVE",
+      verified: true,
+      rolesWanted: ["backend", "data", "mobile"],
+      prizes: [
+        [1, "1st place", 250_000],
+        [2, "2nd place", 120_000],
+        [3, "3rd place", 60_000],
+      ],
+    },
+    {
       slug: "edtech-for-rural-schools",
       title: "EdTech for Rural Schools",
       summary: "Offline learning tools for schools with one shared tablet and no reliable network.",
@@ -459,7 +514,7 @@ async function main(): Promise<void> {
     update: {},
   });
 
-  console.log("Seeded: Technetium Kenya org, 1 organizer, 5 developers, 1 judge, 10 hackathons, 2 teams, 1 submission.");
+  console.log("Seeded: Technetium Kenya org, 1 organizer, 5 developers, 1 judge, 13 hackathons, 2 teams, 1 submission.");
   console.log("Demo login: organizer@hackvillage.dev / wanjiku@hackvillage.dev / judge@hackvillage.dev … password: demopass123");
 }
 
