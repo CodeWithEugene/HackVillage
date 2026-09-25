@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 import type { BlogPost } from "@/lib/blog/types";
 
 function Body() {
@@ -66,7 +67,7 @@ function Body() {
       <p>
         Your trust score and track record appear on every hackathon you host, so following through
         is how you build a reputation builders notice.{" "}
-        <Link href="/onboarding/organizer">Host a hackathon</Link> when you&apos;re ready.
+        <Link href={HOST_HACKATHON_HREF}>Host a hackathon</Link> when you&apos;re ready.
       </p>
     </>
   );

@@ -12,6 +12,7 @@ import {
   type HackathonPhase,
 } from "@/lib/events/format";
 import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
+import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 import { HACKATHON_CATEGORIES, isCategory, type HackathonCategory } from "@/lib/events/categories";
 import { CalendarX2 } from "lucide-react";
 
@@ -164,7 +165,7 @@ export default async function EventsPage({
           title="No Hackathons In This View Yet"
           description="Hackathons appear here once their prize pool is secured. Check back soon."
           action={
-            <Link href="/onboarding/organizer">
+            <Link href={HOST_HACKATHON_HREF}>
               <Button arrow>Host The First Hackathon</Button>
             </Link>
           }

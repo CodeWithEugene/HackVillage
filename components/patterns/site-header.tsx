@@ -5,6 +5,7 @@ import { MobileNav } from "@/components/patterns/mobile-nav";
 import { NavDropdown } from "@/components/patterns/nav-dropdown";
 import { NavLink } from "@/components/patterns/nav-link";
 import { ThemeSwitcher } from "@/components/patterns/theme-switcher";
+import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -19,7 +20,7 @@ const NAV_LINKS: NavItem[] = [
 ];
 
 const ORGANIZER_LINKS: NavItem[] = [
-  { href: "/onboarding/organizer", label: "Host A Hackathon" },
+  { href: HOST_HACKATHON_HREF, label: "Host A Hackathon" },
   { href: "/how-escrow-works", label: "How Escrow Works" },
 ];
 

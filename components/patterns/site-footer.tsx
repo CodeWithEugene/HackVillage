@@ -4,6 +4,7 @@ import { Mail, MapPin } from "lucide-react";
 import { GithubMark } from "@/components/icons/github-icon";
 import { LinkedinIcon, XIcon, YoutubeIcon } from "@/components/icons/social-icons";
 import { NewsletterForm } from "@/components/patterns/newsletter-form";
+import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 
 const GITHUB_URL = "https://github.com/CodeWithEugene/HackVillage";
 const CONTACT_EMAIL = "info@hackvillage.xyz";
@@ -48,7 +49,7 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
     links: [
       { label: "Sign in", href: "/signin" },
       { label: "Create an account", href: "/signup" },
-      { label: "Host a hackathon", href: "/onboarding/organizer" },
+      { label: "Host a hackathon", href: HOST_HACKATHON_HREF },
     ],
   },
 ];

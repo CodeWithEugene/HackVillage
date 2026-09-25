@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormError, Input, Label } from "@/components/ui/input";
 import { signUpAction, type AuthActionState } from "@/lib/auth/actions";
+import type { SignUpRole } from "@/lib/auth/signup-links";
 
 const ROLES = [
   {
@@ -26,14 +27,16 @@ const ROLES = [
 ] as const;
 
 export function SignUpForm({
+  initialRole = "DEVELOPER",
   googleEnabled,
   githubEnabled,
 }: {
+  initialRole?: SignUpRole;
   googleEnabled: boolean;
   githubEnabled: boolean;
 }) {
   const [state, action, pending] = useActionState<AuthActionState, FormData>(signUpAction, {});
-  const [role, setRole] = useState<"DEVELOPER" | "ORGANIZER">("DEVELOPER");
+  const [role, setRole] = useState<SignUpRole>(initialRole);
 
   return (
     <Card>
@@ -45,7 +48,8 @@ export function SignUpForm({
       <OAuthButtons
         googleEnabled={googleEnabled}
         githubEnabled={githubEnabled}
-        redirectTo="/dashboard"
+        // OAuth accounts start as developers; organizer setup grants the organizer role.
+        redirectTo={role === "ORGANIZER" ? "/onboarding/organizer" : "/dashboard"}
       />
 
       <form action={action} className="mt-6 space-y-5">

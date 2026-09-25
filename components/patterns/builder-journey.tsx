@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Sparkle } from "@/components/patterns/sparkle";
+import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 
 const ARC_TEXT = "Verified. Paid. Proven.";
 
@@ -45,7 +46,7 @@ export function BuilderJourney() {
             Every prize is fully deposited before the first line of code, so builders across
             Africa compete for money that is already there.
           </p>
-          <Link href="/onboarding/organizer" className="journey-action btn-pill">
+          <Link href={HOST_HACKATHON_HREF} className="journey-action btn-pill">
             <span className="btn-fill" aria-hidden />
             <span className="btn-content">
               Host A Hackathon <ArrowUpRight aria-hidden size={16} className="btn-arrow" />

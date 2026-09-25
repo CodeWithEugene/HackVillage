@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 import type { BlogPost } from "@/lib/blog/types";
 
 function Body() {
@@ -58,8 +59,8 @@ function Body() {
         comes back stronger to your next hackathon.
       </p>
       <p>
-        Ready to set one up? <Link href="/onboarding/organizer">Host a hackathon</Link> and build
-        your scorecard from your hackathon page.
+        Ready to set one up? <Link href={HOST_HACKATHON_HREF}>Host a hackathon</Link> and build your
+        scorecard from your hackathon page.
       </p>
     </>
   );
