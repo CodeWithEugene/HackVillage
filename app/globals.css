@@ -1159,6 +1159,27 @@
     margin-inline: auto;
     text-align: center;
   }
+  /* Home page stars (see .journey-star), just outside the centered hero copy. */
+  .hero-star {
+    position: absolute;
+    width: clamp(36px, 3.6vw, 56px);
+    height: auto;
+    fill: var(--color-brand);
+    pointer-events: none;
+  }
+  .hero-star-left {
+    top: 26%;
+    right: calc(100% + clamp(24px, 3vw, 56px));
+  }
+  .hero-star-right {
+    top: 60%;
+    left: calc(100% + clamp(24px, 3vw, 56px));
+  }
+  @media (max-width: 1023px) {
+    .hero-star {
+      display: none;
+    }
+  }
   .hero-eyebrow {
     font-size: 10px;
     font-weight: 600;
