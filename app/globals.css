@@ -881,11 +881,9 @@
   .nav-dropdown-trigger[data-active],
   .nav-dropdown-link[aria-current="page"],
   .mobile-nav-link[aria-current="page"] {
-    color: var(--color-ink);
-    text-decoration: underline;
-    text-decoration-color: var(--color-brand);
-    text-decoration-thickness: 2px;
-    text-underline-offset: 6px;
+    /* The current page is marked by colour alone, no underline. */
+    color: var(--color-brand);
+    font-weight: 600;
   }
   .nav-dropdown {
     position: relative;

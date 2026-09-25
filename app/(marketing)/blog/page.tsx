@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default function BlogPage() {
-  const [featured, ...rest] = allPosts();
+  const posts = allPosts();
   return (
     <>
       <div className="site-container py-16">
@@ -28,14 +28,11 @@ export default function BlogPage() {
           </p>
         </header>
 
-        {featured ? <BlogCard post={featured.meta} featured /> : null}
-        {rest.length > 0 ? (
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {rest.map((post) => (
-              <BlogCard key={post.meta.slug} post={post.meta} />
-            ))}
-          </div>
-        ) : null}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => (
+            <BlogCard key={post.meta.slug} post={post.meta} />
+          ))}
+        </div>
       </div>
       <CtaBanner photoSide="left" />
     </>

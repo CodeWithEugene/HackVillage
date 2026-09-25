@@ -1,6 +1,5 @@
 import { post as howWinnersGetPaid } from "@/lib/blog/posts/how-winners-get-paid";
 import { post as runningAHackathon } from "@/lib/blog/posts/running-a-hackathon-builders-trust";
-import { post as whyWeLockEveryPrize } from "@/lib/blog/posts/why-we-lock-every-prize-first";
 import { post as yourFirstHackathon } from "@/lib/blog/posts/your-first-hackathon";
 import type { BlogPost } from "@/lib/blog/types";
 
@@ -8,12 +7,7 @@ import type { BlogPost } from "@/lib/blog/types";
  * Every published post. To publish one, add a module under lib/blog/posts
  * and list it here; the order here breaks ties between posts on the same date.
  */
-const POSTS: BlogPost[] = [
-  whyWeLockEveryPrize,
-  howWinnersGetPaid,
-  yourFirstHackathon,
-  runningAHackathon,
-];
+const POSTS: BlogPost[] = [howWinnersGetPaid, yourFirstHackathon, runningAHackathon];
 
 /** Newest first. */
 export function allPosts(): BlogPost[] {
