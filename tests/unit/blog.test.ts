@@ -48,10 +48,11 @@ describe("formatPostDate", () => {
 });
 
 describe("blog pagination", () => {
-  it("counts pages of three, with at least one page", () => {
-    expect(pageCount(9)).toBe(3);
-    expect(pageCount(8)).toBe(3);
-    expect(pageCount(0)).toBe(1);
+  it("counts pages, with at least one page", () => {
+    expect(pageCount(9, 6)).toBe(2);
+    expect(pageCount(8, 3)).toBe(3);
+    expect(pageCount(6, 6)).toBe(1);
+    expect(pageCount(0, 6)).toBe(1);
   });
 
   it("reads the page leniently and clamps overshoots", () => {
@@ -66,8 +67,9 @@ describe("blog pagination", () => {
 
   it("slices one page of items", () => {
     const items = [1, 2, 3, 4, 5, 6, 7, 8];
-    expect(pageSlice(items, 1)).toEqual([1, 2, 3]);
-    expect(pageSlice(items, 3)).toEqual([7, 8]);
+    expect(pageSlice(items, 1, 3)).toEqual([1, 2, 3]);
+    expect(pageSlice(items, 3, 3)).toEqual([7, 8]);
+    expect(pageSlice(items, 2, 6)).toEqual([7, 8]);
   });
 
   it("shows every page when there are only a few", () => {

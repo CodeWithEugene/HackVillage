@@ -1,9 +1,12 @@
-/** One row of cards on a wide screen. */
-export const POSTS_PER_PAGE = 3;
+/** Two rows of cards on a wide screen. */
+export const BLOG_PAGE_SIZE = 6;
+
+/** One row of cards under a post. */
+export const KEEP_READING_PAGE_SIZE = 3;
 
 export type PageItem = number | "gap";
 
-export function pageCount(total: number, perPage: number = POSTS_PER_PAGE): number {
+export function pageCount(total: number, perPage: number): number {
   return Math.max(1, Math.ceil(total / perPage));
 }
 
@@ -15,11 +18,7 @@ export function parsePage(raw: string | string[] | undefined, count: number): nu
   return Math.min(page, count);
 }
 
-export function pageSlice<T>(
-  items: readonly T[],
-  page: number,
-  perPage: number = POSTS_PER_PAGE,
-): T[] {
+export function pageSlice<T>(items: readonly T[], page: number, perPage: number): T[] {
   const start = (page - 1) * perPage;
   return items.slice(start, start + perPage);
 }

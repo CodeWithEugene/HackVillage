@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { BlogCard } from "@/components/patterns/blog-card";
 import { Pagination } from "@/components/patterns/pagination";
 import { allPosts } from "@/lib/blog";
-import { pageCount, pageSlice, parsePage } from "@/lib/blog/pagination";
+import { BLOG_PAGE_SIZE, pageCount, pageSlice, parsePage } from "@/lib/blog/pagination";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -21,7 +21,7 @@ function blogPageHref(page: number): string {
 
 export default async function BlogPage({ searchParams }: PageProps) {
   const posts = allPosts();
-  const count = pageCount(posts.length);
+  const count = pageCount(posts.length, BLOG_PAGE_SIZE);
   const page = parsePage((await searchParams).page, count);
   return (
     <>
@@ -40,7 +40,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
         </header>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {pageSlice(posts, page).map((post) => (
+          {pageSlice(posts, page, BLOG_PAGE_SIZE).map((post) => (
             <BlogCard key={post.meta.slug} post={post.meta} />
           ))}
         </div>

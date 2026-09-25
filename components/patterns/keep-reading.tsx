@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 
 import { BlogCard } from "@/components/patterns/blog-card";
 import { Pagination } from "@/components/patterns/pagination";
-import { pageCount, pageSlice } from "@/lib/blog/pagination";
+import { KEEP_READING_PAGE_SIZE, pageCount, pageSlice } from "@/lib/blog/pagination";
 import type { BlogPostMeta } from "@/lib/blog/types";
 
 /** Three other posts at a time, with page controls to see the rest. */
@@ -30,13 +30,13 @@ export function KeepReading({ posts }: { posts: BlogPostMeta[] }) {
         Keep Reading
       </h2>
       <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
-        {pageSlice(posts, page).map((post) => (
+        {pageSlice(posts, page, KEEP_READING_PAGE_SIZE).map((post) => (
           <BlogCard key={post.slug} post={post} />
         ))}
       </div>
       <Pagination
         page={page}
-        pageCount={pageCount(posts.length)}
+        pageCount={pageCount(posts.length, KEEP_READING_PAGE_SIZE)}
         label="More posts"
         onSelect={showPage}
       />
