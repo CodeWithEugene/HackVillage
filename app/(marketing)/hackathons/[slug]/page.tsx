@@ -91,24 +91,25 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {verified ? (
-            <PrizeVerifiedBadge />
-          ) : (
-            <Badge variant={statusTone(event.status)}>{STATUS_LABELS[event.status]}</Badge>
-          )}
+      <header className="text-center">
+        {verified ? (
+          <PrizeVerifiedBadge />
+        ) : (
+          <Badge variant={statusTone(event.status)}>{STATUS_LABELS[event.status]}</Badge>
+        )}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+          <h1 className="font-display text-3xl leading-tight font-bold text-ink sm:text-4xl">
+            {event.title}
+          </h1>
+          <Badge variant="neutral">
+            <Users aria-hidden className="size-3.5" /> {event._count.teams} team
+            {event._count.teams === 1 ? "" : "s"}
+          </Badge>
         </div>
-        <Badge variant="neutral">
-          <Users aria-hidden className="size-3.5" /> {event._count.teams} team
-          {event._count.teams === 1 ? "" : "s"}
-        </Badge>
-      </div>
-
-      <h1 className="mt-4 font-display text-3xl leading-tight font-bold text-ink sm:text-4xl">
-        {event.title}
-      </h1>
-      {event.summary ? <p className="mt-2 text-lg text-muted">{event.summary}</p> : null}
+        {event.summary ? (
+          <p className="mx-auto mt-2 max-w-2xl text-lg text-muted">{event.summary}</p>
+        ) : null}
+      </header>
 
       {!verified ? (
         <div className="mt-6 rounded-card border border-warning/40 bg-warning/10 p-4">
