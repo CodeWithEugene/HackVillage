@@ -18,7 +18,7 @@ import { registrationOpen, submissionWindowOpen } from "@/lib/events/lifecycle";
 export const metadata: Metadata = { title: "Team Workspace" };
 
 const NOTICES: Record<string, string> = {
-  "leader": "Leaders can't leave — disband the team instead (only before submitting).",
+  "leader": "Leaders can't leave; disband the team instead (only before submitting).",
   "team-first": "Leave your team before cancelling your registration.",
   "submitted": "A team with a submitted project can't be disbanded.",
 };
@@ -50,7 +50,7 @@ export default async function WorkspacePage({
       <EmptyState
         icon={UsersRound}
         title="You're not registered for this event"
-        description="Register from the event page first — then this workspace becomes your team's build hub."
+        description="Register from the event page first, then this workspace becomes your team's build hub."
         action={
           <a href={`/events/${event.slug}`}>
             <Button>Go To Event Page</Button>
@@ -204,7 +204,7 @@ export default async function WorkspacePage({
       <Card>
         <CardTitle>What Happens After Announcement</CardTitle>
         <CardDescription>
-          Endorse the winners you judged —{" "}
+          Endorse the winners you judged:{" "}
           <a href={`/judge/events/${event.slug}/endorse`} className="underline hover:text-ink">
             write endorsements
           </a>{" "}

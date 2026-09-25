@@ -82,7 +82,7 @@ export function PayoutMethodForm({
           />
           {method === "MPESA" ? (
             <p className="mt-1.5 text-xs text-muted">
-              Format: 2547XXXXXXXX or 2541XXXXXXXX — the full number with country code.
+              Format: 2547XXXXXXXX or 2541XXXXXXXX, the full number with country code.
             </p>
           ) : null}
         </div>

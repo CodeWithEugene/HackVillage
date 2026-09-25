@@ -59,7 +59,7 @@ export function SiteFooter() {
           />
           <p className="mt-3 max-w-sm text-sm leading-6 text-on-inverse/70">
             The open-source infrastructure for high-impact tech events. 100% escrowed prize pools,
-            50% instant payouts, verified Proof-of-Work developer profiles — built with intention
+            50% instant payouts, verified Proof-of-Work developer profiles, built with intention
             for the African developer community.
           </p>
           <p className="mt-4 text-xs text-on-inverse/50">

@@ -16,7 +16,7 @@ export function IntroResponseActions({ introductionId }: { introductionId: strin
         loading={pending}
         onClick={() => startTransition(() => void respondToIntroductionAction(introductionId, true))}
       >
-        <Check aria-hidden className="size-4" /> Accept — exchange contacts
+        <Check aria-hidden className="size-4" /> Accept And Exchange Contacts
       </Button>
       <Button
         size="sm"

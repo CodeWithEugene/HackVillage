@@ -22,7 +22,7 @@ export default function GlobalError({
           <div>
             <h1 className="font-display text-2xl font-bold text-ink">Something Went Wrong</h1>
             <p className="mt-2 max-w-md text-muted">
-              The app hit an unexpected error and could not load. Your data is safe — money
+              The app hit an unexpected error and could not load. Your data is safe. Money
               operations fail closed on this platform. Try reloading, and if it persists, contact
               support with the reference below.
             </p>

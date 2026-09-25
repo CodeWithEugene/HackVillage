@@ -36,7 +36,7 @@ export default async function EventRubricPage({
       <header>
         <h1 className="font-display text-2xl font-bold text-ink">Rubric</h1>
         <p className="mt-1 text-sm text-muted">
-          {event.title} · judges score 0–10 per criterion
+          {event.title} · judges score 0-10 per criterion
         </p>
       </header>
 

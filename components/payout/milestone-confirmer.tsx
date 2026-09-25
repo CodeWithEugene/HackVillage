@@ -41,7 +41,7 @@ export function MilestoneConfirmer({ winnerId }: { winnerId: string }) {
           })
         }
       >
-        <Handshake aria-hidden className="size-4" /> Confirm handover — release final 50%
+        <Handshake aria-hidden className="size-4" /> Confirm handover, release final 50%
       </Button>
     </div>
   );

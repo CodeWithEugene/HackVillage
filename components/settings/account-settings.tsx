@@ -103,7 +103,7 @@ export function AccountSettings({
         <CardTitle className="text-danger">Danger Zone</CardTitle>
         <CardDescription>
           Deactivating anonymizes your account immediately. If you have winnings awaiting payout,
-          those obligations are still honored — funds are never forfeited.
+          those obligations are still honored, and funds are never forfeited.
         </CardDescription>
         {confirming ? (
           <form action={deactivate} className="mt-4 space-y-4">

@@ -89,7 +89,7 @@ export default async function JudgeTeamPage({
           ) : null}
         </div>
         <CardDescription>
-          Open the repo and demo in separate tabs — rubric scoring follows below.
+          Open the repo and demo in separate tabs. Rubric scoring follows below.
         </CardDescription>
       </Card>
 

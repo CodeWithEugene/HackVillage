@@ -22,7 +22,7 @@ export default function TermsOfServicePage() {
       <p>
         HackVillage is open-source infrastructure for high-impact tech events: organizers host
         Prize Verified hackathons with escrowed prize pools, developers register, form teams,
-        and submit projects, judges score submissions, and winners are paid out — 50% instantly
+        and submit projects, judges score submissions, and winners are paid out: 50% instantly
         on results, 50% at milestone completion. Every deposit and payout is attested on a
         public ledger.
       </p>
@@ -36,7 +36,7 @@ export default function TermsOfServicePage() {
       <ul>
         <li>You must be at least 18 years old, or have a parent/guardian&apos;s consent and involvement, to create an account.</li>
         <li>You&apos;re responsible for keeping your login credentials secure and for all activity under your account.</li>
-        <li>You must provide accurate information — for organizers, this includes accurate business identity for KYB verification; for winners, accurate payout details for KYC verification.</li>
+        <li>You must provide accurate information: for organizers, this includes accurate business identity for KYB verification; for winners, accurate payout details for KYC verification.</li>
         <li>One account per person. Organization accounts may have multiple authorized members.</li>
       </ul>
 
@@ -93,7 +93,7 @@ export default function TermsOfServicePage() {
         <a href="https://github.com/CodeWithEugene/HackVillage">
           github.com/CodeWithEugene/HackVillage
         </a>
-        . The license covers the software itself — it does not grant rights to the HackVillage
+        . The license covers the software itself; it does not grant rights to the HackVillage
         name, logo, hosted data, or any specific event&apos;s content.
       </p>
 
@@ -128,7 +128,7 @@ export default function TermsOfServicePage() {
       <p>
         You may close your account at any time. We may suspend or terminate accounts that
         violate these Terms, with funds already locked in escrow handled per our payout and
-        refund rules — never left in an ambiguous or partially-paid state.
+        refund rules, never left in an ambiguous or partially-paid state.
       </p>
 
       <h2>12. Governing Law</h2>

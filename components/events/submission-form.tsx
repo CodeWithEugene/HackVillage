@@ -53,9 +53,9 @@ export function SubmissionForm({
     <Card>
       <CardTitle>Submission</CardTitle>
       <CardDescription>
-        One submission per team — any member can save it, everyone sees it. {windowOpen
+        One submission per team: any member can save it, everyone sees it. {windowOpen
           ? "Editable until the event ends."
-          : "The submission window has closed — this is your final entry."}
+          : "The submission window has closed. This is your final entry."}
       </CardDescription>
 
       <form action={action} className="mt-4 space-y-5">
@@ -112,8 +112,8 @@ export function SubmissionForm({
             </Badge>
           </legend>
           <p className="mt-1 text-xs leading-5 text-muted">
-            Who receives what if this team wins. The platform pays the leader the full prize —
-            this declared split is visible to every member and guides the payout (ADR-013).
+            Who receives what if this team wins. The platform pays the leader the full prize.
+            This declared split is visible to every member and guides the payout (ADR-013).
           </p>
           <div className="mt-3 space-y-2">
             {members.map((member) => (
@@ -154,7 +154,7 @@ export function SubmissionForm({
             {defaults ? "Update Submission" : "Submit Project"}
           </Button>
         ) : (
-          <p className="text-sm font-semibold text-muted">Window closed — submission locked.</p>
+          <p className="text-sm font-semibold text-muted">Window closed. Submission locked.</p>
         )}
       </form>
     </Card>

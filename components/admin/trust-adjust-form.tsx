@@ -53,7 +53,7 @@ export function TrustAdjustForm({
         <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <div>
             <Label htmlFor={`appeal-note-${orgId}`} className="text-xs">
-              Appeal note — grants +10, reversing the media penalty
+              Appeal note: grants +10, reversing the media penalty
             </Label>
             <Input id={`appeal-note-${orgId}`} name="reason" required minLength={6} maxLength={300} placeholder="Why should this penalty be reversed?" />
           </div>

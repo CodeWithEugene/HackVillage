@@ -26,7 +26,7 @@ export function LegacyCheckinCard({
     <Card>
       <CardTitle>What Happened To Your {eventTitle} Project?</CardTitle>
       <CardDescription>
-        Three months on — did it become a product? {dueLabel} Your answer updates the lifecycle
+        Three months on: did it become a product? {dueLabel} Your answer updates the lifecycle
         badge on your Proof-of-Work portfolio (real-world trajectory is part of the record).
       </CardDescription>
       <form action={action} className="mt-4 space-y-3">
@@ -76,7 +76,7 @@ export function DisputeForm({ winnerId }: { winnerId: string }) {
       <CardTitle>Milestone Not Confirmed?</CardTitle>
       <CardDescription>
         If you delivered and the organizer isn&apos;t confirming, open a dispute. Funds stay locked
-        until platform staff review both sides — nothing is ever lost.
+        until platform staff review both sides, so nothing is ever lost.
       </CardDescription>
       <form action={action} className="mt-4 space-y-3">
         <input type="hidden" name="winnerId" value={winnerId} />

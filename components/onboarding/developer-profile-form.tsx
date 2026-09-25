@@ -41,7 +41,7 @@ export function DeveloperProfileForm({
         </h1>
         <p className="mt-1 text-sm text-muted">
           Your Proof-of-Work profile is what judges and hiring partners see. Everything here is
-          verified by platform events — no self-reported stats.
+          verified by platform events, with no self-reported stats.
         </p>
 
         <form action={action} className="mt-6 space-y-5">
@@ -53,7 +53,7 @@ export function DeveloperProfileForm({
               required
               maxLength={120}
               defaultValue={defaults?.headline ?? ""}
-              placeholder="Full-stack developer — React, Node, Postgres"
+              placeholder="Full-stack developer: React, Node, Postgres"
             />
           </div>
 

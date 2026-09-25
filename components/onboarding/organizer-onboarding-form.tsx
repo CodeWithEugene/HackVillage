@@ -36,12 +36,12 @@ export function OrganizerOnboardingForm({
         </h1>
         <p className="mt-1 text-sm text-muted">
           Organizations run events and hold escrowed prize pools. Your KYB (business verification)
-          is collected later — only when you fund your first event.
+          is collected later, only when you fund your first event.
         </p>
 
         {existingOrgName ? (
           <div className="mt-4 rounded-control border border-success/30 bg-success/10 p-3 text-sm text-ink">
-            You already belong to <strong>{existingOrgName}</strong> — you&apos;re set. If you were
+            You already belong to <strong>{existingOrgName}</strong>, and you&apos;re set. If you were
             invited to another organization, switch to the invite tab below.
           </div>
         ) : null}

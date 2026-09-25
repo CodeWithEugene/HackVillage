@@ -54,7 +54,7 @@ export default async function HiringPage() {
             <Briefcase aria-hidden className="size-5" /> Hiring Here?
           </CardTitle>
           <CardDescription>
-            Join as a hiring partner to request verified introductions. It&apos;s free — you pay
+            Join as a hiring partner to request verified introductions. It&apos;s free: you pay
             nothing, developers pay nothing; we&apos;re paid by event organizers.
           </CardDescription>
           <Link href="/hiring/join" className="mt-4 inline-block">
@@ -67,7 +67,7 @@ export default async function HiringPage() {
         <Card>
           <CardTitle>Partner Mode Active</CardTitle>
           <CardDescription>
-            Request introductions from any verified winner&apos;s profile — track them in{" "}
+            Request introductions from any verified winner&apos;s profile; track them in{" "}
             <Link href="/hiring/requests" className="underline hover:text-ink">
               your requests
             </Link>
@@ -80,7 +80,7 @@ export default async function HiringPage() {
         <EmptyState
           icon={Users}
           title="The directory fills as events conclude"
-          description="Every winner of a Prize Verified event lands here automatically — verified win, verified payout, judge endorsement."
+          description="Every winner of a Prize Verified event lands here automatically: verified win, verified payout, judge endorsement."
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">

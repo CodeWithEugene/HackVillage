@@ -41,7 +41,7 @@ export function RubricEditor({
     <Card>
       <CardTitle>Rubric</CardTitle>
       <CardDescription>
-        Tune labels and weights from the platform template — at least 3 criteria, weights totalling
+        Tune labels and weights from the platform template. At least 3 criteria, weights totalling
         exactly 100. {locked ? "Locked: judging is open." : "Locks when judging opens."}
       </CardDescription>
 

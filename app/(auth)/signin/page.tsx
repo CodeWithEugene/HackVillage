@@ -5,8 +5,8 @@ import { SignInForm } from "@/components/auth/signin-form";
 export const metadata: Metadata = { title: "Sign In" };
 
 const NOTICES: Record<string, string> = {
-  registered: "Account created — check your email for the verification link.",
-  reset: "Password updated — sign in with your new password.",
+  registered: "Account created, check your email for the verification link.",
+  reset: "Password updated, sign in with your new password.",
 };
 
 const OAUTH_ERROR_NOTICES: Record<string, string> = {
@@ -28,7 +28,7 @@ export default async function SignInPage({
     (params.registered && NOTICES.registered) || (params.reset && NOTICES.reset);
   const errorNotice =
     params.error &&
-    (OAUTH_ERROR_NOTICES[params.error] ?? "Something went wrong with that sign-in — try again.");
+    (OAUTH_ERROR_NOTICES[params.error] ?? "Something went wrong with that sign-in, try again.");
 
   return (
     <SignInForm

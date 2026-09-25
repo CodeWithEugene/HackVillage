@@ -166,7 +166,7 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
             <div>
               <Label htmlFor="problemStatement">Problem statement</Label>
               <Textarea id="problemStatement" name="problemStatement" required minLength={40} maxLength={8000} defaultValue={defaults?.problemStatement ?? ""} placeholder="What should teams build, for whom, and why does it matter?" />
-              <p className="mt-1.5 text-xs text-muted">At least 40 characters — this is what builders decide on.</p>
+              <p className="mt-1.5 text-xs text-muted">At least 40 characters. This is what builders decide on.</p>
             </div>
             <div>
               <Label htmlFor="rules">Rules (optional)</Label>
@@ -237,7 +237,7 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
             </Button>
             <p className="text-xs text-muted">
               The prize pool is the sum of all places. It is deposited in full before the event
-              goes live — plus a 5% organizer platform fee at deposit time.
+              goes live, plus a 5% organizer platform fee at deposit time.
             </p>
           </Card>
         </div>
@@ -259,7 +259,7 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
             <p className="font-display text-lg font-bold text-ink">Review &amp; create draft</p>
             <p className="text-sm text-muted">
               Publishing checks the pool, dates, and problem statement. The draft then waits for
-              the Prize Vault deposit before going live — developers see it as
+              the Prize Vault deposit before going live. Developers see it as
               &ldquo;pending verification&rdquo;.
             </p>
             <dl className="grid gap-2 rounded-control bg-paper p-4 text-sm">

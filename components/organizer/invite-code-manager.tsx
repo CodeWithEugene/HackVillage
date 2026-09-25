@@ -55,7 +55,7 @@ export function InviteCodeManager({
           ))}
         </ul>
       ) : (
-        <p className="mt-4 text-sm text-muted">No active invites — generate one below.</p>
+        <p className="mt-4 text-sm text-muted">No active invites. Generate one below.</p>
       )}
 
       <div className="mt-4">

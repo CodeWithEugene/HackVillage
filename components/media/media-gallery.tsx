@@ -22,7 +22,7 @@ export function MediaGallery({ assets }: { assets: Asset[] }) {
     return (
       <Card>
         <CardTitle>Gallery</CardTitle>
-        <p className="mt-2 text-sm text-muted">Nothing uploaded yet — the vault is empty.</p>
+        <p className="mt-2 text-sm text-muted">Nothing uploaded yet: the vault is empty.</p>
       </Card>
     );
   }
