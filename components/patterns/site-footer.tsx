@@ -36,6 +36,7 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
     links: [
       { label: "GitHub", href: GITHUB_URL },
       { label: "Contributing", href: "/contribute" },
+      { label: "Blog", href: "/blog" },
       { label: "Code of Conduct", href: `${GITHUB_URL}/blob/main/CODE_OF_CONDUCT.md` },
       { label: "Security", href: `${GITHUB_URL}/blob/main/SECURITY.md` },
       { label: "License", href: `${GITHUB_URL}/blob/main/LICENSE` },
