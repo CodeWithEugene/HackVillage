@@ -7,11 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { InviteCodeManager } from "@/components/organizer/invite-code-manager";
+import { OrgProfileForm } from "@/components/organizer/org-profile-form";
 import { requireSurface } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
+import { canEditOrgProfile } from "@/lib/orgs/profile";
 import { formatKes } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Organize" };
+
+const KYB_BADGE = {
+  NONE: { label: "KYB: Not Started", tone: "warning" },
+  PENDING: { label: "KYB: In Review", tone: "warning" },
+  VERIFIED: { label: "Verified Organizer", tone: "success" },
+  FAILED: { label: "KYB: Needs Attention", tone: "danger" },
+} as const;
 
 export default async function OrganizerPage() {
   const user = await requireSurface("organizer");
@@ -65,7 +74,7 @@ export default async function OrganizerPage() {
         </div>
         <div className="flex items-center gap-3">
           <Badge variant="success">Trust score {org.trustScore}</Badge>
-          <Badge variant="warning">KYB: not started</Badge>
+          <Badge variant={KYB_BADGE[org.kycStatus].tone}>{KYB_BADGE[org.kycStatus].label}</Badge>
         </div>
       </div>
 
@@ -107,6 +116,30 @@ export default async function OrganizerPage() {
           </ul>
         </Card>
       ) : null}
+
+      <Card>
+        <CardTitle>Public Profile</CardTitle>
+        <CardDescription>
+          Hackathon pages show this in the Organizer card, next to your trust score and track
+          record.
+          {org.kycStatus === "VERIFIED"
+            ? " Your name is locked because KYB verified it; contact HackVillage to change it."
+            : null}
+        </CardDescription>
+        <div className="mt-4">
+          {canEditOrgProfile(membership.role) ? (
+            <OrgProfileForm
+              org={{ id: org.id, name: org.name, about: org.about }}
+              mode="organizer"
+              nameEditable={org.kycStatus !== "VERIFIED"}
+            />
+          ) : (
+            <p className="text-sm leading-6 whitespace-pre-line text-body-copy">
+              {org.about ?? "No about text yet. Ask an owner or admin to add one."}
+            </p>
+          )}
+        </div>
+      </Card>
 
       <InviteCodeManager
         codes={activeInvites.map((invite) => ({
