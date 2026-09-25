@@ -15,12 +15,15 @@ interface NavItem {
 const NAV_LINKS: NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/hackathons", label: "Hackathons" },
+  { href: "/how-it-works", label: "How It Works" },
 ];
 
 const ORGANIZER_LINKS: NavItem[] = [
   { href: "/onboarding/organizer", label: "Host A Hackathon" },
   { href: "/how-escrow-works", label: "How Escrow Works" },
 ];
+
+const CONTRIBUTE_LINK: NavItem = { href: "/contribute", label: "Contribute" };
 
 export function SiteHeader({ className }: { className?: string }) {
   return (
@@ -42,6 +45,9 @@ export function SiteHeader({ className }: { className?: string }) {
             </NavLink>
           ))}
           <NavDropdown label="Organizers" items={ORGANIZER_LINKS} />
+          <NavLink href={CONTRIBUTE_LINK.href} className="site-nav-link">
+            {CONTRIBUTE_LINK.label}
+          </NavLink>
         </nav>
         <div className="site-header-actions">
           <a
@@ -62,7 +68,11 @@ export function SiteHeader({ className }: { className?: string }) {
             <span className="btn-fill" aria-hidden />
             <span className="btn-content">Sign Up</span>
           </Link>
-          <MobileNav navLinks={NAV_LINKS} organizerLinks={ORGANIZER_LINKS} />
+          <MobileNav
+            navLinks={NAV_LINKS}
+            organizerLinks={ORGANIZER_LINKS}
+            contributeLink={CONTRIBUTE_LINK}
+          />
         </div>
       </div>
     </header>

@@ -176,7 +176,7 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
-  .how-it-works-header h2 {
+  .how-it-works-title {
     max-width: 1100px;
     font-size: clamp(28px, 2.6vw, 40px);
     font-weight: 700;
@@ -184,7 +184,7 @@
     line-height: 1.15;
     text-wrap: balance;
   }
-  .how-it-works-header h2 span {
+  .how-it-works-title span {
     color: var(--color-ink-soft);
   }
   .how-it-works-grid {
@@ -1458,6 +1458,30 @@
 
   .legal a {
     @apply text-brand underline underline-offset-2 hover:text-ink-soft;
+  }
+
+  .legal code {
+    padding: 0.1em 0.35em;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 0.9em;
+    color: var(--color-ink);
+  }
+  .legal pre {
+    margin-top: 0.75rem;
+    overflow-x: auto;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: var(--color-brand-ink);
+    line-height: 1.7;
+  }
+  .legal pre code {
+    padding: 0;
+    background: none;
+    color: #e6f3fd;
+    font-size: 13px;
+    white-space: pre;
   }
 
   .legal strong {

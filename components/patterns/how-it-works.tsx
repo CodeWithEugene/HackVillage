@@ -39,7 +39,9 @@ const STEPS = [
   },
 ];
 
-export function HowItWorks() {
+/** `headingLevel` is h1 on the standalone /how-it-works page; it looks the same either way. */
+export function HowItWorks({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" }) {
+  const Heading = headingLevel;
   return (
     <section
       id="how-it-works"
@@ -49,15 +51,15 @@ export function HowItWorks() {
       <header className="how-it-works-header">
         <div className="how-it-works-heading-block">
           <p className="how-it-works-eyebrow">How It Works</p>
-          <h2 id="how-it-works-heading">
+          <Heading id="how-it-works-heading" className="how-it-works-title">
             From First Idea
             <br />
             <span>to Final Payday.</span>
-          </h2>
+          </Heading>
         </div>
         <p className="how-it-works-description">
-          One simple flow: lock in the prize money, bring people together, judge everyone the
-          same way, and pay winners the moment they&apos;re announced.
+          One simple flow: lock in the prize money, bring people together, judge everyone the same
+          way, and pay winners the moment they&apos;re announced.
         </p>
       </header>
       <ol className="how-it-works-grid">
