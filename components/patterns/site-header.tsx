@@ -3,26 +3,27 @@ import { Github } from "lucide-react";
 
 import { MobileNav } from "@/components/patterns/mobile-nav";
 import { NavDropdown } from "@/components/patterns/nav-dropdown";
+import { NavLink } from "@/components/patterns/nav-link";
 import { ThemeSwitcher } from "@/components/patterns/theme-switcher";
 import { cn } from "@/lib/utils";
 
-interface NavLink {
+interface NavItem {
   href: string;
   label: string;
 }
 
-const NAV_LINKS: NavLink[] = [
+const NAV_LINKS: NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/events", label: "Hackathons" },
   { href: "/developers", label: "Developers" },
 ];
 
-const ORGANIZER_LINKS: NavLink[] = [
+const ORGANIZER_LINKS: NavItem[] = [
   { href: "/onboarding/organizer", label: "Host A Hackathon" },
   { href: "/#how-it-works", label: "How Escrow Works" },
 ];
 
-const TRUST_LINK: NavLink = { href: "/trust", label: "Trust" };
+const TRUST_LINK: NavItem = { href: "/trust", label: "Trust" };
 
 export function SiteHeader({ className }: { className?: string }) {
   return (
@@ -39,18 +40,14 @@ export function SiteHeader({ className }: { className?: string }) {
 
         <nav aria-label="Primary" className="site-header-links">
           {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-ink-soft hover:text-ink"
-            >
+            <NavLink key={link.href} href={link.href} className="site-nav-link">
               {link.label}
-            </Link>
+            </NavLink>
           ))}
           <NavDropdown label="Organizers" items={ORGANIZER_LINKS} />
-          <Link href={TRUST_LINK.href} className="text-sm font-medium text-ink-soft hover:text-ink">
+          <NavLink href={TRUST_LINK.href} className="site-nav-link">
             {TRUST_LINK.label}
-          </Link>
+          </NavLink>
         </nav>
         <div className="site-header-actions">
           <a

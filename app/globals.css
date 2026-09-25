@@ -847,6 +847,30 @@
     justify-content: center;
     gap: 28px;
   }
+  /*
+   * Current page: NavLink (components/patterns/nav-link.tsx) sets
+   * aria-current="page", and the Organizers trigger gets data-active when one
+   * of its pages is open. Styling keys off those attributes, so the visual
+   * underline and what screen readers announce can never disagree.
+   */
+  .site-nav-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-ink-soft);
+  }
+  .site-nav-link:hover {
+    color: var(--color-ink);
+  }
+  .site-nav-link[aria-current="page"],
+  .nav-dropdown-trigger[data-active],
+  .nav-dropdown-link[aria-current="page"],
+  .mobile-nav-link[aria-current="page"] {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--color-brand);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
   .nav-dropdown {
     position: relative;
   }
@@ -1448,5 +1472,172 @@
     50% {
       transform: scaleY(1.12) scaleX(1.03);
     }
+  }
+
+  /* Auth pages: full height photo on the left half, form on the right. */
+  .auth-shell {
+    --auth-corner: 1rem;
+    display: grid;
+    min-height: 100dvh;
+    background: var(--color-paper);
+  }
+  .auth-visual {
+    display: none;
+  }
+  .auth-main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 4.5rem 1rem 3rem;
+  }
+  .auth-topbar {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    left: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .auth-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 40px;
+    padding-inline: 0.625rem 0.875rem;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+  .auth-home:hover {
+    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+  }
+  @media (min-width: 1024px) {
+    .auth-shell {
+      grid-template-columns: 1fr 1fr;
+    }
+    .auth-visual {
+      display: block;
+      position: sticky;
+      top: 0;
+      height: 100dvh;
+      overflow: hidden;
+      /* Runs under the form panel so the photo shows through its rounded corners. */
+      width: calc(100% + var(--auth-corner));
+    }
+    .auth-main {
+      z-index: 1;
+      grid-column: 2;
+      grid-row: 1;
+      padding: 4.5rem 2rem 3rem;
+      background: var(--color-paper);
+      border-radius: var(--auth-corner) 0 0 var(--auth-corner);
+    }
+    .auth-visual {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  /* Overlays on the auth photo. Colors are theme stable because they sit on a photo. */
+  .auth-visual-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-brand-ink) 72%, transparent) 0%,
+        transparent 38%
+      ),
+      linear-gradient(
+        to top,
+        color-mix(in srgb, var(--color-brand-ink) 45%, transparent) 0%,
+        transparent 32%
+      );
+    pointer-events: none;
+  }
+  .auth-visual-intro {
+    position: absolute;
+    top: clamp(1.5rem, 3.5vw, 3rem);
+    left: clamp(1.5rem, 3.5vw, 3rem);
+    max-width: 22rem;
+    color: #fff;
+  }
+  .auth-visual-eyebrow {
+    margin-bottom: 0.75rem;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-brand-soft);
+  }
+  .auth-visual-heading {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 2.6vw, 40px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .auth-visual-text {
+    margin-top: 0.625rem;
+    font-size: 15px;
+    line-height: 1.5;
+    color: rgb(255 255 255 / 0.86);
+  }
+  .auth-visual-primary,
+  .auth-visual-secondary {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    overflow: hidden;
+    height: 40px;
+    margin-top: 1.25rem;
+    padding-inline: 1.125rem;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .auth-visual-primary {
+    --btn-fill-color: var(--color-brand-soft);
+    background: var(--color-brand);
+    color: var(--color-brand-ink);
+  }
+  .auth-visual-secondary {
+    --btn-fill-color: rgb(255 255 255 / 0.18);
+    border: 1.5px solid rgb(255 255 255 / 0.85);
+    color: #fff;
+  }
+  .auth-visual-card {
+    position: absolute;
+    right: calc(var(--auth-corner) + clamp(1.5rem, 3.5vw, 3rem));
+    bottom: clamp(1.5rem, 3.5vw, 3rem);
+    width: min(19rem, calc(100% - 3rem));
+    padding: 1.25rem 1.25rem 1.375rem;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    border-radius: 1.25rem;
+    background: color-mix(in srgb, var(--color-brand-ink) 70%, transparent);
+    backdrop-filter: blur(12px);
+    box-shadow: 6px 6px 0 var(--color-brand);
+    color: #fff;
+  }
+  .auth-visual-stat {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-brand-soft);
+  }
+  .auth-visual-card-text {
+    margin-top: 0.5rem;
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgb(255 255 255 / 0.88);
   }
 }
