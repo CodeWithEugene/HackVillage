@@ -48,6 +48,7 @@ export const JOB_NAMES = {
   attestVaultCreated: "escrow.attest-vault-created",
   attestVaultLocked: "escrow.attest-vault-locked",
   escrowCron: "escrow.cron",
+  announceHackathon: "hackathon.announce",
 } as const;
 
 /**

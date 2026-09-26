@@ -94,3 +94,47 @@ export function registrationCancelledEmail(eventTitle: string): EmailTemplate {
     text: renderText([`Your registration for ${eventTitle} was cancelled.`]),
   };
 }
+
+export interface NewHackathonDetails {
+  eventTitle: string;
+  eventUrl: string;
+  /** "KES 300,000" */
+  prizePool: string;
+  /** "10 to 12 October 2026" */
+  dates: string;
+  /** "Nairobi" or "Online" */
+  venue: string;
+  /** "8 October 2026" */
+  registrationCloses: string;
+}
+
+/**
+ * Sent to builders who have hackathon updates on, the moment a hackathon's
+ * full prize pool is locked and it goes live. Only real, public hackathons
+ * are announced (see lib/events/announce.ts).
+ */
+export function newPrizeVerifiedHackathonEmail(details: NewHackathonDetails): EmailTemplate {
+  return {
+    subject: `New Prize Verified Hackathon: ${details.eventTitle}`,
+    html: renderEmail({
+      preheader: `${details.prizePool} is already locked in escrow. Registration closes ${details.registrationCloses}.`,
+      section: {
+        heading: "A New Hackathon Is Live",
+        bodyHtml: html`<p style="margin:0;"><strong>${details.eventTitle}</strong> just went live on HackVillage with its full prize pool locked in escrow, so the money is real before you write a line of code.</p>`,
+        details: [
+          { label: "Prize pool", value: details.prizePool },
+          { label: "When", value: details.dates },
+          { label: "Where", value: details.venue },
+          { label: "Registration closes", value: details.registrationCloses },
+        ],
+        ctaUrl: details.eventUrl,
+        ctaLabel: "View The Hackathon",
+      },
+    }),
+    text: renderText([
+      `${details.eventTitle} just went live on HackVillage with its full prize pool locked in escrow.`,
+      `Prize pool: ${details.prizePool}. When: ${details.dates}. Where: ${details.venue}. Registration closes ${details.registrationCloses}.`,
+      details.eventUrl,
+    ]),
+  };
+}

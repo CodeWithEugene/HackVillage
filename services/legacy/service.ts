@@ -14,6 +14,7 @@ import {
   milestoneReminderEmail,
 } from "@/lib/notifications/templates/legacy";
 import { appUrl } from "@/lib/url";
+import { canOpenDispute, disputeOpensAt } from "@/services/legacy/dispute-window";
 
 /**
  * Legacy Tracker (Phase 8 — plan §10.7): 3-month check-ins on every
@@ -22,7 +23,6 @@ import { appUrl } from "@/lib/url";
  */
 
 export const LEGACY_CHECKIN_DELAY_MS = 90 * 24 * 60 * 60 * 1000; // 3 months
-export const MILESTONE_DISPUTE_WINDOW_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 
 export class LegacyError extends Error {
   constructor(
@@ -272,6 +272,19 @@ export async function openMilestoneDispute(input: {
   }
   if (winner.milestone.confirmedAt) {
     throw new LegacyError("This milestone is already confirmed.", "WRONG_STATE");
+  }
+  // Give the organizer 14 days from the announcement to confirm first.
+  if (!canOpenDispute(winner.announcedAt)) {
+    const opens = new Intl.DateTimeFormat("en-KE", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "Africa/Nairobi",
+    }).format(disputeOpensAt(winner.announcedAt));
+    throw new LegacyError(
+      `You can open a dispute from ${opens}, 14 days after winners were announced.`,
+      "TOO_EARLY",
+    );
   }
 
   const existing = await prisma.dispute.findUnique({ where: { winnerId: input.winnerId } });

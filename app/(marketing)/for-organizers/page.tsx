@@ -274,8 +274,9 @@ export default function ForOrganizersPage() {
         <li>
           <strong>Confirm milestones within 30 days.</strong> When a winning team delivers, confirm
           the milestone and the rest of their prize is released. We send reminders if a confirmation
-          is overdue, and if it stays unconfirmed, the winner can open a dispute. The HackVillage
-          team reviews it, and the money stays in escrow until it&apos;s settled.
+          is overdue, and if it stays unconfirmed 14 days after you announced the winners, the
+          winner can open a dispute. The HackVillage team reviews it, and the money stays in escrow
+          until it&apos;s settled.
         </li>
         <li>
           <strong>Endorse great builders.</strong> Your judges can endorse the winners they judged,

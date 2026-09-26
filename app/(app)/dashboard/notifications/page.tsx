@@ -10,6 +10,11 @@ import { prisma } from "@/lib/db";
 export const metadata: Metadata = { title: "Notifications" };
 
 const TYPE_LABELS: Record<string, { title: string; detail: (payload: Record<string, unknown>) => string }> = {
+  "hackathon.live": {
+    title: "New Prize Verified Hackathon",
+    detail: (p) =>
+      `${String(p.eventTitle ?? "A new hackathon")} is live with its full prize pool locked in escrow.`,
+  },
   "media.penalty": {
     title: "Trust Penalty: Media Deadline",
     detail: (p) =>

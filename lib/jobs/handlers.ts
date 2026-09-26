@@ -52,6 +52,13 @@ export async function registerJobs(): Promise<void> {
     attestations.attestVaultLocked(String(data.eventId))
   );
 
+  // New Prize Verified hackathon alert to builders (fan-out off the money path).
+  await registerJob(boss, "hackathon.announce", async (data) => {
+    const { announceHackathonToBuilders } = await import("@/lib/events/announce");
+    const told = await announceHackathonToBuilders(String(data.eventId));
+    console.info(`[jobs] hackathon.announce told ${told} builders about ${String(data.eventId)}`);
+  });
+
   // Payout families (Phase 5): execution, attestations, and the sweep.
   await registerJob(boss, "payout.execute", async (data) => {
     await payouts.executePayout(String(data.payoutId));

@@ -17,11 +17,3 @@ export function mediaDeadlineFor(endsAt: Date): Date {
 }
 
 export const MEDIA_PENALTY_DELTA = -10;
-
-/**
- * Payout excellence bonus (+1 per event hitting the 1h KPI) is applied by
- * the payout pipeline — derived here for display consistency.
- */
-export function payoutExcellenceDelta(eventsInWindow: number): number {
-  return Math.min(eventsInWindow, 20);
-}
