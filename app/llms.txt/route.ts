@@ -73,6 +73,7 @@ HackVillage ("Hack Village") is open-source infrastructure for high-impact hacka
 
 - [Hackathons](${appUrl("/hackathons")}): browse ongoing, upcoming and past prize-verified hackathons in Kenya, Africa and online.
 - [How it works](${appUrl("/how-it-works")}): the full lifecycle: escrowed prize, team formation, structured judging, instant payouts.
+- [How it works for organizers](${appUrl("/for-organizers")}): hosting a hackathon step by step: setup, verification, the 5% fee, funding the prize vault, judging, payouts, milestones and the trust score.
 - [How escrow works](${appUrl("/how-escrow-works")}): exactly how prize money is deposited, locked, held and paid, step by step.
 - [Blog](${appUrl("/blog")}): guides and stories on escrow, payouts, judging and building hackathons builders trust.
 - [Contribute](${appUrl("/contribute")}): how to contribute to the open-source platform.

@@ -21,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: appUrl("/hackathons"), changeFrequency: "daily", priority: 0.9 },
     { url: appUrl("/how-it-works"), changeFrequency: "weekly", priority: 0.8 },
     { url: appUrl("/how-escrow-works"), changeFrequency: "weekly", priority: 0.8 },
+    { url: appUrl("/for-organizers"), changeFrequency: "weekly", priority: 0.8 },
     { url: appUrl("/blog"), changeFrequency: "daily", priority: 0.8 },
     { url: appUrl("/contribute"), changeFrequency: "monthly", priority: 0.6 },
     { url: appUrl("/privacy"), changeFrequency: "yearly", priority: 0.3 },
