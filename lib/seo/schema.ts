@@ -4,6 +4,7 @@ import {
   CONTACT_EMAIL,
   KNOW_ABOUT,
   LOGO_PATH,
+  PARENT_ORGANIZATION,
   SAME_AS,
   SITE_ALTERNATE_NAME,
   SITE_DESCRIPTION,
@@ -42,11 +43,16 @@ export function organizationSchema(): Schema {
     description: SITE_DESCRIPTION,
     email: CONTACT_EMAIL,
     sameAs: [...SAME_AS],
+    parentOrganization: {
+      "@type": "Organization",
+      name: PARENT_ORGANIZATION.name,
+      url: PARENT_ORGANIZATION.url,
+    },
     address: {
       "@type": "PostalAddress",
       addressCountry: "KE",
     },
-    knowAbout: [...KNOW_ABOUT],
+    knowsAbout: [...KNOW_ABOUT],
   };
 }
 
@@ -76,6 +82,7 @@ export interface EventSchemaInput {
   coverUrl: string;
   orgName: string;
   orgWebsite?: string | null;
+  registrationDeadline: Date;
 }
 
 const ATTENDANCE_MODE = {
@@ -84,22 +91,24 @@ const ATTENDANCE_MODE = {
   HYBRID: "https://schema.org/MixedEventAttendanceMode",
 } as const;
 
-export function eventSchema(event: EventSchemaInput): Schema {
+export function eventSchema(event: EventSchemaInput, now: Date = new Date()): Schema {
   const pageUrl = appUrl(`/hackathons/${event.slug}`);
-  const location: Schema =
-    event.venueType === "ONLINE"
-      ? { "@type": "VirtualLocation", url: pageUrl }
-      : {
-          "@type": "Place",
-          name: event.location ?? "Venue to be announced",
-          address: {
-            "@type": "PostalAddress",
-            // Listings are Kenya-first; the stored location text (e.g.
-            // "Nairobi Innovation Hub") carries the city detail.
-            addressLocality: event.location ?? undefined,
-            addressCountry: "KE",
-          },
-        };
+  const online: Schema = { "@type": "VirtualLocation", url: pageUrl };
+  const place: Schema = {
+    "@type": "Place",
+    name: event.location ?? "Venue to be announced",
+    address: {
+      "@type": "PostalAddress",
+      // Listings are Kenya-first; the stored location text (e.g.
+      // "Nairobi Innovation Hub") carries the city detail.
+      addressLocality: event.location ?? undefined,
+      addressCountry: "KE",
+    },
+  };
+  // Google expects both locations for a hybrid event.
+  const location =
+    event.venueType === "ONLINE" ? online : event.venueType === "HYBRID" ? [place, online] : place;
+  const registrationOpen = now.getTime() < event.registrationDeadline.getTime();
   return {
     "@context": "https://schema.org",
     "@type": "Event",
@@ -118,7 +127,8 @@ export function eventSchema(event: EventSchemaInput): Schema {
       price: "0",
       priceCurrency: "KES",
       url: pageUrl,
-      availability: "https://schema.org/InStock",
+      // Free registration: "in stock" while it's open, "sold out" once it closes.
+      availability: registrationOpen ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
     },
     organizer: {
       "@type": "Organization",
@@ -209,8 +219,8 @@ export function profileSchema(profile: ProfileSchemaInput): Schema {
       name: profile.name ?? `@${profile.handle}`,
       alternateName: `@${profile.handle}`,
       url: pageUrl,
-      ...(profile.headline ? { description: profile.headline } : {}),
-      ...(profile.bio ? { knowsAbout: profile.bio.slice(0, 300) } : {}),
+      ...(profile.headline ? { jobTitle: profile.headline } : {}),
+      ...(profile.bio ? { description: profile.bio.slice(0, 300) } : {}),
       ...(profile.location
         ? {
             address: {
@@ -220,8 +230,9 @@ export function profileSchema(profile: ProfileSchemaInput): Schema {
           }
         : {}),
       ...(sameAs.length > 0 ? { sameAs } : {}),
-      memberOf: { "@id": ORGANIZATION_ID },
     },
+    // The page is published on HackVillage; the person isn't a member of it.
+    isPartOf: { "@id": WEBSITE_ID },
   };
 }
 

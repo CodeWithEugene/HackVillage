@@ -347,6 +347,9 @@ model Event {
   rules String?
   venueType VenueType
   location String?
+  /// Seeded demo data: shown on the site, but kept out of search engines,
+  /// the sitemap, llms.txt and Event structured data (not a real event).
+  isDemo Boolean @default(false)
   coverUrl String?
   startsAt DateTime
   endsAt DateTime

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 
 import { LegalDocument } from "@/components/patterns/legal-document";
+import { pageOpenGraph } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
   description: "The terms that govern your use of HackVillage.",
   alternates: { canonical: "/terms" },
-  openGraph: { url: "/terms" },
+  openGraph: pageOpenGraph("/terms"),
 };
 
 export default function TermsOfServicePage() {

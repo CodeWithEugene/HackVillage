@@ -107,6 +107,7 @@ async function main(): Promise<void> {
     where: { slug: "fintech-for-matatu-culture" },
     create: {
       orgId: org.id,
+      isDemo: true,
       slug: "fintech-for-matatu-culture",
       title: "Fintech for Matatu Culture",
       summary: "Build the payments, savings, and crew tools that Nairobi's matatu economy runs on.",
@@ -205,6 +206,7 @@ async function main(): Promise<void> {
     where: { slug: "ai-for-health-records" },
     create: {
       orgId: org.id,
+      isDemo: true,
       slug: "ai-for-health-records",
       title: "AI for Health Records",
       summary: "Privacy-first AI tooling that connects patient records across community clinics.",
@@ -486,6 +488,7 @@ async function main(): Promise<void> {
       where: { slug: entry.slug },
       create: {
         orgId: org.id,
+        isDemo: true,
         slug: entry.slug,
         title: entry.title,
         summary: entry.summary,

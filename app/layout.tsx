@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { JsonLd } from "@/components/seo/json-ld";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/metadata";
 import { ThemeController } from "@/components/patterns/theme-controller";
 import { organizationSchema, websiteSchema } from "@/lib/seo/schema";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
@@ -13,25 +14,18 @@ const spaceGrotesk = Space_Grotesk({ variable: "--font-space-grotesk", subsets: 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: {
-    default: "HackVillage — Hackathon Platform With Escrowed Prizes",
+    default: "HackVillage: The Hackathon Platform With Escrowed Prizes",
     template: "%s · HackVillage",
   },
   description:
     "The open-source hackathon platform for Kenya and Africa: 100% escrowed prize pools, winners paid 50% instantly, and verified Proof-of-Work developer portfolios.",
   openGraph: {
-    title: "HackVillage — Hackathon Platform With Escrowed Prizes",
+    title: "HackVillage: The Hackathon Platform With Escrowed Prizes",
     description:
-      "100% of the prize pool is locked in escrow before a hackathon goes live. Winners are paid 50% the same day, verified on a public ledger.",
+      "100% of the prize pool is locked in escrow before a hackathon goes live. Winners are paid 50% the same day.",
     type: "website",
     siteName: "HackVillage",
-    images: [
-      {
-        url: "/branding/og.png",
-        width: 1200,
-        height: 630,
-        alt: "HackVillage: the open-source infrastructure for high-impact hackathons",
-      },
-    ],
+    images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
     site: "@hackvillagexyz",

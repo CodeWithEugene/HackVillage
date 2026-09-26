@@ -2,17 +2,18 @@ import type { Metadata } from "next";
 
 import { BuilderJourney } from "@/components/patterns/builder-journey";
 import { CtaBanner } from "@/components/patterns/cta-banner";
+import { LandingAbout } from "@/components/patterns/landing-about";
 import { LandingHero } from "@/components/patterns/landing-hero";
-import { LandingSeo } from "@/components/patterns/landing-seo";
 import { TrustImpact } from "@/components/patterns/trust-impact";
+import { pageOpenGraph } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = {
   // `absolute` because the layout template would double the brand ("… · HackVillage").
-  title: { absolute: "HackVillage — Hackathon Platform With Escrowed Prizes" },
+  title: { absolute: "HackVillage: The Hackathon Platform With Escrowed Prizes" },
   description:
     "The open-source hackathon platform for Kenya and Africa: 100% escrowed prize pools, winners paid 50% instantly, and verified Proof-of-Work developer portfolios.",
   alternates: { canonical: "/" },
-  openGraph: { url: "/" },
+  openGraph: pageOpenGraph("/"),
 };
 
 export default function LandingPage() {
@@ -20,11 +21,11 @@ export default function LandingPage() {
     <div className="font-display">
       <LandingHero />
 
+      <LandingAbout />
+
       <BuilderJourney />
 
       <TrustImpact />
-
-      <LandingSeo />
 
       <CtaBanner />
     </div>

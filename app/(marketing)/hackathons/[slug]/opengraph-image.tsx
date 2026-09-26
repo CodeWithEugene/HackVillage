@@ -112,7 +112,7 @@ export default async function HackathonOgImage({ params }: RouteProps): Promise<
           {event ? (
             <>
               <span style={{ display: "flex", fontSize: 20, fontWeight: 700, letterSpacing: 2 }}>
-                PRIZE POOL — 100% IN ESCROW
+                PRIZE POOL, 100% IN ESCROW
               </span>
               <span style={{ display: "flex", fontSize: 44, fontWeight: 800, marginTop: 4 }}>
                 {formatKes(poolKes)}

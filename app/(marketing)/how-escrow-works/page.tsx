@@ -4,13 +4,14 @@ import Link from "next/link";
 import { LegalDocument } from "@/components/patterns/legal-document";
 import { JsonLd } from "@/components/seo/json-ld";
 import { faqSchema } from "@/lib/seo/schema";
+import { pageOpenGraph } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = {
-  title: "How Escrow Works — Hackathon Prize Money, Secured",
+  title: "How Escrow Works: Hackathon Prize Money, Secured",
   description:
-    "How HackVillage locks 100% of every hackathon prize pool in escrow before the event goes live, and exactly how winners get paid — 50% instantly, 50% on milestone.",
+    "How HackVillage locks 100% of every hackathon prize pool in escrow before the event goes live, and exactly how winners get paid: 50% instantly, 50% on milestone.",
   alternates: { canonical: "/how-escrow-works" },
-  openGraph: { url: "/how-escrow-works" },
+  openGraph: pageOpenGraph("/how-escrow-works"),
 };
 
 /**
@@ -27,7 +28,7 @@ const FAQS = [
   {
     question: "When do hackathon winners get paid?",
     answer:
-      "Winners receive 50% of their prize as soon as results are announced — the platform target is for over 90% of these payouts to arrive within one hour. The remaining 50% releases when the organizer confirms the winning team's milestone, due within 30 days. Prizes without a milestone pay in full on the day.",
+      "Winners receive 50% of their prize as soon as results are announced. The platform target is for over 90% of these payouts to arrive within one hour. The remaining 50% releases when the organizer confirms the winning team's milestone, due within 30 days. Prizes without a milestone pay in full on the day.",
   },
   {
     question: "Who holds the prize money during a hackathon?",
