@@ -6,8 +6,8 @@
  */
 export function LandingAbout() {
   return (
-    <section className="site-container py-16" aria-labelledby="about-hackvillage">
-      <div className="mx-auto max-w-3xl text-center">
+    <section className="site-container pt-16" aria-labelledby="about-hackvillage">
+      <div className="mx-auto max-w-5xl text-center">
         <h2 id="about-hackvillage" className="font-display text-2xl font-bold text-ink sm:text-3xl">
           What Is HackVillage?
         </h2>
