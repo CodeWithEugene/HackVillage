@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 
-import { EventCard } from "@/components/patterns/event-card";
+import { EventCard, type EventCardData } from "@/components/patterns/event-card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { prisma } from "@/lib/db";
 import {
   defaultPhase,
+  formatEventDates,
   HACKATHON_PHASES,
   hackathonPhase,
   type HackathonPhase,
@@ -17,9 +19,64 @@ import { HACKATHON_CATEGORIES, isCategory, type HackathonCategory } from "@/lib/
 import { CalendarX2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Hackathons",
-  description: "Browse hackathons on HackVillage, every one with its full prize pool secured.",
+  title: "Hackathons in Kenya & Africa — Prizes in Escrow",
+  description:
+    "Browse ongoing and upcoming hackathons in Kenya, Africa and online. Every one is Prize Verified — the full prize pool is locked in escrow before it goes live.",
+  // Filter/tab variants (?filter=, ?category=) all canonicalize to the base
+  // listing so they never compete with it as separate pages.
+  alternates: { canonical: "/hackathons" },
+  openGraph: { url: "/hackathons" },
 };
+
+/**
+ * The listing is the most crawler- and visitor-heavy page, but `searchParams`
+ * makes every request dynamic. Cache the database read (plain ISO strings —
+ * `unstable_cache` must stay JSON-safe) and rebuild Dates at render.
+ */
+type StoredCard = Omit<
+  EventCardData,
+  "startsAt" | "endsAt" | "registrationDeadline" | "publishedAt"
+> & {
+  startsAt: string;
+  endsAt: string;
+  registrationDeadline: string;
+  publishedAt: string | null;
+};
+
+const getStoredCards = unstable_cache(
+  async (): Promise<StoredCard[]> => {
+    const events = await prisma.event.findMany({
+      where: PUBLIC_HACKATHON_WHERE,
+      include: {
+        org: { select: { name: true, trustScore: true } },
+        prizes: { select: { amountKes: true } },
+        _count: { select: { teams: { where: { status: { not: "DISBANDED" } } } } },
+      },
+      orderBy: { startsAt: "desc" },
+      take: 60,
+    });
+    return events.map((event) => ({
+      slug: event.slug,
+      title: event.title,
+      summary: event.summary,
+      venueType: event.venueType,
+      location: event.location,
+      startsAt: event.startsAt.toISOString(),
+      endsAt: event.endsAt.toISOString(),
+      registrationDeadline: event.registrationDeadline.toISOString(),
+      publishedAt: event.publishedAt?.toISOString() ?? null,
+      status: event.status,
+      poolKes: event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0),
+      teamCount: event._count.teams,
+      orgName: event.org.name,
+      orgTrustScore: event.org.trustScore,
+      categories: event.categories,
+      coverUrl: event.coverUrl,
+    }));
+  },
+  ["public-hackathon-listing"],
+  { revalidate: 300 },
+);
 
 const TABS: { key: HackathonPhase; label: string }[] = [
   { key: "ongoing", label: "Ongoing" },
@@ -67,34 +124,13 @@ export default async function EventsPage({
   const category = isCategory(categoryParam) ? categoryParam : null;
   const now = new Date();
 
-  const events = await prisma.event.findMany({
-    where: PUBLIC_HACKATHON_WHERE,
-    include: {
-      org: { select: { name: true, trustScore: true } },
-      prizes: { select: { amountKes: true } },
-      _count: { select: { teams: { where: { status: { not: "DISBANDED" } } } } },
-    },
-    orderBy: { startsAt: "desc" },
-    take: 60,
-  });
-
-  const allCards = events.map((event) => ({
-    slug: event.slug,
-    title: event.title,
-    summary: event.summary,
-    venueType: event.venueType,
-    location: event.location,
-    startsAt: event.startsAt,
-    endsAt: event.endsAt,
-    registrationDeadline: event.registrationDeadline,
-    publishedAt: event.publishedAt,
-    status: event.status,
-    poolKes: event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0),
-    teamCount: event._count.teams,
-    orgName: event.org.name,
-    orgTrustScore: event.org.trustScore,
-    categories: event.categories,
-    coverUrl: event.coverUrl,
+  const stored = await getStoredCards();
+  const allCards: EventCardData[] = stored.map((card) => ({
+    ...card,
+    startsAt: new Date(card.startsAt),
+    endsAt: new Date(card.endsAt),
+    registrationDeadline: new Date(card.registrationDeadline),
+    publishedAt: card.publishedAt ? new Date(card.publishedAt) : null,
   }));
   // Only offer categories that at least one live listing actually uses.
   const usedCategories = HACKATHON_CATEGORIES.filter(({ key }) =>
@@ -114,10 +150,12 @@ export default async function EventsPage({
   return (
     <div className="site-container py-16">
       <header className="mb-8 text-center">
-        <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">Explore Hackathons</h1>
+        <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">
+          Explore Hackathons In Kenya, Africa & Online
+        </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted">
-          Every hackathon here has its full prize pool secured before it goes live, so you can build
-          knowing the prize is real.
+          Every hackathon here has its full prize pool secured in escrow before it goes live, so you
+          can build knowing the prize is real.
         </p>
       </header>
 
@@ -172,11 +210,59 @@ export default async function EventsPage({
         />
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {cards.map((event) => (
-            <EventCard key={event.slug} event={event} />
+          {cards.map((event, index) => (
+            // Above-the-fold covers load eagerly; they are the page's LCP.
+            <EventCard key={event.slug} event={event} priority={index < 3} />
           ))}
         </div>
       )}
+
+      <section
+        className="mt-14 border-t border-ink/10 pt-10 text-center"
+        aria-labelledby="listing-about"
+      >
+        <h2 id="listing-about" className="font-display text-xl font-bold text-ink sm:text-2xl">
+          Hackathons With Prizes You Can Verify
+        </h2>
+        <div className="mx-auto mt-4 max-w-2xl space-y-3 leading-7 text-body-copy">
+          <p>
+            HackVillage lists hackathons in Nairobi, across Kenya, Africa-wide and fully online —
+            fintech, agri-tech, civic tech, clean energy, AI and more. A hackathon appears here only
+            after its organizer has deposited 100% of the prize pool into escrow and earned the{" "}
+            <Link href="/how-escrow-works" className="font-semibold text-ink underline">
+              Prize Verified
+            </Link>{" "}
+            badge. Winners are paid 50% within an hour of results and 50% on milestone delivery,
+            with every payout recorded on a public ledger.
+          </p>
+          {allCards.length > 0 ? (
+            <p className="text-sm text-muted">
+              Recently listed:{" "}
+              {allCards.slice(0, 3).map((event, index) => (
+                <span key={event.slug}>
+                  {index > 0 ? " · " : ""}
+                  <Link href={`/hackathons/${event.slug}`} className="underline hover:text-ink">
+                    {event.title}
+                  </Link>{" "}
+                  ({formatEventDates(event.startsAt, event.endsAt)})
+                </span>
+              ))}
+              .
+            </p>
+          ) : null}
+          <p className="text-sm text-muted">
+            Running your own?{" "}
+            <Link href={HOST_HACKATHON_HREF} className="font-semibold text-ink underline">
+              Host a hackathon
+            </Link>{" "}
+            and see{" "}
+            <Link href="/how-it-works" className="font-semibold text-ink underline">
+              how judging and payouts work
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
     </div>
   );
 }

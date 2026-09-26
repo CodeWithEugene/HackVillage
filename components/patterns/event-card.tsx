@@ -40,7 +40,13 @@ function registrationNote(event: EventCardData, open: boolean): string {
     : "Registration closed";
 }
 
-export function EventCard({ event }: { event: EventCardData }) {
+export function EventCard({
+  event,
+  priority = false,
+}: {
+  event: EventCardData;
+  priority?: boolean;
+}) {
   const open = registrationOpen(event);
   const categories = event.categories.filter(isCategory);
   const cover = coverFor(event);
@@ -55,7 +61,8 @@ export function EventCard({ event }: { event: EventCardData }) {
           src={cover}
           // Uploaded covers live on R2 and are already sized to 1600x900.
           unoptimized={!cover.startsWith("/")}
-          alt=""
+          alt={`${event.title} — hackathon on HackVillage`}
+          priority={priority}
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"

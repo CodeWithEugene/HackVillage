@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 
 import { NewsletterUnsubscribeClient } from "@/components/newsletter/newsletter-unsubscribe-client";
 
-export const metadata: Metadata = { title: "Unsubscribe" };
+// Tokenized utility page reached from email links — never search-facing.
+export const metadata: Metadata = {
+  title: "Unsubscribe",
+  robots: { index: false, follow: false },
+};
 
 export default async function NewsletterUnsubscribePage({
   searchParams,

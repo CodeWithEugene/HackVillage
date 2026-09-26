@@ -1,3 +1,13 @@
+import type { Metadata } from "next";
+
+/**
+ * Private surface — not search-facing. Crawlers that follow links here should
+ * not spend index budget on it (sign-in, dashboards, admin). The robots.txt
+ * disallow list covers the app surfaces; this meta tag covers pages we still
+ * want crawlable-but-not-indexable (auth pages linked from the header/footer).
+ */
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
 import { notFound } from "next/navigation";
 
 import { requireSurface } from "@/lib/auth/guards";

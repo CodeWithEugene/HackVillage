@@ -30,7 +30,8 @@
     "dev:fund": "tsx --env-file=.env scripts/fund-event.ts",
     "dev:cycle": "tsx --env-file=.env scripts/cycle-event.ts",
     "load:test": "tsx --env-file=.env scripts/load-test.ts",
-    "newsletter:send": "tsx --env-file=.env scripts/send-newsletter-blast.ts"
+    "newsletter:send": "tsx --env-file=.env scripts/send-newsletter-blast.ts",
+    "indexnow:ping": "tsx --env-file=.env scripts/ping-indexnow.ts"
   },
   "dependencies": {
     "@auth/core": "0.41.3",
