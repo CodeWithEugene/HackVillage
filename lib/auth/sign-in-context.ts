@@ -51,8 +51,50 @@ const OS_WITHOUT_RELIABLE_VERSION = new Set(["macOS", "Windows"]);
 
 const countryNames = new Intl.DisplayNames(["en"], { type: "region" });
 
-function describeDevice(userAgent: string | null): { device: string; browser: string } {
-  if (!userAgent) return { device: "Unknown device", browser: "Unknown browser" };
+// Brands as Chromium-based browsers name themselves in Sec-CH-UA, mapped to
+// what people call them. Brands not listed here are shown as sent.
+const CLIENT_HINT_BRANDS: Record<string, string> = {
+  "Google Chrome": "Chrome",
+  "Microsoft Edge": "Microsoft Edge",
+  Brave: "Brave",
+  Opera: "Opera",
+  "Opera GX": "Opera GX",
+  Vivaldi: "Vivaldi",
+  "Samsung Internet": "Samsung Internet",
+  YaBrowser: "Yandex Browser",
+  DuckDuckGo: "DuckDuckGo",
+};
+
+/**
+ * The browser named in the Sec-CH-UA client hint, e.g.
+ * `"Chromium";v="152", "Brave";v="152", "Not)A;Brand";v="24"` is "Brave 152".
+ * Brave (and some others) send exactly Chrome's user agent on purpose, so
+ * this hint is the only honest way to tell them apart server side. The
+ * generic "Chromium" brand and the randomized "Not A Brand" filler are
+ * skipped; null means the hint names no specific browser.
+ */
+export function browserFromClientHints(secChUa: string | null): string | null {
+  if (!secChUa) return null;
+  const brands = [...secChUa.matchAll(/"([^"]*)"\s*;\s*v\s*=\s*"([^"]*)"/g)].map((match) => ({
+    name: match[1].trim(),
+    version: match[2].trim(),
+  }));
+  const specific = brands.find(
+    (brand) =>
+      brand.name !== "Chromium" &&
+      !/not.?a.?brand/i.test(brand.name) &&
+      /^[\w .()-]{1,40}$/.test(brand.name),
+  );
+  if (!specific) return null;
+  const name = CLIENT_HINT_BRANDS[specific.name] ?? specific.name;
+  const major = specific.version.split(".")[0];
+  return /^\d{1,4}$/.test(major) ? `${name} ${major}` : name;
+}
+
+function describeDevice(headers: HeaderReader): { device: string; browser: string } {
+  const userAgent = headers.get("user-agent");
+  const hintedBrowser = browserFromClientHints(headers.get("sec-ch-ua"));
+  if (!userAgent) return { device: "Unknown device", browser: hintedBrowser ?? "Unknown browser" };
   const { browser, os, platform } = Bowser.getParser(userAgent).getResult();
 
   const hardware =
@@ -66,9 +108,9 @@ function describeDevice(userAgent: string | null): { device: string; browser: st
 
   return {
     device: osLabel ? `${hardware} running ${osLabel}` : hardware,
-    browser: browser.name
-      ? [browser.name, majorVersion].filter(Boolean).join(" ")
-      : "Unknown browser",
+    browser:
+      hintedBrowser ??
+      (browser.name ? [browser.name, majorVersion].filter(Boolean).join(" ") : "Unknown browser"),
   };
 }
 
@@ -180,7 +222,7 @@ export function describeSignIn({
   const network = clientNetwork(headers);
   return {
     time: describeTime(network.timeZone, now),
-    ...describeDevice(headers.get("user-agent")),
+    ...describeDevice(headers),
     location: describeLocation(network),
     ip: network.ip ?? "Unknown",
     method: signInMethodLabel(provider),
