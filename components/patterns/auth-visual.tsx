@@ -10,7 +10,7 @@ export function AuthVisual() {
   return (
     <aside className="auth-visual" aria-label="About HackVillage">
       <Image
-        src="/marketing/hero/kenya/center-developer.webp"
+        src="/marketing/auth/welcome.webp"
         alt=""
         fill
         priority

@@ -16,7 +16,7 @@ function PillPhoto({ name, alt, className }: PillPhotoProps) {
   return (
     <div className={className ? `journey-pill ${className}` : "journey-pill"}>
       <Image
-        src={`/marketing/hero/kenya/${name}.webp`}
+        src={`/marketing/journey/${name}.webp`}
         alt={alt}
         fill
         sizes="(max-width: 1023px) 45vw, 14vw"
@@ -54,10 +54,10 @@ export function BuilderJourney() {
           </Link>
         </div>
         <div className="journey-pair journey-pair-left">
-          <PillPhoto name="speaker" alt="Kenyan tech speaker sharing ideas at a hackathon" />
+          <PillPhoto name="build" alt="Kenyan software engineer building her hackathon project" />
           <PillPhoto
-            name="community"
-            alt="Developers exchanging ideas around a table at a Nairobi tech gathering"
+            name="ship"
+            alt="Kenyan developer demonstrating the mobile app he built"
           />
         </div>
       </div>
@@ -73,8 +73,8 @@ export function BuilderJourney() {
         </svg>
         <div className="journey-pill journey-pill-center">
           <Image
-            src="/marketing/hero/kenya/center-developer.webp"
-            alt="Kenyan software engineer in a blue overshirt holding her laptop"
+            src="/marketing/journey/win.webp"
+            alt="Kenyan hackathon winner holding her trophy and laptop"
             fill
             sizes="(max-width: 1023px) 80vw, 26vw"
             className="object-cover"
@@ -85,12 +85,12 @@ export function BuilderJourney() {
       <div className="journey-column journey-column-right">
         <div className="journey-pair journey-pair-right">
           <PillPhoto
-            name="event-arrival"
-            alt="Kenyan developer arriving at a hackathon with his laptop"
+            name="paid"
+            alt="Kenyan developer checking his phone after receiving a prize payout"
           />
           <PillPhoto
-            name="coding-focus"
-            alt="Kenyan software engineer concentrating on her laptop in a sunlit workspace"
+            name="hired"
+            alt="Kenyan engineer presenting her project portfolio to a hiring manager"
           />
         </div>
         <div className="journey-copy journey-copy-right">

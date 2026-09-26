@@ -65,8 +65,8 @@ export const post: BlogPost = {
     publishedAt: "2026-09-18",
     author: "HackVillage Team",
     readingMinutes: 4,
-    cover: "/marketing/hero/kenya/center-developer.webp",
-    coverAlt: "Kenyan software engineer in a blue overshirt holding her laptop",
+    cover: "/marketing/blog/portfolio.webp",
+    coverAlt: "A Kenyan software engineer presenting her project portfolio to a hiring manager",
   },
   Body,
 };
