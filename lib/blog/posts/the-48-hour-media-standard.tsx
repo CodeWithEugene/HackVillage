@@ -28,11 +28,8 @@ function Body() {
       <h2>How The Trust Score Works</h2>
       <ul>
         <li>Every organization starts at 100.</li>
-        <li>
-          Each hackathon whose payouts reach winners within an hour of the announcement adds a
-          point.
-        </li>
-        <li>Missed media deadlines take points away.</li>
+        <li>Missed media deadlines take points away, unless an appeal is granted.</li>
+        <li>The HackVillage team can adjust a score, always with a recorded reason.</li>
         <li>The score never drops below 0 and tops out at 150.</li>
       </ul>
       <p>

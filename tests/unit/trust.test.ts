@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import {
   MAX_TRUST_SCORE,
   mediaDeadlineFor,
-  payoutExcellenceDelta,
   trustScoreFrom,
   MEDIA_PENALTY_DELTA,
 } from "@/services/media/trust";
@@ -19,7 +18,7 @@ describe("trust score math", () => {
     expect(trustScoreFrom(0, -10)).toBe(0);
   });
 
-  it("caps at 150 — excellence bonuses can't run away", () => {
+  it("caps at 150, however many points are added", () => {
     expect(trustScoreFrom(145, 10)).toBe(MAX_TRUST_SCORE);
     expect(trustScoreFrom(MAX_TRUST_SCORE, 10)).toBe(MAX_TRUST_SCORE);
   });
@@ -34,13 +33,5 @@ describe("media deadline", () => {
 
   it("the media penalty is -10", () => {
     expect(MEDIA_PENALTY_DELTA).toBe(-10);
-  });
-});
-
-describe("payout excellence bonus", () => {
-  it("is +1 per event, capped at 20", () => {
-    expect(payoutExcellenceDelta(0)).toBe(0);
-    expect(payoutExcellenceDelta(3)).toBe(3);
-    expect(payoutExcellenceDelta(50)).toBe(20);
   });
 });

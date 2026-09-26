@@ -259,6 +259,22 @@ describe("milestone disputes (integration)", () => {
       })
     ).rejects.toMatchObject({ code: "FORBIDDEN" });
 
+    // Too early: within 14 days of the announcement the organizer still has time.
+    const realAnnouncedAt = (await prisma.winner.findUniqueOrThrow({ where: { id: world.winnerId } }))
+      .announcedAt;
+    await prisma.winner.update({
+      where: { id: world.winnerId },
+      data: { announcedAt: new Date(Date.now() - 3 * 24 * 3600 * 1000) },
+    });
+    await expect(
+      openMilestoneDispute({
+        winnerId: world.winnerId,
+        userId: world.winnerUserId,
+        claim: "Only three days after the announcement, which is too soon.",
+      })
+    ).rejects.toMatchObject({ code: "TOO_EARLY" });
+    await prisma.winner.update({ where: { id: world.winnerId }, data: { announcedAt: realAnnouncedAt } });
+
     await openMilestoneDispute({
       winnerId: world.winnerId,
       userId: world.winnerUserId,
