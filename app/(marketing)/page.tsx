@@ -21,11 +21,11 @@ export default function LandingPage() {
     <div className="font-display">
       <LandingHero />
 
+      <LandingAbout />
+
       <BuilderJourney />
 
       <TrustImpact />
-
-      <LandingAbout />
 
       <CtaBanner />
     </div>
