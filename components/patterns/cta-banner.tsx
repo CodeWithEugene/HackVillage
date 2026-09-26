@@ -27,7 +27,7 @@ export function CtaBanner({ photoSide = "right" }: { photoSide?: "left" | "right
 
         <div className="cta-banner-photo">
           <Image
-            src="/marketing/newsletter/community.webp"
+            src="/marketing/newsletter/developers-exploring-next-hackathon.webp"
             alt="Two Kenyan developers exploring their next hackathon together"
             fill
             sizes="(max-width: 1023px) 100vw, 50vw"

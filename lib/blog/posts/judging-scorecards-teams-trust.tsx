@@ -76,7 +76,7 @@ export const post: BlogPost = {
     publishedAt: "2026-09-22",
     author: "HackVillage Team",
     readingMinutes: 4,
-    cover: "/marketing/blog/judging.webp",
+    cover: "/marketing/blog/judges-reviewing-prototype-with-scorecard.webp",
     coverAlt: "Kenyan judges reviewing a developer’s prototype with a shared scorecard",
   },
   Body,

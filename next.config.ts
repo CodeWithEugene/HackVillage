@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { RENAMED_IMAGES } from "./lib/seo/renamed-images";
+
 /** Sections whose `/events` routes were renamed to `/hackathons`. */
 const RENAMED_SECTIONS = ["", "/dashboard", "/organizer", "/judge", "/admin"];
 
@@ -74,7 +76,15 @@ const nextConfig: NextConfig = {
       { source: "/developers", destination: "/hackathons", permanent: false },
       { source: "/trust", destination: "/how-escrow-works", permanent: false },
     ];
+    // Images renamed for image search: old URLs keep working (and pass their
+    // ranking on) wherever they were indexed, shared, or stored.
+    const images = Object.entries(RENAMED_IMAGES).map(([source, destination]) => ({
+      source,
+      destination,
+      permanent: true,
+    }));
     return removed.concat(
+      images,
       RENAMED_SECTIONS.flatMap((section) => [
         { source: `${section}/events`, destination: `${section}/hackathons`, permanent: true },
         {

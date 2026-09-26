@@ -45,7 +45,7 @@ export function TrustImpact() {
         <div className="trust-impact-frame">
           <div className="trust-impact-photo">
             <Image
-              src="/marketing/trust/escrow.webp"
+              src="/marketing/trust/organizer-reviewing-hackathon-prize-funding.webp"
               alt="Kenyan organizer reviewing hackathon prize funding at her laptop"
               fill
               sizes="(max-width: 1023px) 80vw, 460px"
@@ -72,7 +72,7 @@ export function TrustImpact() {
       <div className="trust-impact-strip">
         <div className="trust-strip-photo">
           <Image
-            src="/marketing/trust/deposit.webp"
+            src="/marketing/trust/organizer-funding-hackathon-prize-pool.webp"
             alt="Kenyan organizer funding a prize pool from his phone"
             fill
             sizes="200px"
@@ -81,7 +81,7 @@ export function TrustImpact() {
         </div>
         <div className="trust-strip-photo">
           <Image
-            src="/marketing/trust/payout.webp"
+            src="/marketing/trust/developer-celebrating-prize-payout.webp"
             alt="Kenyan developer celebrating a prize payout on her phone"
             fill
             sizes="200px"
@@ -90,7 +90,7 @@ export function TrustImpact() {
         </div>
         <div className="trust-strip-photo">
           <Image
-            src="/marketing/trust/record.webp"
+            src="/marketing/trust/engineer-checking-payout-record.webp"
             alt="Kenyan engineer checking a transaction record on his laptop"
             fill
             sizes="200px"

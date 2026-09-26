@@ -19,16 +19,16 @@ describe("coverFor", () => {
   it("replaces old seeded stock covers with a category-specific photo", () => {
     expect(
       coverFor({
-        coverUrl: "/marketing/how-it-works/reward.webp",
+        coverUrl: "/marketing/how-it-works/hackathon-winners-with-trophy.webp",
         categories: ["mobility", "civic"],
       }),
-    ).toBe("/marketing/hackathons/mobility.webp");
+    ).toBe("/marketing/hackathons/mobility-hackathon-kenya.webp");
     expect(
       coverFor({
-        coverUrl: "/marketing/hero/kenya/coding-focus.webp",
+        coverUrl: "/marketing/hero/kenya/kenyan-software-engineer-coding-on-laptop.webp",
         categories: ["ai", "health"],
       }),
-    ).toBe("/marketing/hackathons/ai.webp");
+    ).toBe("/marketing/hackathons/ai-hackathon-kenya.webp");
   });
 
   it("preserves explicit covers outside the exact legacy stock list", () => {

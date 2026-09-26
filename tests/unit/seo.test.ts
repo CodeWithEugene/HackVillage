@@ -13,7 +13,7 @@ const EVENT = {
   endsAt: new Date("2026-10-11T15:00:00Z"),
   venueType: "PHYSICAL" as const,
   location: "Nairobi",
-  coverUrl: "/marketing/hackathons/ai.webp",
+  coverUrl: "/marketing/hackathons/ai-hackathon-kenya.webp",
   orgName: "Technetium Kenya",
   registrationDeadline: new Date("2026-10-08T21:00:00Z"),
 };
@@ -79,7 +79,7 @@ describe("pageOpenGraph", () => {
   });
 
   it("lets a page use its own image", () => {
-    const custom = [{ url: "/marketing/blog/payouts.webp" }];
+    const custom = [{ url: "/marketing/blog/hackathon-winners-checking-prize-payout.webp" }];
     expect(pageOpenGraph("/blog/x", { images: custom }).images).toBe(custom);
   });
 });
