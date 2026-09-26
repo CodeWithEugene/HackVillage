@@ -12,10 +12,23 @@
  */
 
 const KEY = "6e497826b467be505d007bfe1b62611d";
-const SITE = (process.env.NEXT_PUBLIC_APP_URL ?? "https://www.hackvillage.xyz").replace(/\/$/, "");
+/**
+ * Always the live site. It used to read NEXT_PUBLIC_APP_URL, which is
+ * localhost in a local .env, so it submitted the local sitemap's localhost
+ * URLs. INDEXNOW_SITE overrides it (for example a future domain).
+ */
+const SITE = (process.env.INDEXNOW_SITE ?? "https://www.hackvillage.xyz").replace(/\/$/, "");
 const MAX_URLS_PER_POST = 10_000;
 
+function assertPublicSite(site: string): void {
+  const { protocol, hostname } = new URL(site);
+  if (protocol !== "https:" || hostname === "localhost" || hostname.endsWith(".localhost")) {
+    throw new Error(`IndexNow only accepts public https sites; refusing to submit ${site}.`);
+  }
+}
+
 async function main(): Promise<void> {
+  assertPublicSite(SITE);
   const sitemapResponse = await fetch(`${SITE}/sitemap.xml`);
   if (!sitemapResponse.ok) {
     throw new Error(
@@ -23,11 +36,15 @@ async function main(): Promise<void> {
     );
   }
   const xml = await sitemapResponse.text();
-  const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1].trim());
-  if (urls.length === 0) throw new Error("No URLs found in the sitemap — is it deployed?");
+  const siteHost = new URL(SITE).host;
+  const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map((match) => match[1].trim())
+    // IndexNow rejects the whole batch if any URL is on another host.
+    .filter((url) => new URL(url).host === siteHost);
+  if (urls.length === 0) throw new Error(`No ${siteHost} URLs found in the sitemap. Is it deployed?`);
 
   const payload = {
-    host: new URL(SITE).host,
+    host: siteHost,
     key: KEY,
     keyLocation: `${SITE}/${KEY}.txt`,
     urlList: urls.slice(0, MAX_URLS_PER_POST),
@@ -39,11 +56,15 @@ async function main(): Promise<void> {
   });
 
   // 200 = received, 202 = accepted and queued. Anything else is a failure
-  // (403 usually means the key file is not reachable at keyLocation yet).
+  // (403 usually means the key file is not reachable at keyLocation yet;
+  // 429 is IndexNow's rate limit, so wait an hour or so and try again).
   console.log(
-    `Submitted ${payload.urlList.length} URLs to IndexNow — ${response.status} ${response.statusText}`,
+    `Submitted ${payload.urlList.length} ${siteHost} URLs to IndexNow: ${response.status} ${response.statusText}`,
   );
-  if (response.status >= 400) {
+  if (response.status === 429) {
+    console.error("IndexNow is rate limiting this host. Try again in an hour or so.");
+    process.exitCode = 1;
+  } else if (response.status >= 400) {
     console.error(await response.text());
     process.exitCode = 1;
   }
