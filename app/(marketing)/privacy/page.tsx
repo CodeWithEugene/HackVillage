@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 
 import { LegalDocument } from "@/components/patterns/legal-document";
+import { pageOpenGraph } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "How HackVillage collects, uses, shares, and protects your data.",
   alternates: { canonical: "/privacy" },
-  openGraph: { url: "/privacy" },
+  openGraph: pageOpenGraph("/privacy"),
 };
 
 export default function PrivacyPolicyPage() {

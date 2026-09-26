@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 
 import { LegalDocument } from "@/components/patterns/legal-document";
+import { pageOpenGraph } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = {
-  title: "Contribute — Open-Source Hackathon Infrastructure",
+  title: "Contribute To Open-Source Hackathon Infrastructure",
   description:
     "HackVillage is open source. Report bugs, suggest features, improve the docs, or send a pull request to the hackathon platform with escrowed prizes.",
   alternates: { canonical: "/contribute" },
-  openGraph: { url: "/contribute" },
+  openGraph: pageOpenGraph("/contribute"),
 };
 
 const REPO = "https://github.com/CodeWithEugene/HackVillage";

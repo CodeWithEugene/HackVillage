@@ -17,15 +17,16 @@ import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
 import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 import { HACKATHON_CATEGORIES, isCategory, type HackathonCategory } from "@/lib/events/categories";
 import { CalendarX2 } from "lucide-react";
+import { pageOpenGraph } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = {
-  title: "Hackathons in Kenya & Africa — Prizes in Escrow",
+  title: "Hackathons In Kenya And Africa With Escrowed Prizes",
   description:
-    "Browse ongoing and upcoming hackathons in Kenya, Africa and online. Every one is Prize Verified — the full prize pool is locked in escrow before it goes live.",
+    "Browse ongoing and upcoming hackathons in Kenya, Africa and online. Every one is Prize Verified: the full prize pool is locked in escrow before it goes live.",
   // Filter/tab variants (?filter=, ?category=) all canonicalize to the base
   // listing so they never compete with it as separate pages.
   alternates: { canonical: "/hackathons" },
-  openGraph: { url: "/hackathons" },
+  openGraph: pageOpenGraph("/hackathons"),
 };
 
 /**
@@ -226,7 +227,7 @@ export default async function EventsPage({
         </h2>
         <div className="mx-auto mt-4 max-w-2xl space-y-3 leading-7 text-body-copy">
           <p>
-            HackVillage lists hackathons in Nairobi, across Kenya, Africa-wide and fully online —
+            HackVillage lists hackathons in Nairobi, across Kenya, Africa-wide and fully online:
             fintech, agri-tech, civic tech, clean energy, AI and more. A hackathon appears here only
             after its organizer has deposited 100% of the prize pool into escrow and earned the{" "}
             <Link href="/how-escrow-works" className="font-semibold text-ink underline">

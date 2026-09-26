@@ -5,6 +5,7 @@ import { Pagination } from "@/components/patterns/pagination";
 import { JsonLd } from "@/components/seo/json-ld";
 import { allPosts } from "@/lib/blog";
 import { BLOG_PAGE_SIZE, pageCount, pageSlice, parsePage } from "@/lib/blog/pagination";
+import { pageOpenGraph } from "@/lib/seo/metadata";
 import { itemListSchema } from "@/lib/seo/schema";
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
@@ -12,12 +13,13 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const count = pageCount(posts.length, BLOG_PAGE_SIZE);
   const page = parsePage((await searchParams).page, count);
   return {
-    title: "Blog — Hackathon Guides & Stories",
+    // Later pages say so in the title, so they aren't duplicates of page 1.
+    title: page === 1 ? "Blog: Hackathon Guides And Stories" : `Blog: Hackathon Guides And Stories, Page ${page}`,
     description:
       "Guides and stories from HackVillage: how escrowed prizes work, how winners get paid instantly, and how to run hackathons builders trust in Kenya and beyond.",
     // Self-canonical per pagination page; page 1 canonicalizes to the clean URL.
     alternates: { canonical: page === 1 ? "/blog" : `/blog?page=${page}` },
-    openGraph: { url: page === 1 ? "/blog" : `/blog?page=${page}` },
+    openGraph: pageOpenGraph(page === 1 ? "/blog" : `/blog?page=${page}`),
   };
 }
 

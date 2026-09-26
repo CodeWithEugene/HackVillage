@@ -61,7 +61,7 @@ export function EventCard({
           src={cover}
           // Uploaded covers live on R2 and are already sized to 1600x900.
           unoptimized={!cover.startsWith("/")}
-          alt={`${event.title} — hackathon on HackVillage`}
+          alt={`${event.title}, a hackathon on HackVillage`}
           priority={priority}
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"

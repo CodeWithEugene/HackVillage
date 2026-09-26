@@ -4,6 +4,7 @@ import { allPosts } from "@/lib/blog";
 import { BLOG_PAGE_SIZE, pageCount } from "@/lib/blog/pagination";
 import { prisma } from "@/lib/db";
 import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
+import { INDEXABLE_DEVELOPER_WHERE, isRealAccountEmail } from "@/lib/seo/indexable";
 import { appUrl } from "@/lib/url";
 
 /**
@@ -51,13 +52,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const [events, developers] = await Promise.all([
       prisma.event.findMany({
-        where: PUBLIC_HACKATHON_WHERE,
+        // Demo hackathons are noindex, so they don't belong in the sitemap.
+        where: { ...PUBLIC_HACKATHON_WHERE, isDemo: false },
         select: { slug: true, updatedAt: true },
         orderBy: { startsAt: "desc" },
       }),
       prisma.user.findMany({
-        where: { deletedAt: null, profile: { isNot: null } },
-        select: { handle: true, updatedAt: true },
+        where: INDEXABLE_DEVELOPER_WHERE,
+        select: { handle: true, email: true, updatedAt: true },
       }),
     ]);
     for (const event of events) {
@@ -68,7 +70,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.9,
       });
     }
-    for (const developer of developers) {
+    for (const developer of developers.filter((user) => isRealAccountEmail(user.email))) {
       entries.push({
         url: appUrl(`/developers/${developer.handle}`),
         lastModified: developer.updatedAt,
@@ -76,8 +78,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.5,
       });
     }
-  } catch {
-    // Keep the sitemap useful with what we have.
+  } catch (error) {
+    // Keep the sitemap useful with what we have, but say why it's short.
+    console.error("[sitemap] database sections skipped", error);
   }
 
   return entries;

@@ -10,6 +10,8 @@ import { prisma } from "@/lib/db";
 import { profileSchema } from "@/lib/seo/schema";
 import { computePowMetrics } from "@/services/pow/service";
 import { formatKes } from "@/lib/utils";
+import { isIndexableDeveloper } from "@/lib/seo/indexable";
+import { pageOpenGraph } from "@/lib/seo/metadata";
 
 interface ProfilePageProps {
   params: Promise<{ handle: string }>;
@@ -19,15 +21,28 @@ export async function generateMetadata({ params }: ProfilePageProps): Promise<Me
   const { handle } = await params;
   const user = await prisma.user.findFirst({
     where: { handle: { equals: handle, mode: "insensitive" }, deletedAt: null },
-    select: { name: true, handle: true, profile: { select: { headline: true, location: true } } },
+    select: {
+      name: true,
+      handle: true,
+      email: true,
+      profile: { select: { headline: true, location: true } },
+      _count: { select: { registrations: true, portfolioItems: true } },
+    },
   });
   if (!user?.profile) return { title: "Profile Not Found", robots: { index: false } };
-  const detail = [user.profile.headline, user.profile.location].filter(Boolean).join(" — ");
+  const indexable = isIndexableDeveloper({
+    email: user.email,
+    registrationCount: user._count.registrations,
+    portfolioCount: user._count.portfolioItems,
+  });
+  const detail = [user.profile.headline, user.profile.location].filter(Boolean).join(", ");
   return {
-    title: `${user.name ?? `@${user.handle}`} (@${user.handle}) — Verified Hackathon Developer`,
-    description: `The verified Proof-of-Work profile for @${user.handle}${detail ? ` — ${detail}` : ""}: hackathon results, judge endorsements and projects on HackVillage.`,
+    title: `${user.name ?? `@${user.handle}`} (@${user.handle}), Verified Hackathon Developer`,
+    description: `The verified Proof-of-Work profile for @${user.handle}${detail ? ` (${detail})` : ""}: hackathon results, judge endorsements and projects on HackVillage.`,
+    // Demo, test and empty profiles stay reachable but out of search results.
+    robots: indexable ? undefined : { index: false, follow: true },
     alternates: { canonical: `/developers/${user.handle}` },
-    openGraph: { url: `/developers/${user.handle}` },
+    openGraph: pageOpenGraph(`/developers/${user.handle}`),
   };
 }
 

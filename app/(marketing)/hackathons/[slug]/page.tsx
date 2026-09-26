@@ -37,10 +37,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       endsAt: true,
       venueType: true,
       location: true,
+      isDemo: true,
       prizes: { select: { amountKes: true } },
     },
   });
   if (!event) return { title: "Hackathon Not Found", robots: { index: false } };
+  // Demo hackathons are fictional: visitors can browse them, but search
+  // engines must not index them as real events.
+  const robots = event.isDemo ? { index: false, follow: true } : undefined;
   const poolKes = event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0);
   const venue = event.venueType === "ONLINE" ? "Online" : (event.location ?? "Kenya");
   // Long-tail description: dates + venue + pool mirror what people search for
@@ -49,6 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: event.title,
     description,
+    robots,
     alternates: { canonical: `/hackathons/${slug}` },
     openGraph: {
       title: event.title,
@@ -127,10 +132,14 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
   return (
     <div className="site-container py-12">
       {/* Event + breadcrumb structured data: makes the hackathon eligible for
-          Google event listings and quotable by AI answer engines. */}
+          Google event listings and quotable by AI answer engines. Demo
+          hackathons get none: Event markup must describe real events. */}
       <JsonLd
         data={[
-          eventSchema({
+          ...(event.isDemo
+            ? []
+            : [
+                eventSchema({
             slug: event.slug,
             title: event.title,
             summary: event.summary,
@@ -141,7 +150,9 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
             coverUrl: cover,
             orgName: event.org.name,
             orgWebsite: event.org.website,
+            registrationDeadline: event.registrationDeadline,
           }),
+              ]),
           breadcrumbSchema([
             { name: "Hackathons", path: "/hackathons" },
             { name: event.title, path: `/hackathons/${event.slug}` },
@@ -220,7 +231,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           <div className="relative aspect-[16/9] overflow-hidden rounded-card bg-brand/10 shadow-card">
             <Image
               src={cover}
-              alt={`${event.title} — hackathon cover`}
+              alt={`${event.title} hackathon cover`}
               fill
               priority
               sizes="(min-width: 1024px) 400px, 100vw"

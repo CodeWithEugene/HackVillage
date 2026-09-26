@@ -24,20 +24,25 @@ export const LOGO_PATH = "/branding/icon-512.png";
 export const OG_IMAGE_PATH = "/branding/og.png";
 
 /**
- * Profiles that declare "same entity" to search engines via Organization
- * schema `sameAs`. Includes the backing organizations (Technetium Kenya,
- * Salamander Tech Hub) so the brand graph is connected on day one.
+ * HackVillage's own profiles, declared as "the same entity" through
+ * Organization schema `sameAs`. Only HackVillage's accounts belong here:
+ * listing another organization would tell search engines HackVillage *is*
+ * that organization.
  */
 export const SAME_AS = [
   GITHUB_URL,
   "https://www.linkedin.com/company/hackvillage",
   "https://x.com/hackvillagexyz",
   "https://www.youtube.com/@hackvillage",
-  "https://www.technetium.co.ke",
-  "https://salamandertechhub.com",
 ] as const;
 
-/** Topics the entity should be associated with (schema.org knowAbout). */
+/** HackVillage is a Technetium Kenya initiative (see the site footer). */
+export const PARENT_ORGANIZATION = {
+  name: "Technetium Kenya",
+  url: "https://www.technetium.co.ke",
+} as const;
+
+/** Topics the entity should be associated with (schema.org knowsAbout). */
 export const KNOW_ABOUT = [
   "hackathons",
   "hackathon prize escrow",
