@@ -83,7 +83,7 @@ export const post: BlogPost = {
     publishedAt: "2026-09-25",
     author: "HackVillage Team",
     readingMinutes: 5,
-    cover: "/marketing/blog/organizing.webp",
+    cover: "/marketing/blog/organizer-coordinating-hackathon-team.webp",
     coverAlt: "A Kenyan organizer coordinating her team before a hackathon",
   },
   Body,

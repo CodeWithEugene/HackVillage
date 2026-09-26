@@ -123,7 +123,7 @@ async function main(): Promise<void> {
       maxTeams: 20,
       rolesWanted: ["frontend", "fintech", "mobile", "design"],
       categories: ["fintech", "mobility"],
-      coverUrl: "/marketing/hackathons/fintech.webp",
+      coverUrl: "/marketing/hackathons/fintech-hackathon-kenya.webp",
       status: "LIVE",
       prizeVerifiedAt: new Date(now - 5 * DAY),
       publishedAt: new Date(now - 6 * DAY),
@@ -220,7 +220,7 @@ async function main(): Promise<void> {
       maxTeams: 15,
       rolesWanted: ["ai", "backend", "design"],
       categories: ["ai", "health"],
-      coverUrl: "/marketing/hackathons/ai.webp",
+      coverUrl: "/marketing/hackathons/ai-hackathon-kenya.webp",
       status: "PENDING_DEPOSIT",
       publishedAt: new Date(now - 1 * DAY),
     },
@@ -271,7 +271,7 @@ async function main(): Promise<void> {
       verified: true,
       rolesWanted: ["data", "backend", "mobile"],
       categories: ["climate", "agritech"],
-      coverUrl: "/marketing/hackathons/climate.webp",
+      coverUrl: "/marketing/hackathons/climate-tech-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 200_000],
         [2, "2nd place", 100_000],
@@ -291,7 +291,7 @@ async function main(): Promise<void> {
       verified: true,
       rolesWanted: ["mobile", "design", "backend"],
       categories: ["agritech", "fintech"],
-      coverUrl: "/marketing/hackathons/agritech.webp",
+      coverUrl: "/marketing/hackathons/agritech-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 150_000],
         [2, "2nd place", 75_000],
@@ -312,7 +312,7 @@ async function main(): Promise<void> {
       verified: true,
       rolesWanted: ["frontend", "backend", "civic"],
       categories: ["civic"],
-      coverUrl: "/marketing/hackathons/civic.webp",
+      coverUrl: "/marketing/hackathons/civic-tech-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 150_000],
         [2, "2nd place", 75_000],
@@ -332,7 +332,7 @@ async function main(): Promise<void> {
       verified: true,
       rolesWanted: ["hardware", "mobile", "fintech"],
       categories: ["climate"],
-      coverUrl: "/marketing/hackathons/climate.webp",
+      coverUrl: "/marketing/hackathons/climate-tech-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 200_000],
         [2, "2nd place", 100_000],
@@ -352,7 +352,7 @@ async function main(): Promise<void> {
       verified: true,
       rolesWanted: ["backend", "data", "mobile"],
       categories: ["agritech", "web3"],
-      coverUrl: "/marketing/hackathons/agritech.webp",
+      coverUrl: "/marketing/hackathons/agritech-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 250_000],
         [2, "2nd place", 120_000],
@@ -373,7 +373,7 @@ async function main(): Promise<void> {
       verified: false,
       rolesWanted: ["frontend", "design", "education"],
       categories: ["edtech"],
-      coverUrl: "/marketing/hackathons/edtech.webp",
+      coverUrl: "/marketing/hackathons/edtech-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 80_000],
         [2, "2nd place", 40_000],
@@ -393,7 +393,7 @@ async function main(): Promise<void> {
       verified: false,
       rolesWanted: ["fintech", "frontend", "design"],
       categories: ["web3", "fintech"],
-      coverUrl: "/marketing/hackathons/web3.webp",
+      coverUrl: "/marketing/hackathons/web3-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 120_000],
         [2, "2nd place", 60_000],
@@ -413,7 +413,7 @@ async function main(): Promise<void> {
       verified: false,
       rolesWanted: ["mobile", "maps", "backend"],
       categories: ["mobility", "civic"],
-      coverUrl: "/marketing/hackathons/mobility.webp",
+      coverUrl: "/marketing/hackathons/mobility-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 90_000],
         [2, "2nd place", 45_000],
@@ -433,7 +433,7 @@ async function main(): Promise<void> {
       verified: true,
       rolesWanted: ["security", "fintech", "data"],
       categories: ["security", "fintech"],
-      coverUrl: "/marketing/hackathons/security.webp",
+      coverUrl: "/marketing/hackathons/cybersecurity-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 300_000],
         [2, "2nd place", 150_000],
@@ -453,7 +453,7 @@ async function main(): Promise<void> {
       verified: true,
       rolesWanted: ["data", "frontend", "civic"],
       categories: ["civic"],
-      coverUrl: "/marketing/hackathons/civic.webp",
+      coverUrl: "/marketing/hackathons/civic-tech-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 100_000],
         [2, "2nd place", 50_000],
@@ -473,7 +473,7 @@ async function main(): Promise<void> {
       verified: true,
       rolesWanted: ["ai", "data", "backend"],
       categories: ["ai"],
-      coverUrl: "/marketing/hackathons/ai.webp",
+      coverUrl: "/marketing/hackathons/ai-hackathon-kenya.webp",
       prizes: [
         [1, "1st place", 250_000],
         [2, "2nd place", 120_000],

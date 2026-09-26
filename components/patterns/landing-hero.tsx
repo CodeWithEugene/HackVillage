@@ -62,35 +62,35 @@ export function LandingHero() {
             Real rewards.
           </p>
           <Photo
-            name="coding-focus"
+            name="kenyan-software-engineer-coding-on-laptop"
             alt="Kenyan software engineer concentrating on her laptop in a sunlit workspace"
           />
         </div>
         <div className="hero-column hero-column-left">
-          <Photo name="speaker" alt="Kenyan tech speaker sharing ideas at a hackathon" />
+          <Photo name="kenyan-tech-speaker-at-hackathon" alt="Kenyan tech speaker sharing ideas at a hackathon" />
           <Photo
-            name="team-build"
+            name="kenyan-developers-collaborating-at-hackathon"
             alt="Two Kenyan developers collaborating on a hackathon project"
           />
         </div>
         <Photo
-          name="center-developer"
+          name="kenyan-software-engineer-holding-laptop"
           alt="Kenyan software engineer in a blue overshirt holding her laptop"
           center
         />
         <div className="hero-column hero-column-right">
           <Photo
-            name="hackathon-pair"
+            name="kenyan-engineers-coding-together"
             alt="Two Kenyan engineers sharing a laugh while coding together"
           />
           <Photo
-            name="community"
+            name="nairobi-tech-community-gathering"
             alt="Developers exchanging ideas around a table at a Nairobi tech gathering"
           />
         </div>
         <div className="hero-column hero-column-edge-right">
           <Photo
-            name="event-arrival"
+            name="kenyan-developer-arriving-at-hackathon"
             alt="Kenyan developer arriving at a hackathon with his laptop"
           />
           <p className="hero-side-note">

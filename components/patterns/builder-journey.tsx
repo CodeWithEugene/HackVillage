@@ -54,9 +54,9 @@ export function BuilderJourney() {
           </Link>
         </div>
         <div className="journey-pair journey-pair-left">
-          <PillPhoto name="build" alt="Kenyan software engineer building her hackathon project" />
+          <PillPhoto name="kenyan-developer-building-hackathon-project" alt="Kenyan software engineer building her hackathon project" />
           <PillPhoto
-            name="ship"
+            name="developer-demoing-mobile-app"
             alt="Kenyan developer demonstrating the mobile app he built"
           />
         </div>
@@ -73,7 +73,7 @@ export function BuilderJourney() {
         </svg>
         <div className="journey-pill journey-pill-center">
           <Image
-            src="/marketing/journey/win.webp"
+            src="/marketing/journey/hackathon-winner-with-trophy-and-laptop.webp"
             alt="Kenyan hackathon winner holding her trophy and laptop"
             fill
             sizes="(max-width: 1023px) 80vw, 26vw"
@@ -85,11 +85,11 @@ export function BuilderJourney() {
       <div className="journey-column journey-column-right">
         <div className="journey-pair journey-pair-right">
           <PillPhoto
-            name="paid"
+            name="developer-receiving-hackathon-prize-payout"
             alt="Kenyan developer checking his phone after receiving a prize payout"
           />
           <PillPhoto
-            name="hired"
+            name="engineer-presenting-portfolio-to-hiring-manager"
             alt="Kenyan engineer presenting her project portfolio to a hiring manager"
           />
         </div>

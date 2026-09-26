@@ -8,7 +8,7 @@ import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
 const STEPS = [
   {
     number: "01",
-    image: "launch",
+    image: "organizers-planning-hackathon-at-laptop",
     intro: "Set the challenge, put up the money, and give great ideas somewhere to start.",
     title: "The Prize Is Already There",
     description:
@@ -17,7 +17,7 @@ const STEPS = [
   },
   {
     number: "02",
-    image: "build",
+    image: "developers-building-at-nairobi-hackathon",
     intro: "Bring the right people together and turn one idea into a working project.",
     title: "Builders Team Up",
     description:
@@ -26,7 +26,7 @@ const STEPS = [
   },
   {
     number: "03",
-    image: "judge",
+    image: "developer-demoing-project-to-hackathon-judges",
     intro: "Give every project a fair review and feedback they can actually use.",
     title: "Everyone Gets Judged the Same Way",
     description:
@@ -35,7 +35,7 @@ const STEPS = [
   },
   {
     number: "04",
-    image: "reward",
+    image: "hackathon-winners-checking-payout-beside-trophy",
     intro: "Celebrate the work, reward the winners, and let anyone check the receipts.",
     title: "Winners Get Paid Instantly",
     description:
