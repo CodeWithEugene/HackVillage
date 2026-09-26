@@ -75,8 +75,8 @@ export const post: BlogPost = {
     publishedAt: "2026-09-25",
     author: "HackVillage Team",
     readingMinutes: 5,
-    cover: "/marketing/hero/kenya/team-build.webp",
-    coverAlt: "A Kenyan team building their hackathon project together",
+    cover: "/marketing/blog/first-hackathon.webp",
+    coverAlt: "A Kenyan volunteer welcoming developers to their first hackathon",
   },
   Body,
 };

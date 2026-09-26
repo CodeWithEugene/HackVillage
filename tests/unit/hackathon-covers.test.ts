@@ -16,6 +16,26 @@ describe("coverFor", () => {
     expect(cover).not.toBe(DEFAULT_COVER);
   });
 
+  it("replaces old seeded stock covers with a category-specific photo", () => {
+    expect(
+      coverFor({
+        coverUrl: "/marketing/how-it-works/reward.webp",
+        categories: ["mobility", "civic"],
+      }),
+    ).toBe("/marketing/hackathons/mobility.webp");
+    expect(
+      coverFor({
+        coverUrl: "/marketing/hero/kenya/coding-focus.webp",
+        categories: ["ai", "health"],
+      }),
+    ).toBe("/marketing/hackathons/ai.webp");
+  });
+
+  it("preserves explicit covers outside the exact legacy stock list", () => {
+    const coverUrl = "/marketing/custom-event.webp";
+    expect(coverFor({ coverUrl, categories: ["fintech"] })).toBe(coverUrl);
+  });
+
   it("uses the default photo when there is nothing to go on", () => {
     expect(coverFor({ coverUrl: null, categories: [] })).toBe(DEFAULT_COVER);
   });

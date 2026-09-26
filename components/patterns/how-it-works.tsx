@@ -31,7 +31,7 @@ const STEPS = [
     title: "Everyone Gets Judged the Same Way",
     description:
       "Teams submit their work. Judges score every project against the same scorecard and leave notes builders can learn from.",
-    alt: "A Kenyan developer demonstrating his project to a judge at a hackathon",
+    alt: "A Kenyan developer demonstrating his project to two hackathon judges",
   },
   {
     number: "04",
@@ -40,7 +40,7 @@ const STEPS = [
     title: "Winners Get Paid Instantly",
     description:
       "The moment winners are announced, half their prize lands in their account, instantly. The rest follows once they deliver, and anyone can check it actually happened.",
-    alt: "Two Kenyan hackathon winners celebrating together with their trophy",
+    alt: "Two Kenyan hackathon winners checking their prize payout beside a trophy",
   },
 ];
 
@@ -90,7 +90,7 @@ export function HowItWorks({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2"
             <p className="how-it-works-intro">{step.intro}</p>
             <div className="how-it-works-photo">
               <Image
-                src={`/marketing/how-it-works/${step.image}.webp`}
+                src={`/marketing/process/${step.image}.webp`}
                 alt={step.alt}
                 fill
                 sizes="(max-width: 599px) 94vw, (max-width: 1023px) 46vw, 23vw"
