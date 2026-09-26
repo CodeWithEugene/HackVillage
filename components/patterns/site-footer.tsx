@@ -30,6 +30,7 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
     links: [
       { label: "Hackathons", href: "/hackathons" },
       { label: "How it works", href: "/how-it-works" },
+      { label: "How it works for organizers", href: "/for-organizers" },
       { label: "How escrow works", href: "/how-escrow-works" },
     ],
   },

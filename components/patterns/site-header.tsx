@@ -21,6 +21,7 @@ const NAV_LINKS: NavItem[] = [
 
 const ORGANIZER_LINKS: NavItem[] = [
   { href: HOST_HACKATHON_HREF, label: "Host A Hackathon" },
+  { href: "/for-organizers", label: "How It Works For Organizers" },
   { href: "/how-escrow-works", label: "How Escrow Works" },
 ];
 
