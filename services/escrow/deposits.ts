@@ -189,6 +189,11 @@ export async function recordChargeSuccess(input: {
     await notifyEventLive(event.id).catch((error: unknown) => {
       console.error("[escrow] event live notification failed", error);
     });
+    // Tell builders a new Prize Verified hackathon is live. A queued job, so
+    // emailing every builder never slows this webhook; enqueue never throws.
+    await enqueue("hackathon.announce", { eventId: event.id }, {
+      singletonKey: `announce:${event.id}`,
+    });
   }
 
   return { outcome: "recorded", vaultLocked: covered };

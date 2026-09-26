@@ -110,3 +110,21 @@ describe("site copy", () => {
     expect(JSON.stringify(organizationSchema())).not.toMatch(/[—–]/);
   });
 });
+
+describe("robots.txt", () => {
+  it("states the content signals and keeps private areas out, for every group", async () => {
+    const { robotsTxt } = await import("@/lib/seo/robots");
+    const text = robotsTxt();
+    const groups = text.split("\n\n").filter((block) => block.startsWith("User-Agent"));
+    expect(groups.length).toBe(2);
+    for (const block of groups) {
+      expect(block).toContain("Content-Signal: search=yes, ai-input=yes, ai-train=yes");
+      expect(block).toContain("Disallow: /dashboard");
+      expect(block).toContain("Allow: /");
+    }
+    expect(text).toMatch(/^User-Agent: \*$/m);
+    expect(text).toMatch(/^User-Agent: GPTBot$/m);
+    expect(text).toMatch(/^Sitemap: .+\/sitemap\.xml$/m);
+    expect(text).not.toMatch(/^Host:/m);
+  });
+});
