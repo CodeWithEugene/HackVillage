@@ -6,6 +6,7 @@ import { CalendarDays, Clock, MapPin, Users } from "lucide-react";
 import { KeyDatesCard } from "@/components/patterns/key-dates-card";
 import { OrganizerCard } from "@/components/patterns/organizer-card";
 import { StatusTimeline } from "@/components/patterns/status-timeline";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
@@ -14,7 +15,9 @@ import { prisma } from "@/lib/db";
 import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
 import { categoryLabel, isCategory } from "@/lib/events/categories";
 import { coverFor } from "@/lib/events/covers";
+import { formatEventDates } from "@/lib/events/format";
 import { registrationOpen } from "@/lib/events/lifecycle";
+import { breadcrumbSchema, eventSchema } from "@/lib/seo/schema";
 import { formatKes } from "@/lib/utils";
 import Link from "next/link";
 
@@ -27,10 +30,33 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const event = await prisma.event.findFirst({
     where: { slug, ...PUBLIC_HACKATHON_WHERE },
-    select: { title: true, summary: true },
+    select: {
+      title: true,
+      summary: true,
+      startsAt: true,
+      endsAt: true,
+      venueType: true,
+      location: true,
+      prizes: { select: { amountKes: true } },
+    },
   });
-  if (!event) return { title: "Hackathon Not Found" };
-  return { title: event.title, description: event.summary ?? event.title };
+  if (!event) return { title: "Hackathon Not Found", robots: { index: false } };
+  const poolKes = event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0);
+  const venue = event.venueType === "ONLINE" ? "Online" : (event.location ?? "Kenya");
+  // Long-tail description: dates + venue + pool mirror what people search for
+  // ("hackathons in Nairobi September 2026", "KES prize hackathon").
+  const description = `${event.summary ?? event.title} ${formatEventDates(event.startsAt, event.endsAt)} · ${venue} · ${formatKes(poolKes)} prize pool, 100% escrowed and Prize Verified on HackVillage.`;
+  return {
+    title: event.title,
+    description,
+    alternates: { canonical: `/hackathons/${slug}` },
+    openGraph: {
+      title: event.title,
+      description,
+      type: "website",
+      url: `/hackathons/${slug}`,
+    },
+  };
 }
 
 const dateFormat = new Intl.DateTimeFormat("en-KE", {
@@ -100,6 +126,28 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
 
   return (
     <div className="site-container py-12">
+      {/* Event + breadcrumb structured data: makes the hackathon eligible for
+          Google event listings and quotable by AI answer engines. */}
+      <JsonLd
+        data={[
+          eventSchema({
+            slug: event.slug,
+            title: event.title,
+            summary: event.summary,
+            startsAt: event.startsAt,
+            endsAt: event.endsAt,
+            venueType: event.venueType,
+            location: event.location,
+            coverUrl: cover,
+            orgName: event.org.name,
+            orgWebsite: event.org.website,
+          }),
+          breadcrumbSchema([
+            { name: "Hackathons", path: "/hackathons" },
+            { name: event.title, path: `/hackathons/${event.slug}` },
+          ]),
+        ]}
+      />
       {/* Status banner — P1: money state is one glance away */}
       {registration === "closed" ? (
         <div className="mb-6 rounded-card border border-warning/40 bg-warning/10 p-4 text-sm font-semibold text-ink">
@@ -172,7 +220,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           <div className="relative aspect-[16/9] overflow-hidden rounded-card bg-brand/10 shadow-card">
             <Image
               src={cover}
-              alt=""
+              alt={`${event.title} — hackathon cover`}
               fill
               priority
               sizes="(min-width: 1024px) 400px, 100vw"

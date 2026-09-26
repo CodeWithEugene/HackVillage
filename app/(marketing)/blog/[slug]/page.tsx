@@ -6,7 +6,9 @@ import { ArrowLeft } from "lucide-react";
 
 import { KeepReading } from "@/components/patterns/keep-reading";
 import { LegalToc } from "@/components/patterns/legal-toc";
+import { JsonLd } from "@/components/seo/json-ld";
 import { allPosts, formatPostDate, getPost, morePosts } from "@/lib/blog";
+import { articleSchema, breadcrumbSchema } from "@/lib/seo/schema";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -20,14 +22,20 @@ export const dynamicParams = false;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const post = getPost((await params).slug);
-  if (!post) return { title: "Post Not Found" };
+  if (!post) return { title: "Post Not Found", robots: { index: false } };
+  const { meta } = post;
   return {
-    title: post.meta.title,
-    description: post.meta.excerpt,
+    title: meta.title,
+    description: meta.excerpt,
+    alternates: { canonical: `/blog/${meta.slug}` },
     openGraph: {
-      title: post.meta.title,
-      description: post.meta.excerpt,
-      images: [post.meta.cover],
+      title: meta.title,
+      description: meta.excerpt,
+      type: "article",
+      url: `/blog/${meta.slug}`,
+      publishedTime: meta.publishedAt,
+      authors: [meta.author],
+      images: [meta.cover],
     },
   };
 }
@@ -42,6 +50,22 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          articleSchema({
+            slug: meta.slug,
+            title: meta.title,
+            excerpt: meta.excerpt,
+            publishedAt: meta.publishedAt,
+            author: meta.author,
+            cover: meta.cover,
+          }),
+          breadcrumbSchema([
+            { name: "Blog", path: "/blog" },
+            { name: meta.title, path: `/blog/${meta.slug}` },
+          ]),
+        ]}
+      />
       <article className="site-container py-12">
         <Link
           href="/blog"
