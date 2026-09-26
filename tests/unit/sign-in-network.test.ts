@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { describeSignIn } from "@/lib/auth/sign-in-context";
+import { browserFromClientHints, describeSignIn } from "@/lib/auth/sign-in-context";
 import { isCloudflareIp } from "@/lib/net/cloudflare";
 
 const NOW = new Date("2026-09-25T18:57:00Z");
@@ -93,5 +93,53 @@ describe("describeSignIn behind Cloudflare", () => {
       "cf-ipcountry": "XX",
     });
     expect(result.location).toBe("Unknown location");
+  });
+});
+
+const MAC_CHROME_UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36";
+
+describe("browserFromClientHints", () => {
+  it("names Brave, which sends Chrome's user agent on purpose", () => {
+    expect(
+      browserFromClientHints('"Chromium";v="152", "Brave";v="152", "Not)A;Brand";v="24"'),
+    ).toBe("Brave 152");
+  });
+
+  it("maps Google Chrome, Edge, and Opera to their everyday names", () => {
+    expect(
+      browserFromClientHints('"Google Chrome";v="152", "Chromium";v="152", "Not/A)Brand";v="8"'),
+    ).toBe("Chrome 152");
+    expect(
+      browserFromClientHints('"Microsoft Edge";v="151", "Not_A Brand";v="99", "Chromium";v="151"'),
+    ).toBe("Microsoft Edge 151");
+    expect(browserFromClientHints('"Opera";v="120", "Chromium";v="135", "Not-A.Brand";v="8"')).toBe(
+      "Opera 120",
+    );
+  });
+
+  it("returns null when the hint names no specific browser", () => {
+    expect(browserFromClientHints('"Chromium";v="152", "Not;A=Brand";v="24"')).toBeNull();
+    expect(browserFromClientHints(null)).toBeNull();
+    expect(browserFromClientHints("garbage")).toBeNull();
+  });
+
+  it("ignores brand names that look like markup", () => {
+    expect(browserFromClientHints('"<img src=x>";v="1", "Chromium";v="152"')).toBeNull();
+  });
+});
+
+describe("describeSignIn browser name", () => {
+  it("reports Brave when its client hint says so, keeping the device from the user agent", () => {
+    const result = ctx({
+      "user-agent": MAC_CHROME_UA,
+      "sec-ch-ua": '"Chromium";v="152", "Brave";v="152", "Not)A;Brand";v="24"',
+    });
+    expect(result.browser).toBe("Brave 152");
+    expect(result.device).toBe("Mac running macOS");
+  });
+
+  it("falls back to the user agent when there is no client hint (Safari, Firefox)", () => {
+    expect(ctx({ "user-agent": MAC_CHROME_UA }).browser).toBe("Chrome 152");
   });
 });
