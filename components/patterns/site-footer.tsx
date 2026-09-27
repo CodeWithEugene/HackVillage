@@ -63,7 +63,9 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-ink/10 bg-paper">
       <div className="site-container grid grid-cols-2 gap-x-6 gap-y-10 pt-16 pb-12 lg:grid-cols-[1.7fr_1fr_1fr_1fr_1.3fr] lg:gap-8">
-        <div className="col-span-2 lg:col-span-1">
+        {/* Mobile: the brand column reads as a centered stack (logo, tagline,
+            socials, newsletter); lg restores the left-aligned first column. */}
+        <div className="col-span-2 text-center lg:col-span-1 lg:text-left">
           <Link href="/" aria-label="HackVillage home" className="inline-block">
             {/* eslint-disable-next-line @next/next/no-img-element -- animated brand lockup, no static/SVG source */}
             <img
@@ -72,11 +74,11 @@ export function SiteFooter() {
               className="h-10 w-auto rounded-control"
             />
           </Link>
-          <p className="mt-5 max-w-xs text-sm leading-6 text-body-copy">
+          <p className="mx-auto mt-5 max-w-xs text-sm leading-6 text-body-copy lg:mx-0">
             Open-source infrastructure for high-impact hackathons, built for the African developer
             community.
           </p>
-          <ul className="mt-6 flex items-center gap-5">
+          <ul className="mt-6 flex items-center justify-center gap-5 lg:justify-start">
             {SOCIAL_LINKS.map(({ label, href, Icon }) => (
               <li key={href}>
                 <a
@@ -98,7 +100,12 @@ export function SiteFooter() {
             <p className="mt-1 mb-3 text-xs text-body-copy">
               New hackathons and guides, straight to your inbox.
             </p>
-            <NewsletterForm tone="light" />
+            {/* The form is a capped-width block (340px) — flex centers it on
+                 mobile; text-left keeps the input placeholder from inheriting
+                 the column's centering. lg restores the plain block flow. */}
+            <div className="flex justify-center text-left lg:block">
+              <NewsletterForm tone="light" />
+            </div>
           </div>
         </div>
 
