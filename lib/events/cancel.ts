@@ -1,3 +1,4 @@
+import type { EventStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { sendNotification } from "@/lib/notifications/send";
 import { eventCancelledEmail } from "@/lib/notifications/templates/events";
@@ -60,9 +61,17 @@ export async function cancelEventAsOrganizer(input: {
     );
   }
 
-  await prisma.$transaction([
-    prisma.event.update({ where: { id: event.id }, data: { status: "CANCELLED" } }),
-    prisma.auditLog.create({
+  await prisma.$transaction(async (tx) => {
+    // Conditional on the status checked above, so a hackathon that went live
+    // (vault locked) in the meantime is never cancelled from this path.
+    const cancelled = await tx.event.updateMany({
+      where: { id: event.id, status: { in: ["DRAFT", "PENDING_DEPOSIT"] } },
+      data: { status: "CANCELLED" },
+    });
+    if (cancelled.count === 0) {
+      throw new EventCancelError("This hackathon changed state. Refresh the page and try again.", "WRONG_STATE");
+    }
+    await tx.auditLog.create({
       data: {
         actorId: input.userId,
         action: "event.cancelled",
@@ -70,13 +79,13 @@ export async function cancelEventAsOrganizer(input: {
         entityId: event.id,
         reason: "Cancelled by the organizer.",
       },
-    }),
-  ]);
+    });
+  });
   return { slug: event.slug };
 }
 
 /** Statuses an admin may still cancel: anything before winners are announced. */
-const ADMIN_CANCELLABLE_STATUSES = new Set([
+const ADMIN_CANCELLABLE_STATUSES = new Set<EventStatus>([
   "DRAFT",
   "PENDING_DEPOSIT",
   "LIVE",
@@ -110,14 +119,25 @@ export async function cancelEventAsAdmin(input: {
   if (!event) throw new EventCancelError("Hackathon not found.", "NOT_FOUND");
   if (!ADMIN_CANCELLABLE_STATUSES.has(event.status)) {
     throw new EventCancelError(
-      "Hackathons with announced winners can't be cancelled — resolve payouts and disputes instead.",
+      "Hackathons with announced winners can't be cancelled. Resolve payouts and disputes instead.",
       "WRONG_STATE"
     );
   }
 
-  await prisma.$transaction([
-    prisma.event.update({ where: { id: event.id }, data: { status: "CANCELLED" } }),
-    prisma.auditLog.create({
+  await prisma.$transaction(async (tx) => {
+    // Conditional on the status checked above: if winners were announced in
+    // the meantime, nothing is cancelled and no refund follows.
+    const cancelled = await tx.event.updateMany({
+      where: { id: event.id, status: { in: [...ADMIN_CANCELLABLE_STATUSES] } },
+      data: { status: "CANCELLED" },
+    });
+    if (cancelled.count === 0) {
+      throw new EventCancelError(
+        "This hackathon changed state (winners may have just been announced). Refresh the page.",
+        "WRONG_STATE"
+      );
+    }
+    await tx.auditLog.create({
       data: {
         actorId: input.adminId,
         action: "event.admin-cancelled",
@@ -125,8 +145,8 @@ export async function cancelEventAsAdmin(input: {
         entityId: event.id,
         reason: input.reason,
       },
-    }),
-  ]);
+    });
+  });
 
   // The vault refund runs outside the status transaction: refundLockedVault
   // owns its own state machine + attestation and is idempotent.

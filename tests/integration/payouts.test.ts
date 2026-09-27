@@ -227,6 +227,35 @@ describe("payout engine (integration)", () => {
     ).rejects.toMatchObject({ code: "WRONG_STATE" });
   });
 
+  it("announces nothing when the hackathon leaves judging after the read (cancel race)", async () => {
+    // An admin cancel commits between announce's read and its write.
+    const delegate = prisma.event as unknown as Record<string, unknown>;
+    const realFindUnique = prisma.event.findUnique;
+    delegate.findUnique = async (args: Parameters<typeof realFindUnique>[0]) => {
+      delegate.findUnique = realFindUnique;
+      const row = await realFindUnique(args);
+      await prisma.event.update({ where: { id: world.eventId }, data: { status: "CANCELLED" } });
+      return row;
+    };
+    try {
+      await expect(
+        announceWinners({
+          eventId: world.eventId,
+          organizerId: world.organizerId,
+          placements: [
+            { place: 1, teamId: world.teamIds[0] },
+            { place: 2, teamId: world.teamIds[1] },
+          ],
+        })
+      ).rejects.toMatchObject({ code: "WRONG_STATE" });
+    } finally {
+      delegate.findUnique = realFindUnique;
+      await prisma.event.update({ where: { id: world.eventId }, data: { status: "JUDGING" } });
+    }
+    expect(await prisma.winner.count({ where: { eventId: world.eventId } })).toBe(0);
+    expect(await prisma.payout.count({ where: { winner: { eventId: world.eventId } } })).toBe(0);
+  });
+
   it("announces winners: creates winners, milestones, instant payout rows atomically", async () => {
     await announceWinners({
       eventId: world.eventId,

@@ -253,10 +253,19 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
         });
       }
 
-      await tx.event.update({
-        where: { id: event.id },
+      // Conditional on the status checked above: if an admin cancelled (and
+      // refunded) the hackathon in the meantime, nothing is announced and the
+      // winners and payouts created in this transaction roll back.
+      const announced = await tx.event.updateMany({
+        where: { id: event.id, status: "JUDGING" },
         data: { status: "WINNERS_ANNOUNCED" },
       });
+      if (announced.count === 0) {
+        throw new PayoutError(
+          "This hackathon is no longer in judging, so winners weren't announced. Refresh the page.",
+          "WRONG_STATE"
+        );
+      }
     });
   } catch (error) {
     // Unique ({eventId, place}) on Winner — a concurrent/duplicate announce.
@@ -355,20 +364,26 @@ export async function executePayout(payoutId: string): Promise<ExecuteResult> {
   const attempt = payout.attemptCount + 1;
   const reference = transferReference(payout.id, attempt);
 
+  // Resolve the payment port before claiming: if it's unavailable (no key in
+  // production), the job fails here and nothing is left half-claimed.
+  const paystack = getPaystackPort();
+
   // Mark PROCESSING first (claim the attempt) so a concurrent worker or a
-  // replayed job sees "duplicate" and stands down.
+  // replayed job sees "duplicate" and stands down. The reference is stored
+  // with the claim, so even a crash mid-request leaves the sweep a reference
+  // to check with the provider.
   const claimed = await prisma.payout.updateMany({
     where: { id: payout.id, status: { in: ["QUEUED", "FAILED"] } },
-    data: { status: "PROCESSING", attemptCount: attempt },
+    data: { status: "PROCESSING", attemptCount: attempt, paystackReference: reference },
   });
   if (claimed.count === 0) return { outcome: "duplicate" };
 
   try {
-    const transfer = await getPaystackPort().initiateTransfer({
+    const transfer = await paystack.initiateTransfer({
       reference,
       recipientCode: payout.recipientCode,
       amountKes: payout.amountKes,
-      reason: `${payout.winner.event.title} — ${payout.tranche.toLowerCase()} prize`,
+      reason: `${payout.winner.event.title}, ${payout.tranche.toLowerCase()} prize`,
     });
 
     await prisma.payout.update({
@@ -391,10 +406,44 @@ export async function executePayout(payoutId: string): Promise<ExecuteResult> {
     }
     return { outcome: "processing" };
   } catch (error) {
+    // Ambiguous: a timeout or dropped connection can happen after Paystack
+    // already accepted the transfer. Retrying under a new reference would pay
+    // twice, so ask the provider what happened to this attempt first.
     const message = error instanceof Error ? error.message : "Unknown transfer error.";
-    await handleTransferFailure(payout.id, reference, message);
-    return { outcome: "failed" };
+    const truth = await paystack
+      .transferStatus(reference)
+      .catch(() => ({ status: "unknown" as const }));
+    const next = afterAmbiguousTransferError(truth.status);
+    if (next === "confirm") {
+      await confirmTransferSuccess(payout.id, reference);
+      return { outcome: "succeeded" };
+    }
+    if (next === "retry") {
+      await handleTransferFailure(payout.id, reference, message);
+      return { outcome: "failed" };
+    }
+    // Pending or unverifiable: stay PROCESSING (fail closed). The stuck-payout
+    // sweep re-checks the provider and pages ops if it never resolves.
+    await prisma.payout.update({
+      where: { id: payout.id },
+      data: { lastError: `Ambiguous transfer error (${truth.status}): ${message}`.slice(0, 400) },
+    });
+    console.error(`[payout] ambiguous transfer error payout=${payout.id} ref=${reference} provider=${truth.status}`);
+    return { outcome: "processing" };
   }
+}
+
+/**
+ * What to do after the transfer request itself threw. Only a provider answer
+ * that the attempt is dead (failed, reversed, or never created) allows a retry
+ * with a new reference; a live or unverifiable one never does.
+ */
+export function afterAmbiguousTransferError(
+  status: "success" | "failed" | "pending" | "reversed" | "not_found" | "unknown",
+): "confirm" | "retry" | "hold" {
+  if (status === "success") return "confirm";
+  if (status === "failed" || status === "reversed" || status === "not_found") return "retry";
+  return "hold";
 }
 
 /** Transfer confirmed → terminal success + vault/ledger advancement. */
@@ -425,7 +474,7 @@ export async function confirmTransferSuccess(payoutId: string, reference: string
         action: "payout.confirm-on-reversed",
         entity: "Payout",
         entityId: payoutId,
-        reason: `transfer.success arrived for REVERSED payout (ref ${reference}) — refused`,
+        reason: `transfer.success arrived for REVERSED payout (ref ${reference}), refused`,
         meta: { reference, eventTitle: payout.winner.event.title },
       },
     });
@@ -815,7 +864,9 @@ export async function sweepStuckPayouts(): Promise<number> {
           driven += 1;
           continue;
         }
-        if (truth.status === "failed" || truth.status === "reversed") {
+        // not_found: Paystack answered and never created this transfer, so a
+        // fresh attempt can't duplicate it.
+        if (truth.status === "failed" || truth.status === "reversed" || truth.status === "not_found") {
           console.warn(
             `[payout] sweep resolving stuck payout ${payout.id}: provider says ${truth.status}`
           );

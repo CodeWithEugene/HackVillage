@@ -22,7 +22,7 @@ export async function POST(
   }
   const user = await currentUser();
   if (user) {
-    const limit = await rateLimit(`mutate:${user.id}`, 30, 60 * 60 * 1000);
+    const limit = await rateLimit(`judge-invite:${user.id}`, 30, 60 * 60 * 1000);
     if (!limit.ok) {
       return NextResponse.json(
         { error: "Too many attempts. Try again later." },

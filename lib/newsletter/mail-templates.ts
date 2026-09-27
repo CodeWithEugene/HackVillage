@@ -43,7 +43,7 @@ export function newsletterResubscribeConfirmEmail(confirmUrl: string): EmailTemp
       preheader: "You (or someone with your address) asked to re-subscribe.",
       section: {
         heading: "Confirm Your Re-Subscription",
-        bodyHtml: html`<p style="margin:0;">We got a new subscription request for this address, but it had unsubscribed before. If that was you, confirm below and you're back on the list. If it wasn't, ignore this email — you'll stay unsubscribed.</p>`,
+        bodyHtml: html`<p style="margin:0;">We got a new subscription request for this address, but it had unsubscribed before. If that was you, confirm below and you're back on the list. If it wasn't, ignore this email. You'll stay unsubscribed.</p>`,
         ctaUrl: confirmUrl,
         ctaLabel: "Yes, Re-Subscribe Me",
       },
@@ -51,7 +51,7 @@ export function newsletterResubscribeConfirmEmail(confirmUrl: string): EmailTemp
     text: renderText([
       "We got a new subscription request for this address, but it had unsubscribed before.",
       `Confirm here to re-subscribe: ${confirmUrl}`,
-      "If it wasn't you, ignore this email — you'll stay unsubscribed.",
+      "If it wasn't you, ignore this email, and you'll stay unsubscribed.",
     ]),
   };
 }

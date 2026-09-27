@@ -19,7 +19,7 @@ import { LEDGER_TYPE_LABELS, payloadAmountKes, payloadReference, shortenHash } f
 export const metadata: Metadata = {
   title: "The Public Ledger: Every Prize Lock And Payout, Verifiable",
   description:
-    "Every hackathon prize pool locked, paid out or refunded on HackVillage is recorded on a public ledger. Verify each entry yourself — radical transparency is the product.",
+    "Every hackathon prize pool locked, paid out or refunded on HackVillage is recorded on a public ledger. Verify each entry yourself: radical transparency is the product.",
   alternates: { canonical: "/trust" },
   openGraph: pageOpenGraph("/trust"),
 };
@@ -238,7 +238,7 @@ export default async function TrustPage({ searchParams }: PageProps) {
                           </td>
                           <td className="px-4 py-3">{LEDGER_TYPE_LABELS[entry.type]}</td>
                           <td className="px-4 py-3 font-semibold text-ink">
-                            {amount === null ? "—" : formatKes(amount)}
+                            {amount === null ? "None" : formatKes(amount)}
                           </td>
                           <td className="px-4 py-3 font-mono text-xs">
                             {onChain ? (

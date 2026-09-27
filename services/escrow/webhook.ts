@@ -191,7 +191,7 @@ async function routeVerifiedEvent(
             action: "payout.reversed-after-success",
             entity: "Payout",
             entityId: payout.id,
-            reason: `Paystack reversed transfer ${reference} AFTER the payout succeeded — funds clawed back provider-side`,
+            reason: `Paystack reversed transfer ${reference} AFTER the payout succeeded, so funds clawed back provider-side`,
             meta: {
               reference,
               amountKes: payout.amountKes,
@@ -349,8 +349,8 @@ function orphanedChargeEmail(input: {
     html: renderEmail({
       preheader: "Real money arrived for a deposit we can no longer credit.",
       section: {
-        heading: "Orphaned Charge — Manual Repair",
-        bodyHtml: html`<p style="margin:0;">Paystack confirmed a charge for <strong>${input.eventTitle}</strong>, but the deposit was already ${input.depositStatus} (the organizer paid after the 24h window). The money is NOT lost — verify the charge in Paystack, then either refund it or credit the vault manually.</p>`,
+        heading: "Orphaned Charge: Manual Repair",
+        bodyHtml: html`<p style="margin:0;">Paystack confirmed a charge for <strong>${input.eventTitle}</strong>, but the deposit was already ${input.depositStatus} (the organizer paid after the 24h window). The money is NOT lost. Verify the charge in Paystack, then either refund it or credit the vault manually.</p>`,
         details: [
           { label: "Deposit reference", value: input.reference },
           { label: "Hackathon", value: input.eventSlug },
@@ -397,7 +397,7 @@ function clawbackAfterSuccessEmail(
     text: renderText([
       `Paystack reversed transfer ${reference} for ${eventTitle} after success.`,
       `Payout ${payoutId}, winner @${winnerHandle}, KES ${amountKes}.`,
-      `The payout stays SUCCEEDED — recover funds manually.`,
+      `The payout stays SUCCEEDED. Recover funds manually.`,
       appUrl("/admin/payments"),
     ]),
   };

@@ -210,7 +210,7 @@ export async function recordChargeSuccess(input: {
         action: "escrow.deposit-overpayment",
         entity: "Deposit",
         entityId: deposit.id,
-        reason: `Deposit ${input.reference} succeeded after the vault was already LOCKED — refund manually via Paystack`,
+        reason: `Deposit ${input.reference} succeeded after the vault was already LOCKED. Refund manually via Paystack`,
         meta: {
           reference: input.reference,
           eventSlug: event.slug,

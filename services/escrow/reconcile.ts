@@ -140,7 +140,7 @@ export async function reconcileLedger(chainOverride?: ChainPort): Promise<Reconc
         findings.push({
           kind: "chain-state-mismatch",
           eventId: vault.eventId,
-          detail: `DB vault is ${vault.chainState} but no vault exists on-chain — re-enqueued vault creation.`,
+          detail: `DB vault is ${vault.chainState} but no vault exists on-chain. Re-enqueued vault creation.`,
         });
         await enqueue(
           "escrow.attest-vault-created",
@@ -157,7 +157,7 @@ export async function reconcileLedger(chainOverride?: ChainPort): Promise<Reconc
         findings.push({
           kind: "vault-state-mismatch",
           eventId: vault.eventId,
-          detail: `On-chain vault is REFUNDED but DB vault is ${vault.chainState} — investigate before any payout.`,
+          detail: `On-chain vault is REFUNDED but DB vault is ${vault.chainState}. Investigate before any payout.`,
         });
       } else {
         const order = ["AWAITING", "LOCKED", "HALF_RELEASED", "SETTLED"];
@@ -165,7 +165,7 @@ export async function reconcileLedger(chainOverride?: ChainPort): Promise<Reconc
           findings.push({
             kind: "vault-state-mismatch",
             eventId: vault.eventId,
-            detail: `On-chain state ${onChain.state} is ahead of DB vault ${vault.chainState} — investigate.`,
+            detail: `On-chain state ${onChain.state} is ahead of DB vault ${vault.chainState}. Investigate.`,
           });
         }
       }
@@ -175,7 +175,7 @@ export async function reconcileLedger(chainOverride?: ChainPort): Promise<Reconc
         findings.push({
           kind: "chain-state-mismatch",
           eventId: vault.eventId,
-          detail: `DB vault is ${vault.chainState} but on-chain state is ${onChain.state} — re-enqueued lock attestation.`,
+          detail: `DB vault is ${vault.chainState} but on-chain state is ${onChain.state}. Re-enqueued lock attestation.`,
         });
         await enqueue(
           "escrow.attest-vault-locked",
@@ -194,7 +194,7 @@ export async function reconcileLedger(chainOverride?: ChainPort): Promise<Reconc
         findings.push({
           kind: "chain-state-mismatch",
           eventId: vault.eventId,
-          detail: `On-chain state ${onChain.state} is behind DB for payout ${payout.id} (${payout.tranche}) — re-enqueued attestation.`,
+          detail: `On-chain state ${onChain.state} is behind DB for payout ${payout.id} (${payout.tranche}). Re-enqueued attestation.`,
         });
         await enqueue(
           "payout.attest",

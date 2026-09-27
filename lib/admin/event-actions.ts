@@ -26,7 +26,7 @@ export async function adminCancelEventAction(
   const parsedReason = z.string().trim().min(4).max(500).safeParse(reason);
   if (!parsedId.success) return { error: "Unknown hackathon." };
   if (!parsedReason.success) {
-    return { error: "Give a short reason (at least 4 characters) — it's audit-logged." };
+    return { error: "Give a short reason (at least 4 characters), since it's audit-logged." };
   }
 
   try {

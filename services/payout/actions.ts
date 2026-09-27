@@ -135,7 +135,7 @@ export async function confirmMilestoneAction(winnerId: string): Promise<PayoutAc
   } catch (error) {
     // The unique idempotency key — a double-click milestone confirm.
     if (isUniqueViolation(error)) {
-      return { error: "That milestone was already confirmed — refresh the page." };
+      return { error: "That milestone was already confirmed. Refresh the page." };
     }
     return toState(error);
   }

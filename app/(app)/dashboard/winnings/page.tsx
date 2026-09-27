@@ -111,7 +111,7 @@ export default async function WinningsPage() {
           description="When you win a Prize Verified hackathon, the 50% instant tranche lands here the same day, tracked to the shilling."
           action={
             <Link href="/hackathons">
-              <Button arrow>Find a hackathon</Button>
+              <Button arrow>Find A Hackathon</Button>
             </Link>
           }
         />

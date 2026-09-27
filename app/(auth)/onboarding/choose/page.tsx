@@ -21,7 +21,7 @@ export default async function OnboardingChoosePage() {
           <LogIn aria-hidden className="size-5" /> Sign In To Choose Your Path
         </CardTitle>
         <CardDescription>
-          Pick organizer or developer right after you sign in — we&apos;ll bring you straight back
+          Pick organizer or developer right after you sign in. We&apos;ll bring you straight back
           here.
         </CardDescription>
         <div className="mt-5 flex flex-wrap justify-center gap-3">

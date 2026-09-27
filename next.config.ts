@@ -67,6 +67,7 @@ const HTML_LIMITED_BOTS = new RegExp(
  * Media lives on a Cloudflare R2 public URL (lib/ports/storage.ts): either
  * R2_PUBLIC_BASE or the derived pub-<account>.r2.dev host. Only the origin is
  * allow-listed — paths stay unrestricted so bucket layout can change.
+ * Headers are computed at build time, so changing R2 env vars needs a redeploy.
  */
 function r2PublicOrigin(): string | null {
   const explicit = process.env.R2_PUBLIC_BASE;
@@ -83,6 +84,21 @@ function r2PublicOrigin(): string | null {
 }
 
 /**
+ * Browser error reports go to the ingest host named in the public DSN
+ * (https://<key>@oXXX.ingest.<region>.sentry.io/<project>). Like the R2
+ * origin, it's read at build time: changing either env var needs a redeploy.
+ */
+function sentryIngestOrigin(): string | null {
+  const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+  if (!dsn) return null;
+  try {
+    return new URL(dsn).origin;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Baseline security headers applied to every route. CSP note: script-src
  * keeps 'unsafe-inline' because the App Router streams its RSC payload in
  * inline <script> tags (self.__next_f) and app/layout.tsx ships an inline
@@ -92,6 +108,9 @@ function r2PublicOrigin(): string | null {
  */
 function securityHeaders(): Array<{ key: string; value: string }> {
   const imgSrc = ["'self'", "data:", "blob:", r2PublicOrigin()].filter(Boolean).join(" ");
+  const connectSrc = ["'self'", "https://api.paystack.co", sentryIngestOrigin()]
+    .filter(Boolean)
+    .join(" ");
   return [
     {
       key: "Content-Security-Policy",
@@ -100,7 +119,7 @@ function securityHeaders(): Array<{ key: string; value: string }> {
         "script-src 'self' 'unsafe-inline'",
         `style-src 'self' 'unsafe-inline'`,
         `img-src ${imgSrc}`,
-        "connect-src 'self' https://api.paystack.co",
+        `connect-src ${connectSrc}`,
         "frame-src https://js.paystack.co https://checkout.paystack.com",
         "frame-ancestors 'none'",
         "base-uri 'self'",

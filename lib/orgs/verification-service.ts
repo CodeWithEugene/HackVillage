@@ -34,7 +34,7 @@ export async function decideKyb(input: {
   if (!org) throw new KybDecisionError("Organization not found.");
   if (org.kycStatus !== "PENDING") {
     throw new KybDecisionError(
-      "That organization isn't awaiting review — refresh and take the next pending one."
+      "That organization isn't awaiting review. Refresh and take the next pending one."
     );
   }
 

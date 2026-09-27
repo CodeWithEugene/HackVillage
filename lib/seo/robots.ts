@@ -12,7 +12,10 @@ import { appUrl } from "@/lib/url";
  */
 const PRIVATE_PATHS = [
   "/dashboard",
-  "/organizer",
+  // Exactly /organizer and everything under /organizer/: a bare "/organizer"
+  // prefix would also block the public /organizers/<slug> trust pages.
+  "/organizer$",
+  "/organizer/",
   "/judge",
   "/admin",
   "/settings",
