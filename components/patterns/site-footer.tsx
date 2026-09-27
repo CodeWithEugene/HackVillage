@@ -117,13 +117,15 @@ export function SiteFooter() {
           </nav>
         ))}
 
-        <div className="col-span-2 lg:col-span-1">
+        {/* Mobile: sits beside "Get Started" (left/right in the 2-col grid);
+            lg: the fifth column of the footer row. */}
+        <div className="min-w-0 lg:col-span-1">
           <h2 className="font-display text-base font-semibold text-ink">Contact Us</h2>
           <ul className="mt-5 space-y-3">
             <li>
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
-                className={`flex items-center gap-2.5 ${LINK_CLASS}`}
+                className={`flex items-center gap-2.5 [overflow-wrap:anywhere] ${LINK_CLASS}`}
               >
                 <Mail aria-hidden className="size-4 shrink-0 text-brand" />
                 {CONTACT_EMAIL}
@@ -151,7 +153,7 @@ export function SiteFooter() {
             <img
               src="/images/salamander-logo-yellow.svg"
               alt="Salamander Tech Hub"
-              className="h-9 w-auto"
+              className="h-9 w-auto max-w-full"
             />
           </a>
         </div>
@@ -173,20 +175,25 @@ export function SiteFooter() {
             Creation.
           </p>
           <p className="xl:justify-self-end">
-            Apache-2.0 licensed |{" "}
-            <Link
-              href="/terms"
-              className="text-ink-soft underline underline-offset-2 hover:text-ink"
-            >
-              Terms of Service
-            </Link>{" "}
-            |{" "}
-            <Link
-              href="/privacy"
-              className="text-ink-soft underline underline-offset-2 hover:text-ink"
-            >
-              Privacy Policy
-            </Link>
+            Apache-2.0 licensed
+            {/* Mobile: legal links drop to their own centered row below the
+                license line; xl: they flow inline exactly as before. */}
+            <span className="mt-1.5 block xl:mt-0 xl:inline">
+              {" | "}
+              <Link
+                href="/terms"
+                className="text-ink-soft underline underline-offset-2 hover:text-ink"
+              >
+                Terms of Service
+              </Link>
+              {" | "}
+              <Link
+                href="/privacy"
+                className="text-ink-soft underline underline-offset-2 hover:text-ink"
+              >
+                Privacy Policy
+              </Link>
+            </span>
           </p>
         </div>
       </div>

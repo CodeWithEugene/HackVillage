@@ -851,6 +851,12 @@
       grid-column: 1;
       grid-row: auto;
     }
+    /* Mobile reads as a stacked, centered story: eyebrow, heading, copy and
+       CTA all align to the middle instead of hugging the left edge. */
+    .trust-impact-content {
+      align-items: center;
+      text-align: center;
+    }
     .trust-impact-visual {
       width: min(100%, 460px);
       margin-inline: auto;
