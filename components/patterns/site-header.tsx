@@ -61,7 +61,7 @@ export function SiteHeader({ className }: { className?: string }) {
             href="https://github.com/CodeWithEugene/HackVillage"
             target="_blank"
             rel="noopener noreferrer"
-            className="header-icon"
+            className="header-icon header-github"
             aria-label="HackVillage on GitHub (opens in a new tab)"
           >
             <Github aria-hidden className="size-4" />
