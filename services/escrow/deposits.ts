@@ -106,15 +106,21 @@ export async function initiateDeposit(eventId: string, userId: string): Promise<
 
   // Best-effort: the vault-creation attestation follows the deposit attempt.
   const { enqueue } = await import("@/lib/queue");
-  await enqueue("escrow.attest-vault-created", { eventId: event.id }, {
-    singletonKey: `vault-created:${event.id}`,
-  });
+  await enqueue(
+    "escrow.attest-vault-created",
+    { eventId: event.id },
+    {
+      singletonKey: `vault-created:${event.id}`,
+      retryLimit: 10,
+      expireInSeconds: 3600,
+    }
+  );
 
   return { checkoutUrl: checkout.authorizationUrl, simulated: checkout.simulated, reference };
 }
 
 export type ChargeOutcome =
-  | { outcome: "recorded"; vaultLocked: boolean }
+  | { outcome: "recorded"; vaultLocked: boolean; overpayment?: boolean }
   | { outcome: "duplicate" }
   | { outcome: "unknown-reference" }
   | { outcome: "not-initiated" };
@@ -123,6 +129,11 @@ export type ChargeOutcome =
  * The money state machine step: a deposit webhook confirms. Idempotent —
  * replays return "duplicate" with zero side effects (P3). The vault locks
  * and the event goes LIVE in the SAME transaction as the deposit flip (P2).
+ *
+ * OVERPAYMENT GUARD (audit remediation): when the vault is already LOCKED
+ * (pool covered) as this deposit lands, the money is still real — the deposit
+ * records SUCCEEDED — but the lock/vault side effects are skipped and ops is
+ * paged. Remediation is a MANUAL PAYSTACK REFUND of the excess deposit.
  */
 export async function recordChargeSuccess(input: {
   reference: string;
@@ -137,6 +148,7 @@ export async function recordChargeSuccess(input: {
           prizes: { select: { amountKes: true } },
           deposits: { where: { status: "SUCCEEDED" }, select: { poolAmountKes: true } },
           vault: true,
+          org: { select: { owner: { select: { email: true } } } },
         },
       },
     },
@@ -155,7 +167,7 @@ export async function recordChargeSuccess(input: {
     event.deposits.reduce((sum, d) => sum + d.poolAmountKes, 0) + deposit.poolAmountKes;
   const covered = poolCovered([succeededPool], declaredPool);
 
-  await prisma.$transaction(async (tx) => {
+  const committed = await prisma.$transaction(async (tx) => {
     await tx.deposit.update({
       where: { id: deposit.id },
       data: {
@@ -166,24 +178,75 @@ export async function recordChargeSuccess(input: {
       },
     });
 
-    if (covered && event.vault && event.vault.chainState === "AWAITING") {
-      await tx.vaultState.update({
-        where: { eventId: event.id },
-        data: { chainState: "LOCKED", lockedAt: new Date() },
-      });
-      await tx.event.update({
-        where: { id: event.id },
-        data: { status: "LIVE", prizeVerifiedAt: new Date() },
-      });
-    }
+    if (!covered || !event.vault) return { locked: false, overpaid: false };
+
+    // Atomic guard: only the deposit that flips AWAITING→LOCKED locks the
+    // vault. A second full-pool deposit (double-checkout, late split) finds
+    // the vault already locked and MUST NOT double-lock or re-flip LIVE.
+    const locked = await tx.vaultState.updateMany({
+      where: { eventId: event.id, chainState: "AWAITING" },
+      data: { chainState: "LOCKED", lockedAt: new Date() },
+    });
+    if (locked.count === 0) return { locked: false, overpaid: true };
+
+    await tx.event.update({
+      where: { id: event.id },
+      data: { status: "LIVE", prizeVerifiedAt: new Date() },
+    });
+    return { locked: true, overpaid: false };
   });
+
+  if (committed.overpaid) {
+    // Overpayment: the deposit's money is real but the pool was already
+    // covered — alert ops; remediation is a manual Paystack refund.
+    console.error(
+      `[escrow] OVERPAYMENT: deposit ${input.reference} succeeded on an already-LOCKED vault ` +
+        `(event=${event.slug}, gross=${deposit.grossAmountKes} KES, pool=${deposit.poolAmountKes} KES, ` +
+        `organizer=${event.org.owner.email}) — refund manually via Paystack`
+    );
+    await prisma.auditLog.create({
+      data: {
+        actorId: null,
+        action: "escrow.deposit-overpayment",
+        entity: "Deposit",
+        entityId: deposit.id,
+        reason: `Deposit ${input.reference} succeeded after the vault was already LOCKED — refund manually via Paystack`,
+        meta: {
+          reference: input.reference,
+          eventSlug: event.slug,
+          grossAmountKes: deposit.grossAmountKes,
+          poolAmountKes: deposit.poolAmountKes,
+          organizerEmail: event.org.owner.email,
+        },
+      },
+    });
+    const { alertAdmins } = await import("@/lib/notifications/admin-alert");
+    const { overpaymentAdminEmail } = await import("@/services/escrow/deposit-alerts");
+    await alertAdmins(
+      overpaymentAdminEmail({
+        eventSlug: event.slug,
+        eventTitle: event.title,
+        reference: input.reference,
+        grossAmountKes: deposit.grossAmountKes,
+        poolAmountKes: deposit.poolAmountKes,
+        organizerEmail: event.org.owner.email,
+      })
+    ).catch((error: unknown) => console.error("[escrow] overpayment alert failed", error));
+    return { outcome: "recorded", vaultLocked: false, overpayment: true };
+  }
 
   // Best-effort attestation enqueue after the money state committed (§10.3).
   if (covered) {
     const { enqueue } = await import("@/lib/queue");
-    await enqueue("escrow.attest-vault-locked", { eventId: event.id }, {
-      singletonKey: `vault-locked:${event.id}`,
-    });
+    await enqueue(
+      "escrow.attest-vault-locked",
+      { eventId: event.id },
+      {
+        singletonKey: `vault-locked:${event.id}`,
+        retryLimit: 10,
+        expireInSeconds: 3600,
+      }
+    );
 
     // Best-effort notifications, never allowed to affect the money outcome.
     await notifyEventLive(event.id).catch((error: unknown) => {
@@ -196,7 +259,7 @@ export async function recordChargeSuccess(input: {
     });
   }
 
-  return { outcome: "recorded", vaultLocked: covered };
+  return { outcome: "recorded", vaultLocked: committed.locked };
 }
 
 /** Notifies the organizer and registered developers once a vault locks. */

@@ -4,9 +4,17 @@ import { z } from "zod";
 
 import { prisma } from "@/lib/db";
 import { rateLimit } from "@/lib/rate-limit";
-import { newsletterWelcomeEmail } from "@/lib/newsletter/mail-templates";
+import {
+  newsletterResubscribeConfirmEmail,
+  newsletterWelcomeEmail,
+} from "@/lib/newsletter/mail-templates";
 import { sendNewsletterMail } from "@/lib/newsletter/send";
-import { verifyNewsletterUnsubscribeToken } from "@/lib/newsletter/unsubscribe-token";
+import {
+  createNewsletterResubscribeToken,
+  verifyNewsletterResubscribeToken,
+  verifyNewsletterUnsubscribeToken,
+} from "@/lib/newsletter/unsubscribe-token";
+import { appUrl } from "@/lib/url";
 
 export interface SubscribeState {
   error?: string;
@@ -22,6 +30,10 @@ const subscribeSchema = z.object({
  * a generic success message so a failed welcome-email send (provider outage,
  * for example) never blocks the subscription itself, and so the response
  * gives no signal about whether an email was already on the list.
+ *
+ * Re-subscribing a previously unsubscribed address does NOT clear
+ * unsubscribedAt directly: a forwarded form can't silently re-add someone.
+ * They get a signed confirmation link instead; only the click re-opts them in.
  */
 export async function subscribeAction(
   _prev: SubscribeState,
@@ -41,9 +53,25 @@ export async function subscribeAction(
 
   const email = parsed.data.email.toLowerCase();
 
-  const limit = rateLimit(`newsletter:${email}`, 5, 60 * 60 * 1000);
+  const limit = await rateLimit(`newsletter:${email}`, 5, 60 * 60 * 1000);
   if (!limit.ok) {
     return { error: "Too many attempts with that email, try again in a while." };
+  }
+
+  // Previously unsubscribed: confirm-instead-of-auto-resubscribe.
+  const existing = await prisma.newsletterSubscriber.findUnique({ where: { email } });
+  if (existing?.unsubscribedAt) {
+    const token = createNewsletterResubscribeToken(existing.id);
+    await sendNewsletterMail({
+      to: email,
+      subscriberId: existing.id,
+      template: newsletterResubscribeConfirmEmail(
+        appUrl(`/newsletter/resubscribe?token=${token}`)
+      ),
+    }).catch((error: unknown) =>
+      console.error("[newsletter] resubscribe confirm email failed", error)
+    );
+    return { message: "subscribed" };
   }
 
   let subscriber: { id: string };
@@ -51,7 +79,7 @@ export async function subscribeAction(
     subscriber = await prisma.newsletterSubscriber.upsert({
       where: { email },
       create: { email, source: "landing-cta" },
-      update: { unsubscribedAt: null },
+      update: {},
     });
   } catch (error: unknown) {
     // Nothing was saved, so tell the person to retry rather than claiming
@@ -96,6 +124,32 @@ export async function newsletterUnsubscribeAction(
   } catch {
     // Already removed, or the id no longer exists — either way the person
     // is not getting more mail, which is what they asked for.
+  }
+
+  return { done: true };
+}
+
+/**
+ * The click on a re-subscribe confirmation link — the ONLY path that clears
+ * unsubscribedAt for a returning address.
+ */
+export async function confirmNewsletterResubscribeAction(
+  _prev: NewsletterUnsubscribeState,
+  formData: FormData
+): Promise<NewsletterUnsubscribeState> {
+  const token = String(formData.get("token") ?? "");
+  const subscriberId = verifyNewsletterResubscribeToken(token);
+  if (!subscriberId) {
+    return { error: "This confirmation link is invalid or has expired. Subscribe again." };
+  }
+
+  try {
+    await prisma.newsletterSubscriber.update({
+      where: { id: subscriberId },
+      data: { unsubscribedAt: null },
+    });
+  } catch {
+    return { error: "We couldn't find that subscription. Subscribe again from the site." };
   }
 
   return { done: true };

@@ -16,6 +16,7 @@ import {
   payoutManualReviewAdminEmail,
   payoutMethodSavedEmail,
 } from "@/lib/notifications/templates/payouts";
+import { confirmOnReversedAdminEmail, stuckPayoutAdminEmail } from "@/services/payout/payout-alerts";
 import { appUrl } from "@/lib/url";
 import {
   payoutIdempotencyKey,
@@ -151,6 +152,28 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
     );
   }
 
+  // Placement shape (audit remediation): non-empty, every prize place covered
+  // exactly once, and each team wins at most one place — a malformed announce
+  // can never create partial or duplicated Winner/Payout rows.
+  if (input.placements.length === 0) {
+    throw new PayoutError("Select a winning team for every prize place.", "WRONG_STATE");
+  }
+  const placedPlaces = input.placements.map((placement) => placement.place);
+  if (new Set(placedPlaces).size !== placedPlaces.length) {
+    throw new PayoutError("Each prize place can be assigned only once.", "WRONG_STATE");
+  }
+  const prizePlaces = new Set(event.prizes.map((prize) => prize.place));
+  if (
+    placedPlaces.length !== prizePlaces.size ||
+    ![...prizePlaces].every((place) => placedPlaces.includes(place))
+  ) {
+    throw new PayoutError("Every prize place needs exactly one winning team.", "WRONG_STATE");
+  }
+  const placedTeamIds = input.placements.map((placement) => placement.teamId);
+  if (new Set(placedTeamIds).size !== placedTeamIds.length) {
+    throw new PayoutError("Each team can win only one prize place.", "WRONG_STATE");
+  }
+
   // Placements must map onto real prize places and submitted teams.
   const prizesByPlace = new Map(event.prizes.map((prize) => [prize.place, prize]));
   const teamById = new Map(event.teams.map((team) => [team.id, team]));
@@ -188,52 +211,60 @@ export async function announceWinners(input: AnnounceInput): Promise<void> {
     );
   }
 
-  await prisma.$transaction(async (tx) => {
-    for (const placement of input.placements) {
-      const prize = prizesByPlace.get(placement.place)!;
-      const team = teamById.get(placement.teamId)!;
-      const plan = tranchePlanFor(prize.amountKes, prize.milestoneRequired);
+  try {
+    await prisma.$transaction(async (tx) => {
+      for (const placement of input.placements) {
+        const prize = prizesByPlace.get(placement.place)!;
+        const team = teamById.get(placement.teamId)!;
+        const plan = tranchePlanFor(prize.amountKes, prize.milestoneRequired);
 
-      const winner = await tx.winner.create({
-        data: {
-          eventId: event.id,
-          teamId: team.id,
-          place: placement.place,
-          userId: team.leaderId,
-          amountKes: prize.amountKes,
-          milestoneRequired: prize.milestoneRequired,
-          announcedAt: new Date(),
-        },
-      });
+        const winner = await tx.winner.create({
+          data: {
+            eventId: event.id,
+            teamId: team.id,
+            place: placement.place,
+            userId: team.leaderId,
+            amountKes: prize.amountKes,
+            milestoneRequired: prize.milestoneRequired,
+            announcedAt: new Date(),
+          },
+        });
 
-      if (prize.milestoneRequired) {
-        await tx.milestone.create({
+        if (prize.milestoneRequired) {
+          await tx.milestone.create({
+            data: {
+              winnerId: winner.id,
+              title: `Milestone handover: ${prize.label}`,
+              description: "Deliver and confirm the handover to release the final 50%.",
+              dueAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            },
+          });
+        }
+
+        await tx.payout.create({
           data: {
             winnerId: winner.id,
-            title: `Milestone handover: ${prize.label}`,
-            description: "Deliver and confirm the handover to release the final 50%.",
-            dueAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            tranche: "INSTANT",
+            amountKes: plan.instantKes,
+            idempotencyKey: payoutIdempotencyKey(winner.id, "INSTANT"),
+            recipientCode: recipients.get(team.leaderId)!,
+            status: "QUEUED",
           },
         });
       }
 
-      await tx.payout.create({
-        data: {
-          winnerId: winner.id,
-          tranche: "INSTANT",
-          amountKes: plan.instantKes,
-          idempotencyKey: payoutIdempotencyKey(winner.id, "INSTANT"),
-          recipientCode: recipients.get(team.leaderId)!,
-          status: "QUEUED",
-        },
+      await tx.event.update({
+        where: { id: event.id },
+        data: { status: "WINNERS_ANNOUNCED" },
       });
-    }
-
-    await tx.event.update({
-      where: { id: event.id },
-      data: { status: "WINNERS_ANNOUNCED" },
     });
-  });
+  } catch (error) {
+    // Unique ({eventId, place}) on Winner — a concurrent/duplicate announce.
+    if ((error as { code?: string })?.code === "P2002") {
+      throw new PayoutError("Winners are already announced for this hackathon.", "WRONG_STATE");
+    }
+    throw error;
+  }
 
   // Enqueue after commit (P3: the sweep re-drives any strays — a payout row
   // without a running job is picked up by sweepStuckPayouts).
@@ -303,7 +334,7 @@ async function notifyResults(
 // ── Payout execution (the job — plan §10.4 STEP 4) ──────────────────────
 
 export interface ExecuteResult {
-  outcome: "succeeded" | "processing" | "failed" | "duplicate" | "not-found";
+  outcome: "succeeded" | "processing" | "failed" | "duplicate" | "not-found" | "unverified";
 }
 
 /**
@@ -373,7 +404,7 @@ export async function confirmTransferSuccess(payoutId: string, reference: string
     include: {
       winner: {
         include: {
-          user: { select: { id: true, email: true } },
+          user: { select: { id: true, email: true, handle: true } },
           event: { select: { id: true, title: true, slug: true } },
         },
       },
@@ -381,19 +412,52 @@ export async function confirmTransferSuccess(payoutId: string, reference: string
   });
   if (!payout || payout.status === "SUCCEEDED") return; // idempotent
 
+  // Clawback safety (audit remediation): a REVERSED payout must NEVER flip
+  // back to success — the provider already clawed the funds back. Log loudly
+  // and page ops instead of rewriting the money state.
+  if (payout.status === "REVERSED") {
+    console.error(
+      `[payout] REFUSED confirmTransferSuccess on REVERSED payout=${payoutId} ref=${reference} — provider reported a clawback; verify manually`
+    );
+    await prisma.auditLog.create({
+      data: {
+        actorId: null,
+        action: "payout.confirm-on-reversed",
+        entity: "Payout",
+        entityId: payoutId,
+        reason: `transfer.success arrived for REVERSED payout (ref ${reference}) — refused`,
+        meta: { reference, eventTitle: payout.winner.event.title },
+      },
+    });
+    await alertAdmins(
+      confirmOnReversedAdminEmail(
+        payout.winner.event.title,
+        payoutId,
+        reference,
+        payout.amountKes,
+        payout.winner.user.handle
+      )
+    ).catch((error: unknown) => console.error("[payout] admin alert failed", error));
+    return;
+  }
+
   await prisma.payout.update({
     where: { id: payoutId },
     data: { status: "SUCCEEDED", paidAt: new Date(), paystackReference: reference },
   });
 
   await advanceVaultAfter(payout.winner.eventId);
-  await enqueue("payout.attest", {
-    eventId: payout.winner.eventId,
-    winnerId: payout.winnerId,
-    tranche: payout.tranche,
-    amountKes: payout.amountKes,
-    txRef: reference,
-  });
+  await enqueue(
+    "payout.attest",
+    {
+      eventId: payout.winner.eventId,
+      winnerId: payout.winnerId,
+      tranche: payout.tranche,
+      amountKes: payout.amountKes,
+      txRef: reference,
+    },
+    { retryLimit: 10, expireInSeconds: 3600 }
+  );
 
   const winningsUrl = appUrl("/dashboard/winnings");
   const template =
@@ -446,7 +510,10 @@ async function advanceVaultAfter(eventId: string): Promise<void> {
     prisma.vaultState.findUnique({ where: { eventId } }),
     prisma.winner.findMany({
       where: { eventId },
-      include: { payouts: { select: { tranche: true, status: true } } },
+      include: {
+        payouts: { select: { tranche: true, status: true } },
+        milestone: { select: { confirmedAt: true } },
+      },
     }),
   ]);
   if (winners.length === 0) return;
@@ -469,13 +536,16 @@ async function advanceVaultAfter(eventId: string): Promise<void> {
   }
 
   // Fully settled: every winner's instant tranche succeeded AND every
-  // milestone-required winner's milestone tranche succeeded.
+  // milestone-required winner's milestone tranche succeeded. A ZERO-KES
+  // milestone (tiny prize) is confirmed without a payout row — nothing left
+  // to release, so a confirmed milestone with no payout row counts as settled.
   const allSettled = winners.every((winner) => {
     const instant = winner.payouts.find((p) => p.tranche === "INSTANT");
     if (!instant || instant.status !== "SUCCEEDED") return false;
     if (!winner.milestoneRequired) return true;
     const milestone = winner.payouts.find((p) => p.tranche === "MILESTONE");
-    return milestone != null && milestone.status === "SUCCEEDED";
+    if (milestone) return milestone.status === "SUCCEEDED";
+    return winner.milestone?.confirmedAt != null;
   });
 
   if (allSettled) {
@@ -499,7 +569,7 @@ async function advanceVaultAfter(eventId: string): Promise<void> {
 export async function confirmMilestone(
   winnerId: string,
   organizerId: string
-): Promise<{ outcome: "queued" | "not-required" | "wrong-state" | "forbidden" }> {
+): Promise<{ outcome: "queued" | "confirmed" | "not-required" | "wrong-state" | "forbidden" }> {
   const winner = await prisma.winner.findUnique({
     where: { id: winnerId },
     include: {
@@ -529,22 +599,50 @@ export async function confirmMilestone(
   if (!recipientCode) return { outcome: "wrong-state" };
 
   const plan = tranchePlanFor(winner.amountKes, true);
-  await prisma.$transaction(async (tx) => {
-    await tx.milestone.update({
+
+  // ZERO-KES milestone (audit remediation): a prize so small the 50/50 split
+  // leaves nothing for the second tranche. Confirm the milestone WITHOUT
+  // creating a payout row and advance the vault accounting accordingly —
+  // the money path must never mint a KES 0 transfer.
+  if (plan.milestoneKes <= 0) {
+    await prisma.milestone.update({
       where: { winnerId },
       data: { confirmedBy: organizerId, confirmedAt: new Date() },
     });
-    await tx.payout.create({
-      data: {
-        winnerId,
-        tranche: "MILESTONE",
-        amountKes: plan.milestoneKes,
-        idempotencyKey: payoutIdempotencyKey(winnerId, "MILESTONE"),
-        recipientCode,
-        status: "QUEUED",
-      },
+    await advanceVaultAfter(winner.eventId);
+    await sendNotification({
+      userId: winner.userId,
+      to: winner.user.email,
+      category: "judging",
+      template: milestoneConfirmedEmail(winner.event.title, appUrl("/dashboard/winnings")),
+    }).catch((error: unknown) => console.error("[payout] milestone notification failed", error));
+    return { outcome: "confirmed" };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.milestone.update({
+        where: { winnerId },
+        data: { confirmedBy: organizerId, confirmedAt: new Date() },
+      });
+      await tx.payout.create({
+        data: {
+          winnerId,
+          tranche: "MILESTONE",
+          amountKes: plan.milestoneKes,
+          idempotencyKey: payoutIdempotencyKey(winnerId, "MILESTONE"),
+          recipientCode,
+          status: "QUEUED",
+        },
+      });
     });
-  });
+  } catch (error) {
+    // Unique idempotency key — a double-click/race already created the payout.
+    if ((error as { code?: string })?.code === "P2002") {
+      return { outcome: "wrong-state" };
+    }
+    throw error;
+  }
 
   const created = await prisma.payout.findUnique({
     where: { idempotencyKey: payoutIdempotencyKey(winnerId, "MILESTONE") },
@@ -573,6 +671,22 @@ export async function adminRetryPayout(adminId: string, payoutId: string): Promi
   const payout = await prisma.payout.findUnique({ where: { id: payoutId } });
   if (!payout) return { outcome: "not-found" };
   if (payout.status === "SUCCEEDED") return { outcome: "duplicate" };
+
+  // Provider-truth gate (audit remediation): before re-driving, verify the
+  // ORIGINAL transfer is terminally dead (failed/reversed/never-existed). A
+  // live or pending transfer must never get a duplicate sibling — the admin
+  // verifies the original in the Paystack dashboard first.
+  if (payout.paystackReference) {
+    const truth = await getPaystackPort()
+      .transferStatus(payout.paystackReference)
+      .catch(() => ({ status: "unknown" as const }));
+    if (truth.status === "success" || truth.status === "pending") {
+      console.error(
+        `[payout] adminRetryPayout refused: ${payoutId} original transfer ${payout.paystackReference} is ${truth.status} at the provider`
+      );
+      return { outcome: "unverified" };
+    }
+  }
 
   // Reset to QUEUED for a fresh attempt cycle.
   await prisma.payout.update({
@@ -631,6 +745,21 @@ export async function adminMarkManuallyPaid(
 
   await advanceVaultAfter(payout.winner.eventId);
 
+  // The manual payment is a real transfer too — attest it on the public
+  // ledger with the receipt reference as txRef (same idempotency shape as
+  // the normal confirmTransferSuccess path).
+  await enqueue(
+    "payout.attest",
+    {
+      eventId: payout.winner.eventId,
+      winnerId: payout.winnerId,
+      tranche: payout.tranche,
+      amountKes: payout.amountKes,
+      txRef: receipt,
+    },
+    { retryLimit: 10, expireInSeconds: 3600 }
+  );
+
   await sendNotification({
     userId: payout.winner.user.id,
     to: payout.winner.user.email,
@@ -641,26 +770,135 @@ export async function adminMarkManuallyPaid(
 
 // ── Recovery sweep (cron: re-drive stuck payouts — plan §12) ────────────
 
+const STUCK_ALERT_MARKER = "[stuck>24h]";
+
 /**
- * The safety net for lost jobs: re-drives PROCESSING payouts stuck past the
- * 10-minute mark, and QUEUED/FAILED payouts that never progressed. All paths
- * converge on executePayout, which is idempotent (claims under a conditional
- * update), so the sweep can never double-pay.
+ * The safety net for lost jobs. PROCESSING payouts past the 10-minute attempt
+ * window are resolved from PROVIDER TRUTH first (audit remediation — a lost
+ * webhook must never strand money): success → confirmTransferSuccess, failed
+ * or reversed → the fail-closed retry path, pending/unknown → left alone,
+ * and after 24h stuck the admins are paged (once). QUEUED/FAILED payouts
+ * that never progressed re-drive through executePayout, which is idempotent
+ * (claims under a conditional update), so the sweep can never double-pay.
  */
 export async function sweepStuckPayouts(): Promise<number> {
   const threshold = new Date(Date.now() - 10 * 60 * 1000);
-  const payoutIds = await prisma.payout.findMany({
+  const stuck = await prisma.payout.findMany({
     where: {
       status: { in: ["QUEUED", "FAILED", "PROCESSING"] },
       queuedAt: { lt: threshold },
     },
-    select: { id: true },
+    select: {
+      id: true,
+      status: true,
+      amountKes: true,
+      attemptCount: true,
+      lastError: true,
+      queuedAt: true,
+      paystackReference: true,
+      paystackTransferCode: true,
+      winner: { select: { event: { select: { title: true } } } },
+    },
     take: 50,
   });
   let driven = 0;
-  for (const payout of payoutIds) {
+  for (const payout of stuck) {
+    if (payout.status === "PROCESSING") {
+      const key = payout.paystackReference ?? payout.paystackTransferCode;
+      if (key) {
+        const truth = await getPaystackPort()
+          .transferStatus(key)
+          .catch(() => ({ status: "unknown" as const }));
+        if (truth.status === "success") {
+          console.warn(`[payout] sweep recovered stuck payout ${payout.id}: provider says success`);
+          await confirmTransferSuccess(payout.id, payout.paystackReference ?? key);
+          driven += 1;
+          continue;
+        }
+        if (truth.status === "failed" || truth.status === "reversed") {
+          console.warn(
+            `[payout] sweep resolving stuck payout ${payout.id}: provider says ${truth.status}`
+          );
+          await handleTransferFailure(
+            payout.id,
+            payout.paystackReference ?? key,
+            `Provider reports transfer ${truth.status} (stuck-processing recovery).`
+          );
+          driven += 1;
+          continue;
+        }
+        // pending/unknown — leave it (fail-closed); after 24h stuck, page ops once.
+        if (
+          Date.now() - payout.queuedAt.getTime() > 24 * 60 * 60 * 1000 &&
+          !payout.lastError?.includes(STUCK_ALERT_MARKER)
+        ) {
+          await prisma.payout.update({
+            where: { id: payout.id },
+            data: { lastError: `${STUCK_ALERT_MARKER} provider status ${truth.status}` },
+          });
+          console.error(
+            `[payout] STUCK >24h: payout=${payout.id} reference=${key} provider=${truth.status} — manual resolution required`
+          );
+          await alertAdmins(
+            stuckPayoutAdminEmail({
+              payoutId: payout.id,
+              eventTitle: payout.winner.event.title,
+              reference: key,
+              amountKes: payout.amountKes,
+              providerStatus: truth.status,
+            })
+          ).catch((error: unknown) => console.error("[payout] stuck alert failed", error));
+        }
+        continue;
+      }
+      // No provider reference at all — the attempt crashed before the
+      // transfer call returned; safe to re-drive (fresh reference).
+    }
     const result = await executePayout(payout.id);
     if (result.outcome !== "duplicate" && result.outcome !== "not-found") driven += 1;
   }
   return driven;
+}
+
+// ── Vault healing (cron: recover stuck WINNERS_ANNOUNCED events) ─────────
+
+/**
+ * Finds events stuck WINNERS_ANNOUNCED with a LOCKED vault whose payouts are
+ * ALL terminal (no QUEUED/PROCESSING/FAILED rows) and re-runs the vault
+ * advancement — recomputed from payout facts via advanceVaultAfter, so a
+ * crashed confirm/admin path can never wedge a vault mid-lifecycle.
+ */
+export async function healVaultStates(): Promise<number> {
+  const candidates = await prisma.vaultState.findMany({
+    where: { chainState: "LOCKED", event: { status: "WINNERS_ANNOUNCED" } },
+    select: { eventId: true },
+    take: 50,
+  });
+  let healed = 0;
+  for (const candidate of candidates) {
+    const open = await prisma.payout.count({
+      where: {
+        winner: { eventId: candidate.eventId },
+        status: { in: ["QUEUED", "PROCESSING", "FAILED"] },
+      },
+    });
+    if (open > 0) continue;
+
+    const before = await prisma.vaultState.findUnique({
+      where: { eventId: candidate.eventId },
+      select: { chainState: true },
+    });
+    await advanceVaultAfter(candidate.eventId);
+    const after = await prisma.vaultState.findUnique({
+      where: { eventId: candidate.eventId },
+      select: { chainState: true },
+    });
+    if (after?.chainState !== before?.chainState) {
+      healed += 1;
+      console.warn(
+        `[payout] healed vault for event ${candidate.eventId}: ${before?.chainState} → ${after?.chainState}`
+      );
+    }
+  }
+  return healed;
 }

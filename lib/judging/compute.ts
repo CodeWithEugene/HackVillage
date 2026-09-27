@@ -74,7 +74,6 @@ export interface TeamResult {
 
 export interface RankedResults {
   results: TeamResult[];
-  allJudgesFinalized: boolean;
 }
 
 /**
@@ -114,7 +113,7 @@ export function computeResults(
     result.rank = currentRank;
   }
 
-  return { results: scored, allJudgesFinalized: scored.every((t) => t.judgeCount > 0) };
+  return { results: scored };
 }
 
 /** Score values are integers 0–10. */

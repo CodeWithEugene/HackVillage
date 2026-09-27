@@ -1,5 +1,5 @@
 import { renderEmail, renderText, type EmailTemplate } from "@/lib/notifications/layout";
-import { html } from "@/lib/notifications/html";
+import { html, trustedHtml } from "@/lib/notifications/html";
 
 export function ledgerReconciliationDigestEmail(
   findingCount: number,
@@ -7,10 +7,15 @@ export function ledgerReconciliationDigestEmail(
   findings: { kind: string; detail: string }[],
   url: string
 ): EmailTemplate {
-  const rows = findings
-    .slice(0, 10)
-    .map((f) => `<li style="margin:0 0 6px;text-align:left;">${f.kind}: ${f.detail}</li>`)
-    .join("");
+  // Each row is built with the html`` tag (kind/detail escaped), then joined
+  // and re-wrapped — interpolating a plain joined string would escape the
+  // tags and render "<li>" literally in the email.
+  const rows = trustedHtml(
+    findings
+      .slice(0, 10)
+      .map((f) => html`<li style="margin:0 0 6px;text-align:left;">${f.kind}: ${f.detail}</li>`.value)
+      .join("")
+  );
   return {
     subject: `Ledger Reconciliation Found ${findingCount} Issue${findingCount === 1 ? "" : "s"}`,
     html: renderEmail({
@@ -59,6 +64,24 @@ export function disputeOpenedOrganizerEmail(eventTitle: string): EmailTemplate {
       },
     }),
     text: renderText([`A winner opened a dispute on their milestone for ${eventTitle}. Our team is reviewing it.`]),
+  };
+}
+
+export function disputeRefundedEmail(eventTitle: string, note: string): EmailTemplate {
+  return {
+    subject: `Your Dispute On ${eventTitle} Was Resolved With A Refund`,
+    html: renderEmail({
+      preheader: "The prize pool goes back to the organizer.",
+      section: {
+        heading: "Dispute Resolved: Refund",
+        bodyHtml: html`<p style="margin:0;">Your dispute on <strong>${eventTitle}</strong> was upheld. The remaining prize pool is refunded to the organizer — no milestone payout will be made.</p>
+          <p style="margin:12px 0 0;">Note from our team: ${note}</p>`,
+      },
+    }),
+    text: renderText([
+      `Your dispute on ${eventTitle} was upheld and the remaining pool was refunded to the organizer.`,
+      `Note from our team: ${note}`,
+    ]),
   };
 }
 

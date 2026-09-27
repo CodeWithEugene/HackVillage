@@ -1,4 +1,14 @@
 export async function register(): Promise<void> {
+  // Sentry: DSN-gated, so a boot without SENTRY_DSN never even loads the SDK.
+  if (process.env.SENTRY_DSN) {
+    if (process.env.NEXT_RUNTIME === "nodejs") {
+      await import("./sentry.server.config");
+    }
+    if (process.env.NEXT_RUNTIME === "edge") {
+      await import("./sentry.edge.config");
+    }
+  }
+
   // Jobs (pg-boss + Prisma) only run on the Node.js runtime — never the edge.
   if (process.env.NEXT_RUNTIME === "nodejs") {
     // Never registered during `next build` collection passes.

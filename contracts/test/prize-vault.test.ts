@@ -159,3 +159,87 @@ describe("PrizeVault state machine", () => {
     await expect(vault.connect(outsider).lock(REF)).to.be.revertedWith("Vault: attester only");
   });
 });
+
+describe("Attester rotation (hot key holds no admin — rotate via factory)", () => {
+  const EVENT_ID = "evt_key_ceremony";
+  const REF = ethers.id("paystack-ref-rotate");
+  const WINNER = ethers.id("user_rotation");
+  const TXREF = ethers.id("transfer-ref-rotate");
+
+  async function deployViaFactory() {
+    const [deployer, attester, newAttester, outsider] = await ethers.getSigners();
+    const Factory = await ethers.getContractFactory("PrizeVaultFactory");
+    const factory = await Factory.connect(deployer).deploy();
+    await factory.waitForDeployment();
+    await factory.createVault(EVENT_ID, 500_000, attester.address);
+    const vault = await ethers.getContractAt("PrizeVault", await factory.vaultFor(EVENT_ID));
+    return { deployer, attester, newAttester, outsider, factory, vault };
+  }
+
+  it("grants the attester ONLY ATTESTER_ROLE — the factory keeps DEFAULT_ADMIN_ROLE", async () => {
+    const { attester, factory, vault } = await deployViaFactory();
+    const ADMIN = await vault.DEFAULT_ADMIN_ROLE();
+    const ATTESTER = await vault.ATTESTER_ROLE();
+    expect(await vault.hasRole(ATTESTER, attester.address)).to.equal(true);
+    expect(await vault.hasRole(ADMIN, attester.address)).to.equal(false);
+    expect(await vault.hasRole(ADMIN, await factory.getAddress())).to.equal(true);
+  });
+
+  it("blocks the attester from calling grantRole/revokeRole on the vault", async () => {
+    const { attester, newAttester, vault } = await deployViaFactory();
+    const ATTESTER = await vault.ATTESTER_ROLE();
+    await expect(
+      vault.connect(attester).grantRole(ATTESTER, newAttester.address)
+    ).to.be.revertedWithCustomError(vault, "AccessControlUnauthorizedAccount");
+    await expect(
+      vault.connect(attester).revokeRole(ATTESTER, attester.address)
+    ).to.be.revertedWithCustomError(vault, "AccessControlUnauthorizedAccount");
+  });
+
+  it("factory admin rotates: new key attests, old key is dead on-chain", async () => {
+    const { attester, newAttester, factory, vault } = await deployViaFactory();
+    const vaultAddress = await vault.getAddress();
+
+    await expect(factory.rotateAttester(vaultAddress, attester.address, newAttester.address))
+      .to.emit(factory, "AttesterRotated")
+      .withArgs(vaultAddress, attester.address, newAttester.address);
+
+    const ATTESTER = await vault.ATTESTER_ROLE();
+    expect(await vault.hasRole(ATTESTER, newAttester.address)).to.equal(true);
+    expect(await vault.hasRole(ATTESTER, attester.address)).to.equal(false);
+
+    // The new key can attest.
+    await expect(vault.connect(newAttester).lock(REF))
+      .to.emit(vault, "DepositLocked")
+      .withArgs(EVENT_ID, REF, 500_000, anyValue);
+
+    // The revoked key cannot — the role check fires before any state check.
+    await expect(vault.connect(attester).recordInstantPayout(WINNER, 250_000, TXREF))
+      .to.be.revertedWith("Vault: attester only");
+  });
+
+  it("rejects rotation from non-admin callers — including the attester itself", async () => {
+    const { attester, newAttester, outsider, factory, vault } = await deployViaFactory();
+    const vaultAddress = await vault.getAddress();
+    await expect(
+      factory.connect(outsider).rotateAttester(vaultAddress, attester.address, newAttester.address)
+    ).to.be.revertedWithCustomError(factory, "AccessControlUnauthorizedAccount");
+    await expect(
+      factory.connect(attester).rotateAttester(vaultAddress, attester.address, newAttester.address)
+    ).to.be.revertedWithCustomError(factory, "AccessControlUnauthorizedAccount");
+  });
+
+  it("validates rotation inputs", async () => {
+    const { attester, newAttester, factory, vault } = await deployViaFactory();
+    const vaultAddress = await vault.getAddress();
+    await expect(
+      factory.rotateAttester(ethers.ZeroAddress, attester.address, newAttester.address)
+    ).to.be.revertedWith("Factory: zero vault");
+    await expect(
+      factory.rotateAttester(vaultAddress, attester.address, ethers.ZeroAddress)
+    ).to.be.revertedWith("Factory: zero new attester");
+    await expect(
+      factory.rotateAttester(vaultAddress, attester.address, attester.address)
+    ).to.be.revertedWith("Factory: same attester");
+  });
+});

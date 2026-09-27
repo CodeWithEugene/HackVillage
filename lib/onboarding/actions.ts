@@ -4,22 +4,31 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { currentUser, requireUser } from "@/lib/auth/guards";
+import { requireUser } from "@/lib/auth/guards";
 import { validateHandle } from "@/lib/auth/handles";
+import { acceptOrgInvitation } from "@/lib/organizations/accept-invitation";
 import { generateInviteCode, inviteExpiryFrom } from "@/lib/organizations/invitations";
+import { createWithOrgSlugRetry, freeOrgSlugCandidates } from "@/lib/organizations/slug";
 import { prisma } from "@/lib/db";
+import { rateLimit } from "@/lib/rate-limit";
 import { sendMail } from "@/lib/ports/mail";
 import { orgInviteEmail, orgMemberJoinedEmail } from "@/lib/notifications/templates/organizations";
 import { appUrl } from "@/lib/url";
 import { parseOrgDetails } from "@/lib/orgs/details";
 
+/**
+ * Post-commit notice to the org owner. The membership is already saved, so a
+ * mail failure must never bubble up and fail the action — log only.
+ */
 async function notifyOwnerOfNewMember(orgId: string, memberName: string): Promise<void> {
   const org = await prisma.organization.findUnique({
     where: { id: orgId },
     select: { name: true, owner: { select: { email: true } } },
   });
   if (!org) return;
-  await sendMail({ to: org.owner.email, ...orgMemberJoinedEmail(memberName, org.name) });
+  await sendMail({ to: org.owner.email, ...orgMemberJoinedEmail(memberName, org.name) }).catch(
+    (error: unknown) => console.error(`[onboarding] owner-join notice failed (org=${orgId})`, error)
+  );
 }
 
 /**
@@ -34,19 +43,23 @@ export interface OnboardingActionState {
 
 // ── Role selection ───────────────────────────────────────────────────────
 
+// Server actions receive untrusted input — validate even "typed" params at runtime.
+const roleChoiceSchema = z.enum(["DEVELOPER", "ORGANIZER"]);
+
 export async function chooseRoleAction(role: "DEVELOPER" | "ORGANIZER"): Promise<void> {
+  const parsedRole = roleChoiceSchema.parse(role);
   const user = await requireUser();
 
   await prisma.$transaction(async (tx) => {
-    await tx.user.update({ where: { id: user.id }, data: { primaryRole: role } });
+    await tx.user.update({ where: { id: user.id }, data: { primaryRole: parsedRole } });
     await tx.roleGrant.upsert({
-      where: { userId_role: { userId: user.id, role } },
-      create: { userId: user.id, role },
+      where: { userId_role: { userId: user.id, role: parsedRole } },
+      create: { userId: user.id, role: parsedRole },
       update: {},
     });
   });
 
-  redirect(role === "DEVELOPER" ? "/onboarding/developer" : "/onboarding/organizer");
+  redirect(parsedRole === "DEVELOPER" ? "/onboarding/developer" : "/onboarding/organizer");
 }
 
 // ── Developer onboarding ────────────────────────────────────────────────
@@ -145,32 +158,6 @@ function orgDetailsInput(formData: FormData) {
   };
 }
 
-const RESERVED_ORG_SLUGS = new Set([
-  "admin", "api", "auth", "dashboard", "developers", "events", "hackathons", "hiring",
-  "judge", "organizer", "orgs", "settings", "signin", "signup", "support", "trust",
-]);
-
-function slugifyStem(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 30);
-}
-
-async function uniqueOrgSlug(name: string): Promise<string | null> {
-  const stem = slugifyStem(name);
-  if (stem.length < 3 || RESERVED_ORG_SLUGS.has(stem)) return null;
-  const candidates = [stem, ...Array.from({ length: 20 }, (_, i) => `${stem}-${i + 2}`)];
-  const taken = await prisma.organization.findMany({
-    where: { slug: { in: candidates, mode: "insensitive" } },
-    select: { slug: true },
-  });
-  const takenSet = new Set(taken.map((t) => t.slug.toLowerCase()));
-  return candidates.find((c) => !takenSet.has(c)) ?? null;
-}
-
 export async function createOrganizationAction(
   _prev: OnboardingActionState,
   formData: FormData
@@ -194,34 +181,43 @@ export async function createOrganizationAction(
     return { error: "You already belong to an organization. Leave it before creating another." };
   }
 
-  const slug = await uniqueOrgSlug(parsed.data.name);
-  if (!slug) {
+  const candidates = await freeOrgSlugCandidates(parsed.data.name);
+  if (candidates.length === 0) {
     return { error: "That name doesn't produce a usable address. Try different words." };
   }
 
-  await prisma.$transaction(async (tx) => {
-    const org = await tx.organization.create({
-      data: {
-        name: parsed.data.name,
-        slug,
-        about: parsed.data.about || null,
-        ...details.data,
-        ownerId: user.id,
-      },
-    });
-    await tx.orgMember.create({
-      data: { orgId: org.id, userId: user.id, role: "OWNER", status: "ACTIVE" },
-    });
-    await tx.roleGrant.upsert({
-      where: { userId_role: { userId: user.id, role: "ORGANIZER" } },
-      create: { userId: user.id, role: "ORGANIZER" },
-      update: {},
-    });
-    await tx.user.update({
-      where: { id: user.id },
-      data: { primaryRole: "ORGANIZER", onboardingCompletedAt: new Date() },
-    });
-  });
+  try {
+    // A concurrent signup can claim the pre-checked slug — retry the next
+    // candidates on the unique violation instead of erroring out.
+    await createWithOrgSlugRetry(candidates, (slug) =>
+      prisma.$transaction(async (tx) => {
+        const org = await tx.organization.create({
+          data: {
+            name: parsed.data.name,
+            slug,
+            about: parsed.data.about || null,
+            ...details.data,
+            ownerId: user.id,
+          },
+        });
+        await tx.orgMember.create({
+          data: { orgId: org.id, userId: user.id, role: "OWNER", status: "ACTIVE" },
+        });
+        await tx.roleGrant.upsert({
+          where: { userId_role: { userId: user.id, role: "ORGANIZER" } },
+          create: { userId: user.id, role: "ORGANIZER" },
+          update: {},
+        });
+        await tx.user.update({
+          where: { id: user.id },
+          data: { primaryRole: "ORGANIZER", onboardingCompletedAt: new Date() },
+        });
+      })
+    );
+  } catch (error) {
+    console.error("[onboarding] organization create failed after slug retries", error);
+    return { error: "That name is taken too often right now. Adjust it slightly." };
+  }
 
   redirect("/organizer/verification?welcome=1");
 }
@@ -239,41 +235,13 @@ export async function joinOrganizationAction(
     .safeParse(String(formData.get("code") ?? ""));
   if (!code.success) return { error: "Invite codes are the short codes organizers share." };
 
-  const invitation = await prisma.orgInvitation.findUnique({ where: { token: code.data } });
-  if (!invitation || invitation.acceptedAt || invitation.expiresAt.getTime() <= Date.now()) {
-    return { error: "That invite isn't valid anymore. Ask the organizer for a fresh one." };
-  }
-
-  await prisma.$transaction(async (tx) => {
-    const existing = await tx.orgMember.findFirst({
-      where: { orgId: invitation.orgId, userId: user.id },
-    });
-    if (!existing) {
-      await tx.orgMember.create({
-        data: { orgId: invitation.orgId, userId: user.id, role: invitation.role, status: "ACTIVE" },
-      });
-    } else if (existing.status === "REVOKED") {
-      await tx.orgMember.update({
-        where: { id: existing.id },
-        data: { status: "ACTIVE", role: invitation.role },
-      });
-    }
-    await tx.orgInvitation.update({
-      where: { id: invitation.id },
-      data: { acceptedAt: new Date() },
-    });
-    await tx.roleGrant.upsert({
-      where: { userId_role: { userId: user.id, role: "ORGANIZER" } },
-      create: { userId: user.id, role: "ORGANIZER" },
-      update: {},
-    });
-    await tx.user.update({
-      where: { id: user.id },
-      data: { primaryRole: "ORGANIZER", onboardingCompletedAt: new Date() },
-    });
+  const accepted = await acceptOrgInvitation({
+    token: code.data,
+    user: { id: user.id, email: user.email },
   });
+  if (!accepted.ok) return { error: accepted.error };
 
-  await notifyOwnerOfNewMember(invitation.orgId, user.name ?? user.email);
+  await notifyOwnerOfNewMember(accepted.orgId, user.name ?? user.email);
 
   redirect("/organizer");
 }
@@ -283,17 +251,37 @@ export async function joinOrganizationAction(
  * invitee email is given, the invite is emailed to them directly; left
  * blank, the code is still created for the organizer to share by hand.
  */
-export async function createOrgInviteAction(inviteeEmail?: string): Promise<void> {
-  const user = await currentUser();
-  if (!user?.roles.includes("ORGANIZER")) return;
+export async function createOrgInviteAction(
+  inviteeEmail?: string
+): Promise<OnboardingActionState> {
+  const user = await requireUser();
+  if (!user.roles.includes("ORGANIZER")) {
+    return { error: "Only organizers can invite teammates." };
+  }
 
   const membership = await prisma.orgMember.findFirst({
     where: { userId: user.id, status: "ACTIVE" },
     select: { orgId: true, role: true },
   });
-  if (!membership || membership.role === "MEMBER") return;
+  if (!membership || membership.role === "MEMBER") {
+    return { error: "Only organization owners and admins can create invites." };
+  }
 
   const trimmedEmail = inviteeEmail?.trim();
+  let targetEmail: string | undefined;
+  if (trimmedEmail) {
+    const parsed = z.string().email().safeParse(trimmedEmail);
+    if (!parsed.success) return { error: "That email doesn't look right." };
+    targetEmail = parsed.data.toLowerCase();
+  }
+
+  // Per-organizer cap: invite codes grant real access, so bulk creation is
+  // an abuse vector worth limiting even for legit organizers.
+  const limit = await rateLimit(`org-invite:${membership.orgId}`, 10, 60 * 60 * 1000);
+  if (!limit.ok) {
+    return { error: "Too many invites created this hour. Try again a little later." };
+  }
+
   const token = generateInviteCode();
 
   const [org] = await prisma.$transaction([
@@ -301,7 +289,10 @@ export async function createOrgInviteAction(inviteeEmail?: string): Promise<void
     prisma.orgInvitation.create({
       data: {
         orgId: membership.orgId,
-        email: trimmedEmail || user.email,
+        // Targeted invites carry the invitee's address (acceptance is bound
+        // to it); hand-shared codes store the creator's own — see
+        // acceptOrgInvitation for how that's enforced.
+        email: targetEmail ?? user.email,
         role: "MEMBER",
         token,
         expiresAt: inviteExpiryFrom(),
@@ -309,51 +300,29 @@ export async function createOrgInviteAction(inviteeEmail?: string): Promise<void
     }),
   ]);
 
-  if (trimmedEmail && org) {
+  if (targetEmail && org) {
+    // The invite already exists — a mail failure must not 500 the action.
     await sendMail({
-      to: trimmedEmail,
+      to: targetEmail,
       ...orgInviteEmail(org.name, appUrl(`/invites/${token}`)),
-    });
+    }).catch((error: unknown) => console.error("[onboarding] invite email failed", error));
   }
 
   revalidatePath("/organizer");
+  return {};
 }
 
 /** Logged-in users accepting an invite link directly (/invites/[token]). */
 export async function acceptInvitationTokenAction(token: string): Promise<void> {
   const user = await requireUser();
-  const invitation = await prisma.orgInvitation.findUnique({ where: { token } });
-  if (
-    !invitation ||
-    invitation.acceptedAt ||
-    invitation.expiresAt.getTime() <= Date.now()
-  ) {
-    redirect("/invites/invalid");
-  }
 
-  await prisma.$transaction(async (tx) => {
-    const existing = await tx.orgMember.findFirst({
-      where: { orgId: invitation.orgId, userId: user.id },
-    });
-    if (!existing) {
-      await tx.orgMember.create({
-        data: { orgId: invitation.orgId, userId: user.id, role: invitation.role, status: "ACTIVE" },
-      });
-    } else if (existing.status === "REVOKED") {
-      await tx.orgMember.update({
-        where: { id: existing.id },
-        data: { status: "ACTIVE", role: invitation.role },
-      });
-    }
-    await tx.orgInvitation.update({ where: { id: invitation.id }, data: { acceptedAt: new Date() } });
-    await tx.roleGrant.upsert({
-      where: { userId_role: { userId: user.id, role: "ORGANIZER" } },
-      create: { userId: user.id, role: "ORGANIZER" },
-      update: {},
-    });
+  const accepted = await acceptOrgInvitation({
+    token,
+    user: { id: user.id, email: user.email },
   });
+  if (!accepted.ok) redirect("/invites/invalid");
 
-  await notifyOwnerOfNewMember(invitation.orgId, user.name ?? user.email);
+  await notifyOwnerOfNewMember(accepted.orgId, user.name ?? user.email);
 
   redirect("/organizer");
 }
@@ -382,10 +351,15 @@ export async function updateDeveloperProfileAction(
   const handleError = validateHandle(handle);
   if (handleError) return { error: handleError };
 
-  const taken = await prisma.user.findFirst({
-    where: { handle: { equals: handle, mode: "insensitive" }, id: { not: user.id } },
-    select: { id: true },
-  });
+  const [taken, before] = await Promise.all([
+    prisma.user.findFirst({
+      where: { handle: { equals: handle, mode: "insensitive" }, id: { not: user.id } },
+      select: { id: true },
+    }),
+    // The session's handle can be stale — read the current one so a rename
+    // revalidates BOTH the old and the new public profile paths.
+    prisma.user.findUnique({ where: { id: user.id }, select: { handle: true } }),
+  ]);
   if (taken) return { error: "That handle is taken. Try another." };
 
   const skillList = (skills ?? "")
@@ -421,6 +395,10 @@ export async function updateDeveloperProfileAction(
   ]);
 
   revalidatePath("/dashboard/profile");
+  if (before?.handle && before.handle.toLowerCase() !== handle.toLowerCase()) {
+    // The old public URL must drop the cached profile right away.
+    revalidatePath(`/developers/${before.handle}`);
+  }
   revalidatePath(`/developers/${handle}`);
   return { message: "Profile saved." };
 }

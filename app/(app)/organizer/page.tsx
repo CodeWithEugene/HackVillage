@@ -87,7 +87,10 @@ export default async function OrganizerPage() {
         <div>
           <h1 className="font-display text-2xl font-bold text-ink">{org.name}</h1>
           <p className="mt-1 text-sm text-muted">
-            {membership.role.toLowerCase()} · hackvillage.xyz/organizers/{org.slug}
+            {membership.role.toLowerCase()} ·{" "}
+            <Link href={`/organizers/${org.slug}`} className="underline hover:text-ink">
+              /organizers/{org.slug}
+            </Link>
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -123,8 +126,8 @@ export default async function OrganizerPage() {
               <Plus aria-hidden className="size-5" /> Run A Hackathon
             </CardTitle>
             <CardDescription>
-              Five steps to a draft; publishing declares the prize pool. The vault deposit flow
-              (Phase 3) flips it live with the Prize Verified badge.
+              Five steps to a draft; publishing declares the prize pool. Locking the pool in the
+              Prize Vault flips it live with the Prize Verified badge.
             </CardDescription>
           </div>
           <Link href="/organizer/hackathons/new">

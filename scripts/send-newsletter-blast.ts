@@ -15,6 +15,10 @@
  * Add --dry-run to print recipients and the rendered subject without
  * sending anything.
  */
+import { assertNonProduction } from "./lib/assert-non-production.mjs";
+
+assertNonProduction();
+
 import { prisma } from "@/lib/db";
 import { newsletterBlastEmail } from "@/lib/newsletter/mail-templates";
 import { sendNewsletterMail } from "@/lib/newsletter/send";

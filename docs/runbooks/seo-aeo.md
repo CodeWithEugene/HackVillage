@@ -8,7 +8,7 @@ what only an owner can do in dashboards, and how to keep it healthy.
 | Surface                 | File                                                                       | Purpose                                                                                                                                                                                |
 | ----------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `/sitemap.xml`          | `app/sitemap.ts`                                                           | Discovery manifest: static pages, blog posts + pagination, public hackathons, developer profiles. Regenerates hourly.                                                                  |
-| `/robots.txt`           | `app/robots.ts`                                                            | Crawler policy + `Sitemap:` line. Private surfaces disallowed; AI crawlers explicitly allowed.                                                                                         |
+| `/robots.txt`           | `app/robots.txt/route.ts`                                                  | Crawler policy + `Sitemap:` line. Private surfaces disallowed; AI crawlers explicitly allowed.                                                                                         |
 | `/llms.txt`             | `app/llms.txt/route.ts`                                                    | AI-engine discovery file (community convention): citable facts + page map. Regenerates hourly.                                                                                         |
 | `/favicon.ico`          | `app/favicon.ico`                                                          | Legacy crawler/browser fallback (the modern icon is `app/icon.png`).                                                                                                                   |
 | `/manifest.webmanifest` | `app/manifest.ts`                                                          | PWA metadata.                                                                                                                                                                          |
@@ -19,7 +19,7 @@ what only an owner can do in dashboards, and how to keep it healthy.
 **Rules when editing pages:**
 
 - New public page → give it `alternates.canonical`, a keyword-aware title/description, and add it to `app/sitemap.ts`.
-- New private/auth surface → `robots: { index: false }` metadata (and add its path prefix to `PRIVATE_PATHS` in `app/robots.ts` only if it must not be crawled at all — noindex pages must stay crawlable).
+- New private/auth surface → `robots: { index: false }` metadata (and add its path prefix to `PRIVATE_PATHS` in `app/robots.txt/route.ts` only if it must not be crawled at all — noindex pages must stay crawlable).
 - Structured data must match visible page content exactly (Google spam policy treats mismatches as manual-action risk).
 
 ## Owner dashboard actions (one-time)

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { HandCoins } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { DisputeForm } from "@/components/legacy/legacy-cards";
 import { canOpenDispute } from "@/services/legacy/dispute-window";
@@ -96,7 +97,9 @@ export default async function WinningsPage() {
             It takes a minute.
           </CardDescription>
           <Link href="/settings" className="mt-3 inline-block">
-            <Badge variant="brand">Set up payouts in Settings →</Badge>
+            <Button size="sm" arrow>
+              Set up payouts in Settings
+            </Button>
           </Link>
         </Card>
       ) : null}
@@ -108,7 +111,7 @@ export default async function WinningsPage() {
           description="When you win a Prize Verified hackathon, the 50% instant tranche lands here the same day, tracked to the shilling."
           action={
             <Link href="/hackathons">
-              <Badge variant="brand">Find a hackathon</Badge>
+              <Button arrow>Find a hackathon</Button>
             </Link>
           }
         />

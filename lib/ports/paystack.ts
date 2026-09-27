@@ -65,6 +65,30 @@ export interface TransferResult {
   simulated: boolean;
 }
 
+/** Provider-truth lookup for the stuck-PROCESSING recovery sweep (P4). */
+export interface TransferStatusResult {
+  status: "success" | "failed" | "pending" | "reversed" | "unknown";
+}
+
+/** Maps Paystack transfer statuses onto the platform's recovery vocabulary. */
+export function mapTransferStatus(raw: string | undefined | null): TransferStatusResult["status"] {
+  switch ((raw ?? "").toLowerCase()) {
+    case "success":
+      return "success";
+    case "failed":
+      return "failed";
+    case "reversed":
+      return "reversed";
+    case "pending":
+    case "otp":
+    case "processing":
+    case "queued":
+      return "pending";
+    default:
+      return "unknown";
+  }
+}
+
 export interface PaystackPort {
   mode: "live" | "simulation";
   initializeCheckout(input: CheckoutInput): Promise<CheckoutSession>;
@@ -73,6 +97,12 @@ export interface PaystackPort {
   verifyWebhookSignature(rawBody: string, signature: string | null): boolean;
   createTransferRecipient(input: RecipientInput): Promise<RecipientResult>;
   initiateTransfer(input: TransferInput): Promise<TransferResult>;
+  /**
+   * Resolve a transfer's terminal truth from the provider. Accepts either the
+   * per-attempt reference or the transfer code. "unknown" means Paystack has
+   * no record (or it cannot be verified) — callers must stay fail-closed.
+   */
+  transferStatus(referenceOrCode: string): Promise<TransferStatusResult>;
 }
 
 const PAYSTACK_BASE = "https://api.paystack.co";
@@ -201,9 +231,33 @@ export class PaystackLive implements PaystackPort {
       simulated: false,
     };
   }
+
+  async transferStatus(referenceOrCode: string): Promise<TransferStatusResult> {
+    // Verify-by-reference first (works with the per-attempt reference we
+    // persist), then fetch-by-code (works with the transfer_code). A 404 on
+    // both means Paystack has no record of the transfer at all.
+    const endpoints = [
+      `${PAYSTACK_BASE}/transfer/verify/${encodeURIComponent(referenceOrCode)}`,
+      `${PAYSTACK_BASE}/transfer/${encodeURIComponent(referenceOrCode)}`,
+    ];
+    for (const url of endpoints) {
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${this.secretKey}` },
+      }).catch(() => null);
+      if (!response || !response.ok) continue;
+      const payload = (await response.json().catch(() => null)) as {
+        status?: boolean;
+        data?: { status?: string } | null;
+      } | null;
+      if (!payload?.status || !payload.data) continue;
+      return { status: mapTransferStatus(payload.data.status) };
+    }
+    return { status: "unknown" };
+  }
 }
 
-class PaystackSimulation implements PaystackPort {
+/** Exported for the recovery-matrix unit test — not part of the service surface. */
+export class PaystackSimulation implements PaystackPort {
   mode = "simulation" as const;
 
   async initializeCheckout(input: CheckoutInput): Promise<CheckoutSession> {
@@ -248,7 +302,21 @@ class PaystackSimulation implements PaystackPort {
     if (input.reference.includes("-simreverse")) {
       return { transferCode: `TRF_SIM_${input.reference}`, status: "reversed", simulated: true };
     }
+    if (input.reference.includes("-simpending")) {
+      return { transferCode: `TRF_SIM_${input.reference}`, status: "pending", simulated: true };
+    }
     return { transferCode: `TRF_SIM_${input.reference}`, status: "success", simulated: true };
+  }
+
+  async transferStatus(referenceOrCode: string): Promise<TransferStatusResult> {
+    // Derive from the same dev reference conventions as initiateTransfer —
+    // both the per-attempt reference and the TRF_SIM_ code form resolve.
+    const reference = referenceOrCode.replace(/^TRF_SIM_/, "");
+    if (reference.includes("-simfail")) return { status: "failed" };
+    if (reference.includes("-simreverse")) return { status: "reversed" };
+    if (reference.includes("-simpending")) return { status: "pending" };
+    if (reference.includes("-simunknown")) return { status: "unknown" };
+    return { status: "success" };
   }
 }
 
@@ -256,16 +324,36 @@ let cached: PaystackPort | null = null;
 
 export function getPaystackPort(): PaystackPort {
   if (cached) return cached;
-  const secret = getEnv().PAYSTACK_SECRET_KEY;
-  if (secret && process.env.NODE_ENV === "production") {
-    cached = new PaystackLive(secret);
-  } else if (secret) {
+  const env = getEnv();
+  const secret = env.PAYSTACK_SECRET_KEY;
+  if (secret) {
     cached = new PaystackLive(secret);
   } else {
-    console.warn(
-      "[paystack] PAYSTACK_SECRET_KEY not set — running in SIMULATION mode. " +
-        "Deposits complete via the dev checkout. Never enable in production."
-    );
+    // Fail closed: a keyless production boot must never silently simulate
+    // money movement. Pre-go-live deploys opt in explicitly via
+    // PAYSTACK_ALLOW_SIMULATION_IN_PROD=true (see .env.example).
+    if (
+      process.env.NODE_ENV === "production" &&
+      !env.PAYSTACK_ALLOW_SIMULATION_IN_PROD
+    ) {
+      throw new Error(
+        "[paystack] PAYSTACK_SECRET_KEY is required in production. " +
+          "To run the simulation port in production deliberately (pre-go-live), " +
+          "set PAYSTACK_ALLOW_SIMULATION_IN_PROD=true."
+      );
+    }
+    if (process.env.NODE_ENV === "production") {
+      console.error(
+        "[paystack] WARNING: running the SIMULATION payment port in production " +
+          "(PAYSTACK_ALLOW_SIMULATION_IN_PROD=true). No real money moves. " +
+          "Unset it the moment PAYSTACK_SECRET_KEY is configured."
+      );
+    } else {
+      console.warn(
+        "[paystack] PAYSTACK_SECRET_KEY not set — running in SIMULATION mode. " +
+          "Deposits complete via the dev checkout. Never enable in production."
+      );
+    }
     cached = new PaystackSimulation();
   }
   return cached;

@@ -49,6 +49,14 @@ export function ScoringScreen({
   );
   const [finalizeState, setFinalizeState] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // Scores the judge explicitly moved this session. Sliders never pre-fill a
+  // fabricated value: a criterion counts as scored only when it already has a
+  // saved score or the judge touched its slider.
+  const [touchedScores, setTouchedScores] = useState<Record<string, number>>({});
+  const valueFor = (criterionId: string): number | undefined =>
+    touchedScores[criterionId] ?? existingScores[criterionId];
+  const unscoredCount = criteria.filter((criterion) => valueFor(criterion.id) === undefined).length;
+  const allScored = unscoredCount === 0;
 
   const byKind = (kind: FeedbackKind) => feedback.filter((f) => f.kind === kind);
   const locked = finalized || !judgingOpen;
@@ -60,46 +68,67 @@ export function ScoringScreen({
         <Card>
           <CardTitle>Rubric Scoring: {teamName}</CardTitle>
           <CardDescription>
-            Whole numbers 0-10 per criterion. Save as often as you like; finalization locks
-            everything.
+            Whole numbers 0-10 per criterion. Move every slider to score it, even if you keep the
+            middle value. Save as often as you like; finalization locks everything.
           </CardDescription>
 
           <div className="mt-4 space-y-5">
-            {criteria.map((criterion) => (
-              <div key={criterion.id}>
-                <Label htmlFor={`score-${criterion.id}`} className="flex items-center justify-between">
-                  <span>{criterion.label}</span>
-                  <span className="font-mono text-xs text-muted">weight {criterion.weight}</span>
-                </Label>
-                <div className="flex items-center gap-3">
-                  <input
-                    id={`score-${criterion.id}`}
-                    name={`score-${criterion.id}`}
-                    type="range"
-                    min={0}
-                    max={10}
-                    step={1}
-                    defaultValue={existingScores[criterion.id] ?? 5}
-                    disabled={locked}
-                    className="h-2 flex-1 accent-[#222]"
-                  />
-                  <output
-                    htmlFor={`score-${criterion.id}`}
-                    className="w-8 text-right font-mono text-sm font-bold text-ink"
-                  >
-                    {existingScores[criterion.id] ?? 5}
-                  </output>
+            {criteria.map((criterion) => {
+              const value = valueFor(criterion.id);
+              return (
+                <div key={criterion.id}>
+                  <Label htmlFor={`score-${criterion.id}`} className="flex items-center justify-between">
+                    <span>{criterion.label}</span>
+                    <span className="font-mono text-xs text-muted">weight {criterion.weight}</span>
+                  </Label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      id={`score-${criterion.id}`}
+                      name={`score-${criterion.id}`}
+                      type="range"
+                      min={0}
+                      max={10}
+                      step={1}
+                      value={value ?? 5}
+                      onChange={(event) =>
+                        setTouchedScores((current) => ({
+                          ...current,
+                          [criterion.id]: Number(event.target.value),
+                        }))
+                      }
+                      disabled={locked}
+                      className="h-2 flex-1 accent-ink"
+                    />
+                    <output
+                      htmlFor={`score-${criterion.id}`}
+                      className={
+                        value === undefined
+                          ? "w-8 text-right font-mono text-sm font-bold text-muted"
+                          : "w-8 text-right font-mono text-sm font-bold text-ink"
+                      }
+                    >
+                      {value ?? "–"}
+                    </output>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <FormError message={scoresState.error} />
           <FormSuccess message={scoresState.message} />
           {!locked ? (
-            <Button type="submit" className="mt-5" loading={saving}>
-              Save Scores
-            </Button>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <Button type="submit" loading={saving} disabled={!allScored}>
+                Save Scores
+              </Button>
+              {!allScored ? (
+                <p className="text-xs font-semibold text-muted">
+                  {unscoredCount} {unscoredCount === 1 ? "criterion" : "criteria"} still unscored —
+                  move every slider to enable saving.
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </Card>
       </form>

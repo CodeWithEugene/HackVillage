@@ -26,9 +26,12 @@ pnpm-debug.log*
 *.log
 
 # local env files — never commit credentials (CONTRIBUTING.md)
+# .env.* covers .env.development/.env.test/.env.production etc.; the only
+# committable env file is the documented template.
 .env
 .env.local
-.env.*.local
+.env.*
+!.env.example
 
 # vercel
 .vercel
@@ -46,6 +49,3 @@ next-env.d.ts
 
 # claude-flow local tooling data
 .claude-flow/
-
-# production env (pulled from Vercel — contains real credentials)
-.env.production

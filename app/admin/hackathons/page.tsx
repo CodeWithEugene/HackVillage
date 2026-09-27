@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { AdminEventCancelForm } from "@/components/admin/event-cancel-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
@@ -51,6 +52,11 @@ export default async function AdminEventsPage() {
                 >
                   {STATUS_LABELS[event.status]}
                 </Badge>
+                {["DRAFT", "PENDING_DEPOSIT", "LIVE", "IN_PROGRESS", "JUDGING"].includes(
+                  event.status
+                ) ? (
+                  <AdminEventCancelForm eventId={event.id} eventTitle={event.title} />
+                ) : null}
               </span>
             </li>
           ))}

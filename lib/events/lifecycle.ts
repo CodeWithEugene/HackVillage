@@ -17,16 +17,13 @@ export type EventStatus =
 
 export type VenueType = "PHYSICAL" | "ONLINE" | "HYBRID";
 
-/** Statuses visible on the public browse (anything published, incl. cancelled). */
-export const PUBLIC_STATUSES: EventStatus[] = [
-  "PENDING_DEPOSIT",
-  "LIVE",
-  "IN_PROGRESS",
-  "JUDGING",
-  "WINNERS_ANNOUNCED",
-  "SETTLED",
-  "CANCELLED",
-];
+/**
+ * The media deadline: endsAt + 48h (plan §10.6). The single source for the
+ * 48-hour window — services/media re-exports it; never hardcode the window.
+ */
+export function mediaDeadlineFor(endsAt: Date): Date {
+  return new Date(endsAt.getTime() + 48 * 60 * 60 * 1000);
+}
 
 /** Registration is open before the deadline, while the event is announced. */
 export function registrationOpen(

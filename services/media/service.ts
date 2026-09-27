@@ -7,7 +7,7 @@ import {
   mediaPenaltyEmail,
 } from "@/lib/notifications/templates/trust";
 import { appUrl } from "@/lib/url";
-import { trustScoreFrom } from "@/services/media/trust";
+import { MEDIA_PENALTY_DELTA, trustScoreFrom } from "@/services/media/trust";
 
 /**
  * Media Vault service (Phase 7 — plan §10.6): 48-hour gallery deadline with
@@ -24,7 +24,8 @@ export class MediaError extends Error {
   }
 }
 
-async function requireOrgAdmin(eventId: string, userId: string) {
+/** Exported for the dev upload route, which re-verifies the same rule. */
+export async function requireOrgAdmin(eventId: string, userId: string) {
   const event = await prisma.event.findUnique({
     where: { id: eventId },
     include: {
@@ -41,6 +42,12 @@ async function requireOrgAdmin(eventId: string, userId: string) {
 
 // ── Uploads ──────────────────────────────────────────────────────────────
 
+/**
+ * Step 1: ONLY issue the upload target. No MediaAsset row is created here —
+ * a row exists iff an upload was later confirmed (see confirmMediaUpload),
+ * so phantom PENDING rows for never-uploaded files are impossible by
+ * construction.
+ */
 export async function createUploadTarget(input: {
   eventId: string;
   userId: string;
@@ -64,8 +71,11 @@ export async function createUploadTarget(input: {
   return target;
 }
 
-/** After the client uploaded to the target, register the asset. */
-export async function registerMediaAsset(input: {
+/**
+ * Step 2: after the client PUTs the file, confirm it — verifies the object
+ * actually exists in storage, THEN creates the MediaAsset row.
+ */
+export async function confirmMediaUpload(input: {
   eventId: string;
   userId: string;
   key: string;
@@ -74,7 +84,19 @@ export async function registerMediaAsset(input: {
 }): Promise<void> {
   await requireOrgAdmin(input.eventId, input.userId);
 
-  const url = getStoragePort().publicUrlFor(input.key);
+  // Only keys we issued for THIS event: no cross-event key reuse, no pointing
+  // the vault at somebody else's object.
+  if (!input.key.startsWith(`events/${input.eventId}/`)) {
+    throw new MediaError("That upload doesn't belong to this hackathon.", "FORBIDDEN");
+  }
+
+  const storage = getStoragePort();
+  const exists = await storage.verifyUploaded(input.key);
+  if (!exists) {
+    throw new MediaError("The file never landed in storage. Upload it first.", "BAD_FILE");
+  }
+
+  const url = storage.publicUrlFor(input.key);
   await prisma.mediaAsset.create({
     data: {
       eventId: input.eventId,
@@ -164,19 +186,19 @@ export async function enforceMediaDeadlines(now: Date = new Date()): Promise<Dea
         data: {
           orgId: event.orgId,
           type: "MEDIA_PENALTY",
-          delta: -10,
+          delta: MEDIA_PENALTY_DELTA,
           reason: `48-hour media deadline missed for ${event.title} (${event.id}).`,
         },
       }),
       prisma.organization.update({
         where: { id: event.orgId },
-        data: { trustScore: trustScoreFrom(event.org.trustScore, -10) },
+        data: { trustScore: trustScoreFrom(event.org.trustScore, MEDIA_PENALTY_DELTA) },
       }),
       prisma.notification.create({
         data: {
           userId: owner?.user.id ?? "unknown",
           type: "media.penalty",
-          payload: { eventId: event.id, eventTitle: event.title, delta: -10 },
+          payload: { eventId: event.id, eventTitle: event.title, delta: MEDIA_PENALTY_DELTA },
         },
       }),
     ]);
@@ -272,14 +294,15 @@ export async function grantMediaAppeal(input: {
       data: {
         orgId: input.orgId,
         type: "APPEAL_GRANTED",
-        delta: 10,
+        // Exactly reverses the media penalty.
+        delta: -MEDIA_PENALTY_DELTA,
         reason: `Media penalty appeal granted: ${input.note} (reversing: ${input.originalReason.slice(0, 120)})`,
         actorId: input.adminId,
       },
     }),
     prisma.organization.update({
       where: { id: input.orgId },
-      data: { trustScore: trustScoreFrom(org.trustScore, 10) },
+      data: { trustScore: trustScoreFrom(org.trustScore, -MEDIA_PENALTY_DELTA) },
     }),
     prisma.auditLog.create({
       data: {

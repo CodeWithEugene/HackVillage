@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth/guards";
-import { prisma } from "@/lib/db";
+import { decideKyb, KybDecisionError } from "@/lib/orgs/verification-service";
 import { sendMail } from "@/lib/ports/mail";
 import { kybApprovedEmail, kybRejectedEmail } from "@/lib/notifications/templates/organizations";
 import { appUrl } from "@/lib/url";
@@ -15,14 +15,14 @@ export interface KybDecisionState {
 /**
  * Admin KYB decisions (plan §14.1: admin overrides require a reason, logged
  * to the append-only AuditLog). Paystack-automated KYB replaces the manual
- * review at go-live (Phase 9) — the interface stays identical.
+ * review at go-live (Phase 9) — the interface stays identical. The decision
+ * itself (with its PENDING precondition) lives in decideKyb.
  */
 export async function decideKybAction(
   _prev: KybDecisionState,
   formData: FormData
 ): Promise<KybDecisionState> {
   const admin = await requireUser();
-  if (!admin.roles.includes("ADMIN")) return { error: "Admins only." };
 
   const orgId = String(formData.get("orgId") ?? "");
   const decision = String(formData.get("decision") ?? "");
@@ -35,38 +35,23 @@ export async function decideKybAction(
     return { error: "A rejection needs a reason the organizer can act on." };
   }
 
-  const org = await prisma.organization.findUnique({
-    where: { id: orgId },
-    include: { owner: { select: { email: true } } },
-  });
-  if (!org) return { error: "Organization not found." };
-
-  await prisma.$transaction([
-    prisma.organization.update({
-      where: { id: orgId },
-      data: { kycStatus: decision === "APPROVE" ? "VERIFIED" : "FAILED" },
-    }),
-    // Organizations that asked before structured submissions have no row; updateMany skips them.
-    prisma.kybSubmission.updateMany({
-      where: { orgId },
-      data: { reviewedAt: new Date(), reviewNote: reason || null },
-    }),
-    prisma.auditLog.create({
-      data: {
-        actorId: admin.id,
-        action: decision === "APPROVE" ? "kyc.approved" : "kyc.rejected",
-        entity: "Organization",
-        entityId: orgId,
-        reason: reason || null,
-      },
-    }),
-  ]);
-
-  if (decision === "APPROVE") {
-    await sendMail({ to: org.owner.email, ...kybApprovedEmail(org.name, appUrl("/organizer")) });
-  } else {
-    await sendMail({ to: org.owner.email, ...kybRejectedEmail(org.name, reason) });
+  let outcome: { orgName: string; ownerEmail: string };
+  try {
+    outcome = await decideKyb({ adminId: admin.id, orgId, decision, reason });
+  } catch (error) {
+    if (error instanceof KybDecisionError) return { error: error.message };
+    console.error(`[admin] KYB decision failed (org=${orgId})`, error);
+    return { error: "We couldn't record the decision. Please try again." };
   }
+
+  const template =
+    decision === "APPROVE"
+      ? kybApprovedEmail(outcome.orgName, appUrl("/organizer"))
+      : kybRejectedEmail(outcome.orgName, reason);
+  // The decision is committed — a mail failure must not fail the action.
+  await sendMail({ to: outcome.ownerEmail, ...template }).catch((error: unknown) =>
+    console.error(`[admin] KYB outcome email failed (org=${orgId})`, error)
+  );
 
   revalidatePath("/admin/kyb");
   return {};

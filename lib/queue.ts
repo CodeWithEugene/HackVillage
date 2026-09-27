@@ -58,10 +58,19 @@ export const JOB_NAMES = {
  * never allowed to break a money-path response: failures are logged and the
  * recovery sweep re-drives anything stuck.
  */
+export interface EnqueueOptions {
+  singletonKey?: string;
+  delaySeconds?: number;
+  /** Defaults to 5. Attestation jobs pass 10 — the chain outlives RPC blips. */
+  retryLimit?: number;
+  /** Defaults to 300s. Attestation jobs pass 3600s for slow RPC confirms. */
+  expireInSeconds?: number;
+}
+
 export async function enqueue(
   name: string,
   data: Record<string, unknown>,
-  options?: { singletonKey?: string; delaySeconds?: number }
+  options?: EnqueueOptions
 ): Promise<void> {
   try {
     const boss = await getQueue();
@@ -75,9 +84,9 @@ export async function enqueue(
       options: {
         singletonKey: options?.singletonKey,
         startAfter: options?.delaySeconds ? options.delaySeconds : undefined,
-        retryLimit: 5,
+        retryLimit: options?.retryLimit ?? 5,
         retryBackoff: true,
-        expireInSeconds: 300,
+        expireInSeconds: options?.expireInSeconds ?? 300,
       },
     });
   } catch (error) {

@@ -34,6 +34,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       images: imagesIn("hero/kenya", "journey", "trust"),
     },
     { url: appUrl("/hackathons"), changeFrequency: "daily", priority: 0.9 },
+    // The public ledger is the trust pillar — crawlers should find it easily.
+    { url: appUrl("/trust"), changeFrequency: "hourly", priority: 0.8 },
     {
       url: appUrl("/how-it-works"),
       changeFrequency: "weekly",
@@ -72,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // unreachable during a build, static and blog entries still ship and the
   // rest return at the next regeneration.
   try {
-    const [events, developers] = await Promise.all([
+    const [events, developers, organizers] = await Promise.all([
       prisma.event.findMany({
         // Demo hackathons are noindex, so they don't belong in the sitemap.
         where: { ...PUBLIC_HACKATHON_WHERE, isDemo: false },
@@ -82,6 +84,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       prisma.user.findMany({
         where: INDEXABLE_DEVELOPER_WHERE,
         select: { handle: true, email: true, updatedAt: true },
+      }),
+      // Public organizer trust pages: only organizations with at least one
+      // published hackathon earn a sitemap entry, matching page prominence.
+      prisma.organization.findMany({
+        where: { events: { some: { publishedAt: { not: null } } } },
+        select: { slug: true, updatedAt: true },
       }),
     ]);
     for (const event of events) {
@@ -104,6 +112,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: developer.updatedAt,
         changeFrequency: "weekly",
         priority: 0.5,
+      });
+    }
+    for (const organizer of organizers) {
+      entries.push({
+        url: appUrl(`/organizers/${organizer.slug}`),
+        lastModified: organizer.updatedAt,
+        changeFrequency: "weekly",
+        priority: 0.6,
       });
     }
   } catch (error) {

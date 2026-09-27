@@ -1,48 +1,39 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import { Handshake } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { ConfirmMoneyAction } from "@/components/patterns/confirm-money-action";
 import { confirmMilestoneAction } from "@/services/payout/actions";
 
-export function MilestoneConfirmer({ winnerId }: { winnerId: string }) {
-  const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-
+/**
+ * Releases the final 50% for a winner. The handover used to be a single
+ * unconfirmed click; now it passes through the money-action confirm gate
+ * (typed confirmation above the KES 250k threshold, keyed on the milestone
+ * amount).
+ */
+export function MilestoneConfirmer({
+  winnerId,
+  amountKes,
+}: {
+  winnerId: string;
+  amountKes: number;
+}) {
   return (
-    <div className="mt-3">
-      {error ? (
-        <p role="alert" className="mb-2 rounded-control border border-danger/40 bg-danger/10 p-2 text-xs font-semibold text-danger">
-          {error}
-        </p>
-      ) : null}
-      {message ? (
-        <p role="status" className="mb-2 rounded-control border border-success/40 bg-success/10 p-2 text-xs font-semibold text-success">
-          {message}
-        </p>
-      ) : null}
-      <Button
-        type="button"
-        size="sm"
-        variant="secondary"
-        loading={pending}
-        onClick={() =>
-          startTransition(async () => {
-            const result = await confirmMilestoneAction(winnerId);
-            if (result.error) {
-              setError(result.error);
-              setMessage(null);
-            } else {
-              setMessage(result.message ?? "Milestone confirmed.");
-              setError(null);
-            }
-          })
-        }
-      >
-        <Handshake aria-hidden className="size-4" /> Confirm handover, release final 50%
-      </Button>
-    </div>
+    <ConfirmMoneyAction
+      className="mt-3"
+      amountKes={amountKes}
+      confirmWord="RELEASE"
+      title="Confirm the handover and release the final 50%?"
+      description="Confirming releases the milestone tranche to the team leader immediately. Only confirm once the winner has handed over what the milestone requires."
+      confirmLabel="Confirm handover, release final 50%"
+      triggerLabel={
+        <>
+          <Handshake aria-hidden className="size-4" /> Confirm handover, release final 50%
+        </>
+      }
+      triggerVariant="secondary"
+      triggerSize="sm"
+      onConfirm={() => confirmMilestoneAction(winnerId)}
+    />
   );
 }

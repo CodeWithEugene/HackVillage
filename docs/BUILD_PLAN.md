@@ -6,6 +6,19 @@
 
 ---
 
+## v1.1 Amendments (2026-09-27)
+
+Where shipped reality diverges from the v1.0 plan text, the code is the truth:
+
+- **Sessions**: JWT sessions with DB re-verification supersede ADR-005's database sessions — revocation is preserved via re-checks (see `lib/auth/`).
+- **Routes**: `/events` was renamed to `/hackathons` across the app; `next.config.ts` redirects keep old links working.
+- **`/trust` and `/developers`**: PR #31 removed both pages; v1.1 restores `/trust` (the public ledger page). `/developers/[handle]` profiles never left — only the listing was removed.
+- **`RateLimitBucket`** added (migration `9_5_rate_limit_bucket`): rate limiting is DB-backed (atomic fixed-window upsert) with an in-memory fail-open fallback — see `lib/rate-limit.ts`.
+- **Security headers shipped**: CSP, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `frame-ancestors 'none'` in `next.config.ts` — §14.2's "strict CSP" is now real. `script-src` keeps `'unsafe-inline'` because the App Router streams RSC payloads in inline scripts; documented in `next.config.ts`.
+- **IN_PROGRESS lifecycle wired**: events transition `LIVE → IN_PROGRESS` at `startsAt` (see `lib/events/lifecycle.ts`).
+
+---
+
 ## Table of Contents
 
 1. [Executive Summary](#1-executive-summary)
@@ -739,17 +752,20 @@ Local Hardhat tests cover every legal/illegal transition + access control (unkno
 
 ## 12. Background Jobs & Scheduled Workflows (pg-boss)
 
+Queue name == job name (pg-boss v10). The registry of record is `lib/jobs/handlers.ts`; this table mirrors it:
+
 | Job | Schedule | What it does | Failure policy |
 |---|---|---|---|
 | `payout.execute` | on-enqueue | Create Paystack Transfer per payout | Retry ×5 exp-backoff → MANUAL_REVIEW |
-| `payout.retry` | cron 5m | Re-drive FAILED payouts under attempt cap | Alert admin at cap |
-| `escrow.attest` | on-enqueue | Post state transition to PrizeVault | Retry ×10 (chain RPC flaky is OK) |
-| `ledger.mirror` | on-chain event sub + nightly | Mirror + three-way reconcile | Alert on mismatch |
-| `media.deadline-check` | cron 15m | Enforce 48h vault deadline | Idempotent by (event, deadline) |
-| `legacy.checkin` | cron daily | 3-month check-in due/reminder | Idempotent by (submission, dueAt) |
-| `milestone.reminder` | cron daily | 30/60/90-day organizer nudges | — |
-| `deposit.expire` | cron hourly | Expire INITIATED deposits >24h | — |
-| `notifications.dispatch` | on-enqueue | Email (Brevo) fan-out with templates | Retry ×3, dead-letter table |
+| `payout.attest` | on-enqueue | Attest instant/milestone payout to PrizeVault | Retry ×5, backoff |
+| `escrow.attest-vault-created` | on-enqueue | Attest vault creation to PrizeVaultFactory | Retry ×5, backoff |
+| `escrow.attest-vault-locked` | on-enqueue | Attest deposit lock to PrizeVault | Retry ×5, backoff |
+| `hackathon.announce` | on-enqueue | Fan out "Prize Verified" hackathon alerts to builders | Retry ×5, backoff |
+| `escrow.cron` | cron hourly (`0 * * * *`) | `expire-deposits`: expire INITIATED deposits >24h | Idempotent re-run |
+| `payout.cron` | cron 10m (`*/10 * * * *`) | `sweep-payouts`: re-drive stuck payouts under attempt cap | Alert admin at cap |
+| `media.cron` | cron 15m (`*/15 * * * *`) | `enforce-media-deadlines`: 48h vault deadline → TrustEvent penalty | Idempotent by (event, deadline) |
+| `legacy.cron` | cron daily 09:00 (`0 9 * * *`) | `legacy-sweep`: 3-month check-ins + 30/60/90-day milestone reminders | Idempotent by (submission, dueAt) |
+| `ledger.cron` | cron nightly 03:00 (`0 3 * * *`) | `reconcile-ledger`: three-way match (webhook ⇄ DB ⇄ chain) + admin digest on findings | Alert on mismatch |
 
 All jobs idempotent (safe to re-run); all carry actor/event correlation IDs into structured logs.
 
@@ -941,12 +957,13 @@ Per workflow-architect methodology — every workflow has a status. Specs live i
 | **Instant payout (50%)** | WORKFLOW-payout-instant.md | **Built (Phase 5)** | 5 | Announce winners |
 | **Milestone payout (50%)** | WORKFLOW-payout-milestone.md | **Built (Phase 5)** | 5/6 | Organizer confirm |
 | Payout failure ops | WORKFLOW-payout-failure.md | **Built (Phase 5)** | 5 | transfer.failed |
-| Refund (pre-live cancel) | WORKFLOW-refund.md | Planned | 5 | Event cancel |
+| Refund (pre-live cancel) | WORKFLOW-refund.md | **Built (Phase 5)** — `services/escrow/refund.ts` `refundLockedVault()` (lands with the audit-remediation branch) | 5 | Event cancel |
 | Dispute resolution | WORKFLOW-dispute.md | **Built (Phase 8)** | 8 | Developer dispute |
 | 48h media enforcement | WORKFLOW-media-deadline.md | **Built (Phase 7)** | 7 | Cron |
 | Trust adjustment + appeal | — | **Built (Phase 7)** | 7 | Penalty |
 | Legacy check-in | — | **Built (Phase 8)** | 8 | Cron +3mo |
-| Introduction request/accept | — | Planned | 6 | Hiring CTA |
+| Introduction request/accept | — | **Built (Phase 6)** — `services/pow/actions.ts` | 6 | Hiring CTA |
+| Hackathon announce fan-out | — | **Built (v1.1)** — `hackathon.announce` job | — | Prize Verified go-live |
 | Notification dispatch | — | **Built (Phase 7)** | 7 | All events above |
 | Ledger reconcile (3-way) | — | **Built (Phase 9)** | 3/5 | Nightly |
 

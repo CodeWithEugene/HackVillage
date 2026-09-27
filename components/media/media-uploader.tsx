@@ -6,12 +6,17 @@ import { Image as ImageIcon, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { FormError } from "@/components/ui/input";
-import { requestUploadUrlAction, type MediaActionState } from "@/services/media/actions";
+import {
+  confirmMediaUploadAction,
+  requestUploadUrlAction,
+  type MediaActionState,
+} from "@/services/media/actions";
 
 /**
  * The media vault uploader: requests the upload target, PUTs the file (or
- * POSTs to the dev route locally), then refreshes. Simple, no chunking —
- * files are capped at 15MB by the port.
+ * POSTs to the dev route locally), then CONFIRMS the upload — the MediaAsset
+ * row only exists once the file is verifiably in storage. Simple, no
+ * chunking — files are capped at 15MB by the port.
  */
 export function MediaUploader({ eventId }: { eventId: string }) {
   const [state, action, pending] = useActionState<MediaActionState, FormData>(
@@ -19,39 +24,52 @@ export function MediaUploader({ eventId }: { eventId: string }) {
     {}
   );
   const [uploading, setUploading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   async function handleFile(formData: FormData, file: File) {
+    setError(null);
     formData.set("filename", file.name);
     formData.set("contentType", file.type);
     formData.set("sizeBytes", String(file.size));
 
     const targetState = await requestUploadUrlAction({}, formData);
-    if (targetState.error) return;
-    if (!targetState.uploadUrl) return;
+    if (targetState.error || !targetState.uploadUrl || !targetState.key) {
+      // Was previously swallowed — the uploader failed silently.
+      setError(targetState.error ?? "We couldn't prepare the upload. Try again.");
+      return;
+    }
 
     setUploading(file.name);
     try {
-      if (targetState.message === "dev-upload") {
-        // Dev mode: POST the raw file to our route.
-        await fetch(targetState.uploadUrl, {
-          method: "POST",
-          headers: { "Content-Type": file.type },
-          body: file,
-        });
-      } else {
-        // R2 mode: PUT directly with the presigned headers.
-        await fetch(targetState.uploadUrl, {
-          method: "PUT",
-          headers: targetState.uploadHeaders ?? { "Content-Type": file.type },
-          body: file,
-        });
+      const response = await fetch(targetState.uploadUrl, {
+        method: targetState.uploadUrl.includes("/api/dev/media/upload/") ? "POST" : "PUT",
+        headers: targetState.uploadHeaders ?? { "Content-Type": file.type },
+        body: file,
+      });
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as { error?: string } | null;
+        setError(body?.error ?? "The upload didn't complete. Try again.");
+        return;
       }
-      // Registration for R2 mode happened in the action; dev mode registers
-      // in the route. Either way, reload to show the gallery.
+
+      // The row is created only now, after the file verifiably landed.
+      const confirmed = await confirmMediaUploadAction({
+        eventId,
+        key: targetState.key,
+        kind: file.type.startsWith("video/") ? "VIDEO" : "PHOTO",
+        caption: String(formData.get("caption") ?? "") || undefined,
+      });
+      if (confirmed.error) {
+        setError(confirmed.error);
+        return;
+      }
+
       window.location.reload();
-    } catch (error) {
-      console.error("[media] upload failed", error);
+    } catch (uploadError) {
+      // Was previously a console.error only — the UI gave no signal.
+      console.error("[media] upload failed", uploadError);
+      setError("The upload didn't complete. Check your connection and try again.");
     } finally {
       setUploading(null);
     }
@@ -99,7 +117,7 @@ export function MediaUploader({ eventId }: { eventId: string }) {
             required
           />
         </label>
-        <FormError message={state.error} />
+        <FormError message={error ?? state.error} />
         <Button type="submit" className="mt-4" loading={pending || uploading != null}>
           Upload To The Vault
         </Button>

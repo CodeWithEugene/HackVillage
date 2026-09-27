@@ -31,7 +31,7 @@ export async function changePasswordAction(
     return { error: parsed.error.issues[0]?.message ?? "Check the form and try again." };
   }
 
-  const limit = rateLimit(`pwchange:${user.id}`, 5, 60 * 60 * 1000);
+  const limit = await rateLimit(`pwchange:${user.id}`, 5, 60 * 60 * 1000);
   if (!limit.ok) return { error: "Too many attempts. Try again later." };
 
   const { verify } = await import("@node-rs/argon2");

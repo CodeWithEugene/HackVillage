@@ -1,4 +1,6 @@
 /** Events are run and displayed on Nairobi time, wherever the server sits. */
+import { mediaDeadlineFor } from "@/lib/events/lifecycle";
+
 const EVENT_TIME_ZONE = "Africa/Nairobi";
 
 const dayMonthYear = new Intl.DateTimeFormat("en-KE", {
@@ -79,9 +81,6 @@ export function formatDateTime(date: Date): string {
   return `${pick("weekday")} ${pick("day")} ${pick("month")}, ${pick("hour")}:${pick("minute")}`;
 }
 
-/** Media must be delivered within 48 hours of the end (plan §13 media standard). */
-const MEDIA_WINDOW_MS = 48 * 60 * 60 * 1000;
-
 export interface KeyDate {
   label: string;
   at: Date;
@@ -102,10 +101,8 @@ export function keyDates(
     ["Registration closes", event.registrationDeadline],
     ["Hacking starts", event.startsAt],
     ["Submissions close", event.endsAt],
-    [
-      "Media delivered by",
-      event.mediaDeadlineAt ?? new Date(event.endsAt.getTime() + MEDIA_WINDOW_MS),
-    ],
+    // Media must be delivered within 48 hours of the end (plan §13 media standard).
+    ["Media delivered by", event.mediaDeadlineAt ?? mediaDeadlineFor(event.endsAt)],
   ];
   const nextIndex = milestones.findIndex(([, at]) => at.getTime() > now.getTime());
   return milestones.map(([label, at], index) => ({

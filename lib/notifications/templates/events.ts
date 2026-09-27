@@ -1,6 +1,30 @@
 import { renderEmail, renderText, type EmailTemplate } from "@/lib/notifications/layout";
 import { html } from "@/lib/notifications/html";
 
+export function eventCancelledEmail(
+  eventTitle: string,
+  reason: string,
+  organizerUrl: string
+): EmailTemplate {
+  return {
+    subject: `${eventTitle} Was Cancelled`,
+    html: renderEmail({
+      preheader: "The hackathon was cancelled by the platform.",
+      section: {
+        heading: "Hackathon Cancelled",
+        bodyHtml: html`<p style="margin:0;"><strong>${eventTitle}</strong> was cancelled by the HackVillage team. Any locked prize funds are returned through the refund process.</p>
+          <p style="margin:12px 0 0;">Reason: ${reason}</p>`,
+        ctaUrl: organizerUrl,
+        ctaLabel: "Open Your Organizer Page",
+      },
+    }),
+    text: renderText([
+      `${eventTitle} was cancelled by the HackVillage team. Any locked prize funds are refunded.`,
+      `Reason: ${reason}`,
+    ]),
+  };
+}
+
 export function eventPublishedEmail(eventTitle: string, eventUrl: string): EmailTemplate {
   return {
     subject: `${eventTitle} Is Published`,
