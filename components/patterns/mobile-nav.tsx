@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
 import { NavLink } from "@/components/patterns/nav-link";
+import { cn } from "@/lib/utils";
 
 interface NavLinkItem {
   href: string;
@@ -71,7 +72,7 @@ export function MobileNav({ navLinks, organizerLinks, trailingLinks }: MobileNav
         ? createPortal(
             <>
               <div
-                className={`mobile-nav-overlay${open ? "mobile-nav-overlay-open" : ""}`}
+                className={cn("mobile-nav-overlay", open && "mobile-nav-overlay-open")}
                 aria-hidden="true"
                 onClick={() => setOpen(false)}
               />
@@ -79,7 +80,7 @@ export function MobileNav({ navLinks, organizerLinks, trailingLinks }: MobileNav
               <nav
                 id="mobile-nav-panel"
                 aria-label="Mobile"
-                className={`mobile-nav-panel${open ? "mobile-nav-panel-open" : ""}`}
+                className={cn("mobile-nav-panel", open && "mobile-nav-panel-open")}
                 inert={!open}
               >
                 <div className="mobile-nav-panel-header">
