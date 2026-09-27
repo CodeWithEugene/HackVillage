@@ -4,6 +4,10 @@
  *
  *   npm run dev:cycle -- fintech-for-matatu-culture
  */
+import { assertNonProduction } from "./lib/assert-non-production.mjs";
+
+assertNonProduction();
+
 import { prisma } from "@/lib/db";
 import {
   JudgingError,

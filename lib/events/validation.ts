@@ -4,7 +4,8 @@ import { parseCategoryList } from "@/lib/events/categories";
 
 /**
  * Event wizard validation (server-authoritative). The wizard is a 5-step
- * client stepper over ONE form — this schema is the whole contract.
+ * client stepper over ONE form: the step schemas below validate each step
+ * client-side, and the merged eventWizardSchema is the server contract.
  */
 
 export const eventBasicsSchema = z.object({
@@ -46,7 +47,7 @@ export const eventProblemSchema = z.object({
     ),
 });
 
-export const prizePlaceSchema = z.object({
+const prizePlaceSchema = z.object({
   place: z.coerce.number().int().min(1).max(20),
   label: z.string().trim().min(2).max(60),
   amountKes: z.coerce.number().int().min(1_000, "Each prize must be at least KES 1,000."),
@@ -73,13 +74,6 @@ export const eventWizardSchema = eventBasicsSchema
     message: "The hackathon must end after it starts.",
     path: ["endsAt"],
   });
-
-export type EventWizardInput = z.infer<typeof eventWizardSchema>;
-
-/** Sum of prize places = the pool the organizer must fund (ADR-012). */
-export function poolFromPrizes(prizes: { amountKes: number }[]): number {
-  return prizes.reduce((total, prize) => total + prize.amountKes, 0);
-}
 
 /** Places must be unique (unique(eventId, place) is a DB constraint too). */
 export function placesAreUnique(prizes: { place: number }[]): boolean {

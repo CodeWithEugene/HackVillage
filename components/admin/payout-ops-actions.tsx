@@ -1,23 +1,22 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { RotateCcw } from "lucide-react";
 
+import { ConfirmMoneyAction } from "@/components/patterns/confirm-money-action";
 import { Button } from "@/components/ui/button";
-import { FormError, FormSuccess, Input } from "@/components/ui/input";
-import {
-  adminMarkPaidAction,
-  adminRetryPayoutAction,
-  type PayoutActionState,
-} from "@/services/payout/actions";
+import { Input, Label } from "@/components/ui/input";
+import { adminMarkPaidAction, adminRetryPayoutAction } from "@/services/payout/actions";
 
-export function PayoutOpsActions({ payoutId }: { payoutId: string }) {
+export function PayoutOpsActions({
+  payoutId,
+  amountKes,
+}: {
+  payoutId: string;
+  amountKes: number;
+}) {
   const [retry, startRetry] = useTransition();
   const [retryError, setRetryError] = useState<string | null>(null);
-  const [markState, markPaid, marking] = useActionState<PayoutActionState, FormData>(
-    adminMarkPaidAction,
-    {}
-  );
 
   return (
     <div className="mt-3 space-y-3">
@@ -43,24 +42,36 @@ export function PayoutOpsActions({ payoutId }: { payoutId: string }) {
         ) : null}
       </div>
 
-      <form action={markPaid} className="flex flex-wrap items-end gap-2">
+      <ConfirmMoneyAction
+        amountKes={amountKes}
+        confirmWord="PAID"
+        title="Mark this payout as paid?"
+        description="Records the payout as manually paid with the receipt reference and writes an audit entry. Only do this against a real payment receipt."
+        confirmLabel="Mark Paid With Receipt"
+        triggerLabel="Mark Paid With Receipt"
+        triggerVariant="danger"
+        triggerSize="sm"
+        onConfirm={async (formData) => {
+          const receipt = String(formData.get("receipt") ?? "").trim();
+          if (receipt.length < 6) {
+            return { error: "Paste the payment receipt reference (at least 6 characters)." };
+          }
+          return adminMarkPaidAction({}, formData);
+        }}
+      >
         <input type="hidden" name="payoutId" value={payoutId} />
-        <div className="min-w-48 flex-1">
+        <div>
+          <Label htmlFor={`receipt-${payoutId}`}>Receipt / transaction reference</Label>
           <Input
+            id={`receipt-${payoutId}`}
             name="receipt"
-            placeholder="Receipt / transaction reference (required)"
-            aria-label={`Receipt for payout ${payoutId}`}
+            placeholder="e.g. MPesa code or bank reference"
             required
             minLength={6}
             maxLength={200}
           />
         </div>
-        <Button type="submit" size="sm" variant="danger" loading={marking}>
-          Mark Paid With Receipt
-        </Button>
-      </form>
-      <FormError message={markState.error} />
-      <FormSuccess message={markState.message} />
+      </ConfirmMoneyAction>
     </div>
   );
 }

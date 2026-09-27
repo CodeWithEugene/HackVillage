@@ -7,7 +7,12 @@
  *
  * Success bar: zero 5xx; p95 under 2s for reads, 3s for authenticated writes.
  */
+import { assertLocalTarget, assertNonProduction } from "./lib/assert-non-production.mjs";
+
 const BASE = process.argv[2] ?? "http://localhost:3001";
+
+assertNonProduction();
+assertLocalTarget(BASE);
 const JUDGE_COUNT = Number(process.env.LOAD_JUDGES ?? 500);
 const READ_ROUNDS = Number(process.env.LOAD_READ_ROUNDS ?? 200);
 

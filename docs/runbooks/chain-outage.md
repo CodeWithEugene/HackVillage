@@ -13,7 +13,7 @@
 
 1. Confirm the RPC provider is back (`RPC_URL` health).
 2. Re-drive parked attestations: for each event missing a ledger entry, call `attestVaultCreation` / `attestVaultLocked` / `attestPayout` — all idempotent (one entry per type/entity; covered by integration tests).
-3. Run the nightly reconciliation job (`ledger.reconcile-cron`): a three-way match of DB rows ↔ chain events ↔ Paystack references. Investigate any mismatch before trusting the mirror again.
+3. Run the nightly reconciliation job (`ledger.cron`, scheduled `0 3 * * *` in `lib/jobs/handlers.ts`): a three-way match of DB rows ↔ chain events ↔ Paystack references. Investigate any mismatch before trusting the mirror again.
 
 ## During a prolonged outage
 

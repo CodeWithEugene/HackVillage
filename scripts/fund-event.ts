@@ -5,6 +5,10 @@
  *
  *   npm run dev:fund -- ai-for-health-records
  */
+import { assertNonProduction } from "./lib/assert-non-production.mjs";
+
+assertNonProduction();
+
 import { prisma } from "@/lib/db";
 import { initiateDeposit } from "@/services/escrow/deposits";
 

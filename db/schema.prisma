@@ -927,6 +927,17 @@ model Dispute {
   winner Winner @relation(fields: [winnerId], references: [id], onDelete: Cascade)
 }
 
+// ── Rate limiting (durable fixed-window buckets — shared across serverless
+// instances; the in-memory limiter in lib/rate-limit.ts is the fallback) ────
+
+model RateLimitBucket {
+  key     String   @id
+  count   Int      @default(0)
+  resetAt DateTime
+
+  @@index([resetAt])
+}
+
 // ── Newsletter (public marketing signup — no User account required) ────────
 
 /// Public newsletter list. Anonymous by design: no relation to User, since

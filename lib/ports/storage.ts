@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { access, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { getEnv } from "@/lib/env";
@@ -29,8 +29,6 @@ export interface StoragePort {
     contentType: string;
     sizeBytes: number;
   }): Promise<UploadTarget>;
-  /** Dev mode: persist an uploaded file. No-op in R2 mode. */
-  saveLocal(key: string, body: Buffer): Promise<string>;
   publicUrlFor(key: string): string;
   /**
    * Upload target at an exact key (covers). Local mode points the browser at
@@ -45,6 +43,11 @@ export interface StoragePort {
   saveLocalAt(key: string, body: Buffer): Promise<string>;
   /** Public URL for a keyed upload. */
   urlForKey(key: string): string;
+  /**
+   * Did the upload actually land? R2: HEAD the public URL. Local: the file
+   * exists under public/uploads. Confirms gate on this — no phantom rows.
+   */
+  verifyUploaded(key: string): Promise<boolean>;
 }
 
 const MAX_BYTES = 15 * 1024 * 1024; // 15MB per asset (photos/short clips)
@@ -66,6 +69,16 @@ function keyFor(eventId: string, filename: string): string {
   return `events/${eventId}/${digest}-${safeName}`;
 }
 
+/** Absolute path under public/uploads — the traversal guard every write goes through. */
+function localTargetFor(key: string): string {
+  const root = path.join(process.cwd(), "public", "uploads");
+  const target = path.join(root, key);
+  if (!target.startsWith(root + path.sep)) {
+    throw new Error("Storage key escapes the uploads folder.");
+  }
+  return target;
+}
+
 class LocalStorage implements StoragePort {
   mode = "local" as const;
 
@@ -80,20 +93,13 @@ class LocalStorage implements StoragePort {
     return {
       uploadUrl: `${base}/api/dev/media/upload/${encodeURIComponent(key)}`,
       headers: { "Content-Type": input.contentType },
-      publicUrl: `/uploads/${key.replace("events/", "")}`,
+      publicUrl: this.publicUrlFor(key),
       key,
     };
   }
 
-  async saveLocal(key: string, body: Buffer): Promise<string> {
-    const target = path.join(process.cwd(), "public", key);
-    await mkdir(path.dirname(target), { recursive: true });
-    await writeFile(target, body);
-    return `/uploads/${key.replace("events/", "")}`;
-  }
-
   publicUrlFor(key: string): string {
-    return `/uploads/${key.replace("events/", "")}`;
+    return `/uploads/${key}`;
   }
 
   async createUploadTargetForKey(input: {
@@ -111,10 +117,7 @@ class LocalStorage implements StoragePort {
   }
 
   async saveLocalAt(key: string, body: Buffer): Promise<string> {
-    const root = path.join(process.cwd(), "public", "uploads");
-    const target = path.join(root, key);
-    if (!target.startsWith(root + path.sep))
-      throw new Error("Storage key escapes the uploads folder.");
+    const target = localTargetFor(key);
     await mkdir(path.dirname(target), { recursive: true });
     await writeFile(target, body);
     return this.urlForKey(key);
@@ -122,6 +125,15 @@ class LocalStorage implements StoragePort {
 
   urlForKey(key: string): string {
     return `/uploads/${key}`;
+  }
+
+  async verifyUploaded(key: string): Promise<boolean> {
+    try {
+      await access(localTargetFor(key));
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 
@@ -163,10 +175,6 @@ class R2Storage implements StoragePort {
     };
   }
 
-  async saveLocal(): Promise<string> {
-    throw new Error("R2Storage cannot save locally.");
-  }
-
   publicUrlFor(key: string): string {
     return `${this.config.publicBase}/${key}`;
   }
@@ -174,6 +182,7 @@ class R2Storage implements StoragePort {
   async createUploadTargetForKey(input: {
     key: string;
     contentType: string;
+    devUploadPath: string;
   }): Promise<UploadTarget> {
     const { createPresignedUrl } = await import("@/lib/ports/r2-sign");
     const { url, headers } = await createPresignedUrl({
@@ -191,6 +200,15 @@ class R2Storage implements StoragePort {
 
   urlForKey(key: string): string {
     return `${this.config.publicBase}/${key}`;
+  }
+
+  async verifyUploaded(key: string): Promise<boolean> {
+    try {
+      const response = await fetch(this.urlForKey(key), { method: "HEAD" });
+      return response.ok;
+    } catch {
+      return false;
+    }
   }
 }
 
@@ -214,4 +232,9 @@ export function getStoragePort(): StoragePort {
     cached = new LocalStorage();
   }
   return cached;
+}
+
+/** Test helper — re-resolve the port after env changes. */
+export function resetStoragePortForTests(): void {
+  cached = null;
 }

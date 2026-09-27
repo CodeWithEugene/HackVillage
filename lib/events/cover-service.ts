@@ -54,7 +54,13 @@ export async function setCover(input: { userId: string; eventId: string; key: st
   if (!isCoverKeyFor(input.eventId, input.key)) {
     throw new CoverError("That upload doesn't belong to this hackathon.");
   }
-  const coverUrl = getStoragePort().urlForKey(input.key);
+  const storage = getStoragePort();
+  // The object must actually exist — otherwise the hackathon points at a
+  // cover that 404s forever.
+  if (!(await storage.verifyUploaded(input.key))) {
+    throw new CoverError("The uploaded cover never landed. Upload it again.");
+  }
+  const coverUrl = storage.urlForKey(input.key);
   await prisma.$transaction([
     prisma.event.update({ where: { id: event.id }, data: { coverUrl } }),
     prisma.auditLog.create({

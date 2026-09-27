@@ -1,12 +1,12 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Trophy } from "lucide-react";
 
+import { ConfirmMoneyAction } from "@/components/patterns/confirm-money-action";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
-import { FormError, FormSuccess, Input, Label } from "@/components/ui/input";
+import { FormError, FormSuccess, Label } from "@/components/ui/input";
 import { announceWinnersAction, type PayoutActionState } from "@/services/payout/actions";
 import { formatKes } from "@/lib/utils";
 
@@ -29,7 +29,7 @@ interface TeamOption {
 /**
  * The announcement console (plan §8.2): map judged teams onto prize places,
  * review the money one last time, confirm. Typed confirmation above the
- * KES 250k threshold; the server re-verifies everything.
+ * KES 250k threshold (ConfirmMoneyAction); the server re-verifies everything.
  */
 export function WinnersAnnouncer({
   eventId,
@@ -42,13 +42,8 @@ export function WinnersAnnouncer({
   teams: TeamOption[];
   poolKes: number;
 }) {
-  const [state, action, pending] = useActionState<PayoutActionState, FormData>(
-    announceWinnersAction,
-    {}
-  );
+  const [state, setState] = useState<PayoutActionState>({});
   const [selection, setSelection] = useState<Record<number, string>>({});
-  const typedConfirmNeeded = poolKes > 250_000;
-  const [typed, setTyped] = useState("");
 
   const rankedTeams = useMemo(
     () => [...teams].sort((a, b) => (b.score ?? -1) - (a.score ?? -1)),
@@ -63,16 +58,19 @@ export function WinnersAnnouncer({
     .map((p) => teams.find((t) => t.teamId === p.teamId))
     .filter((t) => t && !t.leaderHasRecipient);
 
-  const ready =
-    placements.length === prizes.length &&
-    missingRecipients.length === 0 &&
-    (!typedConfirmNeeded || typed === "ANNOUNCE");
+  const ready = placements.length === prizes.length && missingRecipients.length === 0;
+
+  const announce = async (): Promise<PayoutActionState> => {
+    const formData = new FormData();
+    formData.set("eventId", eventId);
+    formData.set("placements", JSON.stringify(placements));
+    const outcome = await announceWinnersAction({}, formData);
+    setState(outcome);
+    return outcome;
+  };
 
   return (
-    <form action={action} className="space-y-6">
-      <input type="hidden" name="eventId" value={eventId} />
-      <input type="hidden" name="placements" value={JSON.stringify(placements)} />
-
+    <div className="space-y-6">
       <Card>
         <CardTitle className="flex items-center gap-2">
           <Trophy aria-hidden className="size-5" /> Announce Winners &amp; Pay 50%
@@ -127,28 +125,21 @@ export function WinnersAnnouncer({
           </p>
         ) : null}
 
-        {typedConfirmNeeded ? (
-          <div className="mt-4">
-            <Label htmlFor="typed-confirm">
-              This pool exceeds KES 250,000, type <span className="font-mono font-bold">ANNOUNCE</span> to confirm
-            </Label>
-            <Input
-              id="typed-confirm"
-              value={typed}
-              onChange={(event) => setTyped(event.target.value.toUpperCase())}
-              placeholder="ANNOUNCE"
-              className="font-mono"
-            />
-          </div>
-        ) : null}
-
         <FormError message={state.error} />
         <FormSuccess message={state.message} />
 
-        <Button type="submit" className="mt-5" loading={pending} disabled={!ready}>
-          Announce Winners &amp; Trigger Instant Payouts
-        </Button>
+        <ConfirmMoneyAction
+          className="mt-5"
+          amountKes={poolKes}
+          confirmWord="ANNOUNCE"
+          title="Announce winners and trigger the instant payouts?"
+          description="This announces the selected winners and starts the instant 50% transfers immediately. It cannot be undone."
+          confirmLabel="Announce Winners & Trigger Instant Payouts"
+          triggerLabel="Announce Winners & Trigger Instant Payouts"
+          triggerDisabled={!ready}
+          onConfirm={announce}
+        />
       </Card>
-    </form>
+    </div>
   );
 }

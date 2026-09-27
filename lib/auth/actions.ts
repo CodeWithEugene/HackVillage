@@ -3,6 +3,7 @@
 import { createHash, randomBytes } from "node:crypto";
 
 import { hash } from "@node-rs/argon2";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -10,6 +11,7 @@ import { signIn, signOut } from "@/lib/auth";
 import { passwordResetEmail, verificationEmail } from "@/lib/auth/mail-templates";
 import { candidateHandles, firstAvailableHandle, validateHandle } from "@/lib/auth/handles";
 import { passwordSchema } from "@/lib/auth/password-policy";
+import { clientNetwork } from "@/lib/auth/sign-in-context";
 import { sendMail } from "@/lib/ports/mail";
 import { prisma } from "@/lib/db";
 import { rateLimit } from "@/lib/rate-limit";
@@ -56,6 +58,25 @@ async function issueToken(email: string, ttlMs: number): Promise<string> {
 // (see lib/auth/password-policy.ts — "use server" files export async
 // functions only)
 
+// ── Per-IP secondary limits ──────────────────────────────────────────────
+
+/**
+ * Secondary per-IP throttle (30/hour) on the credential endpoints, alongside
+ * the per-email limits: an attacker cycling through target emails from one
+ * network still hits a wall. The client IP comes from the same
+ * Cloudflare/Vercel header logic as the sign-in alert email
+ * (lib/auth/sign-in-context.ts), so spoofed cf-* headers from non-edge
+ * addresses are never trusted. When no IP is provable the per-IP check is
+ * skipped rather than keyed on a shared "unknown" bucket.
+ */
+const IP_LIMIT_PER_HOUR = 30;
+
+async function rateLimitClientIp(scope: string): Promise<{ ok: boolean } | null> {
+  const ip = clientNetwork(await headers()).ip;
+  if (!ip) return null;
+  return rateLimit(`${scope}:${ip}`, IP_LIMIT_PER_HOUR, 60 * 60 * 1000);
+}
+
 // ── Sign up (credentials) ────────────────────────────────────────────────
 
 const signUpSchema = z.object({
@@ -81,8 +102,10 @@ export async function signUpAction(
   const { name, email, password, role, handle } = parsed.data;
   const emailNormalized = email.toLowerCase();
 
-  const limit = rateLimit(`signup:${emailNormalized}`, 5, 60 * 60 * 1000);
+  const limit = await rateLimit(`signup:${emailNormalized}`, 5, 60 * 60 * 1000);
   if (!limit.ok) return { error: "Too many attempts. Try again later." };
+  const ipLimit = await rateLimitClientIp("signup-ip");
+  if (ipLimit && !ipLimit.ok) return { error: "Too many attempts. Try again later." };
 
   const existing = await prisma.user.findFirst({
     where: { email: emailNormalized, deletedAt: null },
@@ -153,8 +176,12 @@ export async function signInAction(
   const { email, password } = parsed.data;
   const emailNormalized = email.toLowerCase();
 
-  const limit = rateLimit(`signin:${emailNormalized}`, 10, 15 * 60 * 1000);
+  const limit = await rateLimit(`signin:${emailNormalized}`, 10, 15 * 60 * 1000);
   if (!limit.ok) {
+    return { error: "Too many attempts. Wait a few minutes and try again." };
+  }
+  const ipLimit = await rateLimitClientIp("signin-ip");
+  if (ipLimit && !ipLimit.ok) {
     return { error: "Too many attempts. Wait a few minutes and try again." };
   }
 
@@ -215,7 +242,7 @@ export async function resendVerificationAction(
   if (!email.success) return { error: "Enter the email you signed up with." };
   const emailNormalized = email.data.toLowerCase();
 
-  const limit = rateLimit(`verify-resend:${emailNormalized}`, 3, 60 * 60 * 1000);
+  const limit = await rateLimit(`verify-resend:${emailNormalized}`, 3, 60 * 60 * 1000);
   if (!limit.ok) return { error: "Verification emails are limited. Try again in a while." };
 
   const user = await prisma.user.findUnique({ where: { email: emailNormalized } });
@@ -240,8 +267,10 @@ export async function requestPasswordResetAction(
   if (!email.success) return { error: "That email doesn't look right." };
   const emailNormalized = email.data.toLowerCase();
 
-  const limit = rateLimit(`reset:${emailNormalized}`, 3, 60 * 60 * 1000);
+  const limit = await rateLimit(`reset:${emailNormalized}`, 3, 60 * 60 * 1000);
   if (!limit.ok) return { error: "Reset emails are limited. Try again in a while." };
+  const ipLimit = await rateLimitClientIp("reset-ip");
+  if (ipLimit && !ipLimit.ok) return { error: "Reset emails are limited. Try again in a while." };
 
   const user = await prisma.user.findUnique({ where: { email: emailNormalized } });
   if (user && !user.deletedAt && user.passwordHash) {

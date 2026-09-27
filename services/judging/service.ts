@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import {
   DEFAULT_RUBRIC,
   feedbackGateSatisfied,
+  validateRubric,
   type Criterion,
   type FeedbackKind,
 } from "@/lib/judging/compute";
@@ -118,6 +119,21 @@ export async function respondToInvite(
   if (!assignment || assignment.userId !== userId) {
     throw new JudgingError("Invitation not found.", "NOT_FOUND");
   }
+  if (accept) {
+    // Mutual exclusion (audit remediation): the invite was sent before the
+    // judge joined a team — re-check participation at ACTIVATION time so a
+    // judge can never score their own hackathon.
+    const participation = await prisma.teamMember.findFirst({
+      where: { userId, status: "JOINED", team: { eventId: assignment.eventId } },
+      select: { id: true },
+    });
+    if (participation) {
+      throw new JudgingError(
+        "You're participating in this hackathon, so you can't judge it. Leave the team or decline the invite.",
+        "WRONG_STATE"
+      );
+    }
+  }
   await prisma.judgeAssignment.update({
     where: { id: assignmentId },
     data: { status: accept ? "ACTIVE" : "DECLINED" },
@@ -127,6 +143,24 @@ export async function respondToInvite(
     to: assignment.event.org.owner.email,
     ...judgeRespondedEmail(assignment.user.name ?? assignment.user.handle, assignment.event.title, accept),
   });
+}
+
+/**
+ * Mutual-exclusion guard for the team-join paths (lib/teams/actions.ts): a
+ * user holding an ACTIVE or INVITED judging seat for the event can never
+ * become a participant. Throws JudgingError — callers render the message.
+ */
+export async function assertNotJudgeForEvent(eventId: string, userId: string): Promise<void> {
+  const assignment = await prisma.judgeAssignment.findFirst({
+    where: { eventId, userId, status: { in: ["ACTIVE", "INVITED"] } },
+    select: { id: true },
+  });
+  if (assignment) {
+    throw new JudgingError(
+      "You're judging this hackathon, so you can't join a team for it.",
+      "WRONG_STATE"
+    );
+  }
 }
 
 export async function removeJudge(assignmentId: string, organizerId: string): Promise<void> {
@@ -150,10 +184,10 @@ export async function saveRubric(
   if (["JUDGING", "WINNERS_ANNOUNCED", "SETTLED"].includes(event.status)) {
     throw new JudgingError("The rubric locks when judging opens.", "WRONG_STATE");
   }
-  const total = criteria.reduce((sum, criterion) => sum + criterion.weight, 0);
-  if (total !== 100) {
-    throw new JudgingError(`Weights add up to ${total}, but they must total 100.`, "WRONG_STATE");
-  }
+  // Server-authoritative validation (Decision D4) — the action layer's zod
+  // parse is a convenience; the service re-verifies shape AND weights.
+  const invalid = validateRubric(criteria);
+  if (invalid) throw new JudgingError(invalid, "WRONG_STATE");
 
   await prisma.rubric.upsert({
     where: { eventId },
@@ -169,6 +203,26 @@ export async function openJudging(eventId: string, organizerId: string): Promise
   }
   if (event.endsAt.getTime() > Date.now()) {
     throw new JudgingError("The hackathon hasn't ended yet.", "WRONG_STATE");
+  }
+
+  // Fail-closed sweep (audit remediation): judging must NEVER open while an
+  // ACTIVE judge is also a participant — a score on one's own team is an
+  // unrecoverable integrity breach. Refuse and name the conflicts.
+  const conflicts = await prisma.judgeAssignment.findMany({
+    where: {
+      eventId,
+      status: "ACTIVE",
+      user: { teamMemberships: { some: { status: "JOINED", team: { eventId } } } },
+    },
+    select: { user: { select: { handle: true } } },
+  });
+  if (conflicts.length > 0) {
+    throw new JudgingError(
+      `Judging can't open — these judges are also participants; remove them first: ${conflicts
+        .map((conflict) => `@${conflict.user.handle}`)
+        .join(", ")}.`,
+      "WRONG_STATE"
+    );
   }
 
   await prisma.$transaction(async (tx) => {

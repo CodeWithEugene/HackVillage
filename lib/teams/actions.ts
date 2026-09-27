@@ -17,6 +17,7 @@ import {
 } from "@/lib/notifications/templates/teams";
 import { appUrl } from "@/lib/url";
 import { canJoinTeam, MAX_TEAM_MEMBERS, validTeamName, type TeamSnapshot } from "@/lib/teams/policy";
+import { assertNotJudgeForEvent, JudgingError } from "@/services/judging/service";
 
 export interface TeamActionState {
   error?: string;
@@ -65,6 +66,14 @@ export async function createTeamAction(
     select: { id: true },
   });
   if (existingTeam) return { error: "You're already on a team for this hackathon." };
+
+  // Mutual exclusion: judges (invited or active) can never participate.
+  try {
+    await assertNotJudgeForEvent(event.id, user.id);
+  } catch (error) {
+    if (error instanceof JudgingError) return { error: error.message };
+    throw error;
+  }
 
   const teamCount = await prisma.team.count({
     where: { eventId: event.id, status: { not: "DISBANDED" } },
@@ -170,6 +179,14 @@ export async function joinTeamByCodeAction(
   });
   if (alreadyInEvent) return { error: "You're already on a team for this hackathon." };
 
+  // Mutual exclusion: judges (invited or active) can never participate.
+  try {
+    await assertNotJudgeForEvent(team.event.id, user.id);
+  } catch (error) {
+    if (error instanceof JudgingError) return { error: error.message };
+    throw error;
+  }
+
   const membership = team.members.find((m) => m.userId === user.id);
   const decision = canJoinTeam(
     snapshotOf(team),
@@ -201,6 +218,15 @@ export async function acceptTeamInviteAction(teamId: string): Promise<void> {
   if (!membership) redirect("/dashboard/teams");
 
   const team = membership.team;
+
+  // Mutual exclusion: judges (invited or active) can never participate.
+  try {
+    await assertNotJudgeForEvent(team.event.id, user.id);
+  } catch (error) {
+    const message = error instanceof JudgingError ? error.message : "You can't join that team.";
+    redirect(`/dashboard/teams?join=${encodeURIComponent(message)}`);
+  }
+
   const decision = canJoinTeam(snapshotOf(team), false, registrationOpen(team.event));
   if (!decision.ok) {
     redirect(`/dashboard/teams?join=${encodeURIComponent(decision.reason!)}`);

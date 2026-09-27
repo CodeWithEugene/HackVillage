@@ -135,7 +135,7 @@ HackVillage operates as a three-phase engine:
 ```
 ┌───────────────────────────────────────────────────────┐
 │                    CLIENT LAYER                        │
-│           Next.js 14 (SEO-optimized,                  │
+│           Next.js 15 (SEO-optimized,                  │
 │           server components, App Router)              │
 └────────────────────────┬──────────────────────────────┘
                          │
@@ -147,19 +147,22 @@ HackVillage operates as a three-phase engine:
 └──────────┬─────────────────────────┬──────────────────┘
            │                         │
 ┌──────────▼──────────┐   ┌──────────▼──────────────────┐
-│   PostgreSQL DB     │   │     Escrow Microservice      │
+│   PostgreSQL DB     │   │   Escrow service (in-repo)   │
 │  Structured Proof   │   │  Paystack + Smart Contract   │
-│  of Work tracking   │   │  (Polygon / Solana layer)    │
+│  of Work tracking   │   │       (Polygon Amoy)         │
 └─────────────────────┘   └─────────────────────────────┘
 ```
 
+> The separate escrow microservice and Paystack Split API were both evaluated
+> and rejected — see ADR-001 (modular monolith) and ADR-006 (direct transfers).
+
 | Layer | Technology | Purpose |
 |---|---|---|
-| Frontend | Next.js 14 | SEO-optimized project discovery |
+| Frontend | Next.js 15 | SEO-optimized project discovery |
 | Backend | Node.js / TypeScript | High-concurrency event-day API |
 | Database | PostgreSQL | Structured Proof of Work records |
 | Payments | Paystack | Fiat deposits, M-Pesa & bank payouts |
-| Ledger | Smart Contract (Polygon/Solana) | Transparent, tamper-proof transaction log |
+| Ledger | Smart Contract (Polygon Amoy) | Transparent, tamper-proof transaction log |
 | Open Source Core | GitHub | Judging logic & escrow mechanics are public |
 
 ---
@@ -229,12 +232,13 @@ Paystack API ──── Final transfer ──── Public Ledger entry record
 
 | Phase | Feature | Status |
 |---|---|---|
-| v1.0 | Prize Vault & Escrow Engine | In Development |
-| v1.0 | Developer Proof of Work Profiles | In Development |
-| v1.0 | Paystack Split Disbursement | In Development |
-| v1.1 | 48-Hour Media Vault + Trust Penalty | Planned |
-| v1.1 | One-Click Internship Matching | Planned |
-| v1.2 | Legacy Tracker (3-month check-ins) | Planned |
+| v1.0 | Prize Vault & Escrow Engine | Done — live in production |
+| v1.0 | Developer Proof of Work Profiles | Done |
+| v1.0 | Paystack Split Disbursement (50/50 tranches) | Done |
+| v1.1 | 48-Hour Media Vault + Trust Penalty | Done |
+| v1.1 | One-Click Internship Matching | Done |
+| v1.1 | Newsletters (subscribe + organizer blasts) | Done |
+| v1.2 | Legacy Tracker (3-month check-ins + dispute window) | Done |
 | v2.0 | **HackVillage DAO** — Community-driven Elite Organizer rankings | Moonshot |
 | v2.0 | **Global Node** — Nigeria, Rwanda, cross-border prize handling | Moonshot |
 | v2.0 | **AI Judging Co-pilot** — Pre-screen repos for quality & plagiarism | Moonshot |
@@ -260,14 +264,25 @@ pnpm install
 
 ### Environment Variables
 
-Create a `.env.local` file at the project root:
+Copy the template and fill in your values — `.env.example` documents every
+variable the code reads (validated by `lib/env.ts`):
+
+```bash
+cp .env.example .env
+```
+
+The minimum set for a local boot:
 
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/hackvillage
+DATABASE_URL=postgresql://user:***@localhost:5432/hackvillage
+NEXTAUTH_SECRET=           # generate: openssl rand -base64 32
+NEXTAUTH_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Optional: without these, payments/chain run in documented simulation modes
 PAYSTACK_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_...
 SMART_CONTRACT_ADDRESS=0x...
-RPC_URL=https://...
+RPC_URL=https://rpc.amoy.polygonscan.com
+ATTESTER_PRIVATE_KEY=0x...
 ```
 
 ### Development

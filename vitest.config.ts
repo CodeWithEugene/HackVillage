@@ -9,6 +9,19 @@ export default defineConfig({
     environment: "node",
     setupFiles: ["tests/integration/setup.ts"],
     testTimeout: 30_000,
+    coverage: {
+      provider: "v8",
+      // Coverage gate is scoped to the money paths (audit); `pnpm test` stays
+      // fast and coverage-free, `pnpm test:coverage` (CI) enforces the gate.
+      include: ["services/escrow/**", "services/payout/**"],
+      thresholds: {
+        // ratchet toward 90 (plan §14) — floor measured 2026-09-27:
+        // lines 77.5, functions 97.4, statements 77.5
+        lines: 75,
+        functions: 95,
+        statements: 75,
+      },
+    },
   },
   resolve: {
     alias: {

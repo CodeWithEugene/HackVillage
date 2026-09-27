@@ -23,7 +23,7 @@ export function PublishGate({ eventId }: { eventId: string }) {
       </CardTitle>
       <CardDescription>
         Publishing makes the event publicly visible as <strong>pending deposit</strong>. The
-        event goes live when the prize pool is locked in the Prize Vault (Phase 3).
+        event goes live when the prize pool is locked in the Prize Vault.
       </CardDescription>
       {error ? (
         <p role="alert" className="mt-3 rounded-control border border-danger/40 bg-danger/10 p-3 text-sm font-semibold text-danger">

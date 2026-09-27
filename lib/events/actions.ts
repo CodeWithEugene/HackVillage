@@ -7,10 +7,11 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth/guards";
 import { getEnv } from "@/lib/env";
 import { prisma } from "@/lib/db";
+import { cancelEventAsOrganizer, EventCancelError } from "@/lib/events/cancel";
 import { sendNotification } from "@/lib/notifications/send";
 import { eventPublishedEmail } from "@/lib/notifications/templates/events";
 import { appUrl } from "@/lib/url";
-import { canPublishDraft } from "@/lib/events/lifecycle";
+import { canPublishDraft, mediaDeadlineFor } from "@/lib/events/lifecycle";
 import {
   eventSlugCandidates,
   eventWizardSchema,
@@ -216,8 +217,8 @@ export async function publishEventAction(eventId: string): Promise<EventActionSt
     data: {
       status: "PENDING_DEPOSIT",
       publishedAt: new Date(),
-      // endsAt + 48h — enforced by the media job in Phase 7.
-      mediaDeadlineAt: new Date(event.endsAt.getTime() + 48 * 60 * 60 * 1000),
+      // endsAt + 48h — enforced by the media deadline cron.
+      mediaDeadlineAt: mediaDeadlineFor(event.endsAt),
     },
   });
 
@@ -232,4 +233,27 @@ export async function publishEventAction(eventId: string): Promise<EventActionSt
   revalidatePath(`/hackathons/${event.slug}`);
   revalidatePath(`/organizer/hackathons/${event.slug}`);
   return {};
+}
+
+/**
+ * Organizer self-service cancellation: drafts and unfunded hackathons only,
+ * never with a prize vault (money on the table takes the admin refund path).
+ */
+export async function cancelEventAction(eventId: string): Promise<EventActionState> {
+  const user = await requireUser();
+  const parsedId = z.string().cuid().safeParse(eventId);
+  if (!parsedId.success) return { error: "Unknown hackathon." };
+
+  try {
+    const { slug } = await cancelEventAsOrganizer({ eventId: parsedId.data, userId: user.id });
+    revalidatePath("/organizer");
+    revalidatePath(`/organizer/hackathons/${slug}`);
+    revalidatePath(`/hackathons/${slug}`);
+    revalidatePath("/hackathons");
+    return {};
+  } catch (error) {
+    if (error instanceof EventCancelError) return { error: error.message };
+    console.error("[events] cancel failed", error);
+    return { error: "Something went wrong. Try again in a moment." };
+  }
 }

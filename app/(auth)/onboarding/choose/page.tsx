@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import { Building2, Code2 } from "lucide-react";
+import Link from "next/link";
+import { Building2, Code2, LogIn } from "lucide-react";
 
 import { RoleChoiceCards } from "@/components/onboarding/role-choice-cards";
+import { Button } from "@/components/ui/button";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { currentUser } from "@/lib/auth/guards";
 
 export const metadata: Metadata = { title: "Choose Your Path" };
@@ -9,10 +12,27 @@ export const metadata: Metadata = { title: "Choose Your Path" };
 export default async function OnboardingChoosePage() {
   const user = await currentUser();
   if (!user) {
+    // Signed-out visitors get a real way forward, not a dead end. After
+    // sign-in the auth flow returns unonboarded users to this page itself
+    // (lib/auth/actions.ts), so no ?next= round-trip is needed.
     return (
-      <p className="text-center text-muted">
-        Sign in first, then we&apos;ll set you up.
-      </p>
+      <Card className="mx-auto w-full max-w-md text-center">
+        <CardTitle className="flex items-center justify-center gap-2">
+          <LogIn aria-hidden className="size-5" /> Sign In To Choose Your Path
+        </CardTitle>
+        <CardDescription>
+          Pick organizer or developer right after you sign in — we&apos;ll bring you straight back
+          here.
+        </CardDescription>
+        <div className="mt-5 flex flex-wrap justify-center gap-3">
+          <Link href="/signin">
+            <Button arrow>Sign In</Button>
+          </Link>
+          <Link href="/signup">
+            <Button variant="secondary">Create Account</Button>
+          </Link>
+        </div>
+      </Card>
     );
   }
 

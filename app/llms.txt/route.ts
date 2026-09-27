@@ -75,9 +75,11 @@ HackVillage ("Hack Village") is open-source infrastructure for high-impact hacka
 - [How it works](${appUrl("/how-it-works")}): the full lifecycle: escrowed prize, team formation, structured judging, instant payouts.
 - [How it works for organizers](${appUrl("/for-organizers")}): hosting a hackathon step by step: setup, verification, the 5% fee, funding the prize vault, judging, payouts, milestones and the trust score.
 - [How escrow works](${appUrl("/how-escrow-works")}): exactly how prize money is deposited, locked, held and paid, step by step.
+- [Public ledger](${appUrl("/trust")}): every vault lock, payout and refund recorded entry by entry, with the per-hackathon vault state.
 - [Blog](${appUrl("/blog")}): guides and stories on escrow, payouts, judging and building hackathons builders trust.
 - [Contribute](${appUrl("/contribute")}): how to contribute to the open-source platform.
 - Developer profiles: every builder who takes part has a public Proof-of-Work profile at ${appUrl("/developers/")}<handle>.
+- Organizer trust pages: every organizer has a public record at ${appUrl("/organizers/")}<slug>: verification status, trust score, payout performance and hosted hackathons.
 
 ## Current hackathons
 

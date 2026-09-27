@@ -89,12 +89,16 @@ export async function resolveDisputeAction(
   const parsed = z
     .object({
       disputeId: z.string().cuid(),
-      resolution: z.enum(["RELEASE", "REJECT"]),
+      resolution: z.enum(["RELEASE", "REJECT", "REFUND"]),
       note: z.string().trim().min(10, "The resolution note is part of the audit trail.").max(500),
+      secondApproverId: z.string().cuid().optional().or(z.literal("")).transform((v) => v || undefined),
     })
     .safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Check the resolution and try again." };
+  }
+  if (parsed.data.resolution === "REFUND" && !parsed.data.secondApproverId) {
+    return { error: "A refund needs a second admin's user id to co-approve." };
   }
 
   try {
@@ -104,7 +108,9 @@ export async function resolveDisputeAction(
       message:
         result.outcome === "released"
           ? "Milestone released. The final 50% payout is queued."
-          : "Dispute rejected. The organizer's confirmation stands.",
+          : result.outcome === "refunded"
+            ? "Dispute upheld. The remaining pool is refunded to the organizer."
+            : "Dispute rejected. The organizer's confirmation stands.",
     };
   } catch (error) {
     return toState(error);

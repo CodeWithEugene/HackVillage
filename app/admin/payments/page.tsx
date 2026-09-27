@@ -83,7 +83,7 @@ export default async function AdminPaymentsPage() {
                     </Badge>
                   </div>
                 </div>
-                <PayoutOpsActions payoutId={payout.id} />
+                <PayoutOpsActions payoutId={payout.id} amountKes={payout.amountKes} />
               </li>
             ))}
           </ul>

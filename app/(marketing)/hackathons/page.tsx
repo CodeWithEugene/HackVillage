@@ -73,6 +73,7 @@ const getStoredCards = unstable_cache(
       orgTrustScore: event.org.trustScore,
       categories: event.categories,
       coverUrl: event.coverUrl,
+      prizeVerifiedAt: event.prizeVerifiedAt?.toISOString() ?? null,
     }));
   },
   ["public-hackathon-listing"],

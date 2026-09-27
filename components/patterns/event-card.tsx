@@ -2,11 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, CalendarDays, MapPin, Users } from "lucide-react";
 
+import { PrizeVerifiedBadge } from "@/components/patterns/prize-verified-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { categoryLabel, isCategory } from "@/lib/events/categories";
 import { coverFor } from "@/lib/events/covers";
 import { formatEventDates, formatShortDate } from "@/lib/events/format";
-import { registrationOpen, type EventStatus } from "@/lib/events/lifecycle";
+import { isPrizeVerified, registrationOpen, type EventStatus } from "@/lib/events/lifecycle";
 import { cn, formatKes } from "@/lib/utils";
 
 export interface EventCardData {
@@ -19,6 +20,7 @@ export interface EventCardData {
   endsAt: Date;
   registrationDeadline: Date;
   publishedAt?: Date | null;
+  prizeVerifiedAt?: Date | string | null;
   status: EventStatus;
   poolKes: number;
   teamCount: number;
@@ -48,6 +50,10 @@ export function EventCard({
   priority?: boolean;
 }) {
   const open = registrationOpen(event);
+  const verified = isPrizeVerified(
+    event.status,
+    event.prizeVerifiedAt ? new Date(event.prizeVerifiedAt) : null
+  );
   const categories = event.categories.filter(isCategory);
   const cover = coverFor(event);
 
@@ -82,6 +88,7 @@ export function EventCard({
             ))}
           </ul>
         ) : null}
+        {verified ? <PrizeVerifiedBadge className="absolute top-3 right-3" /> : null}
       </div>
 
       <div className="flex flex-1 flex-col p-4">

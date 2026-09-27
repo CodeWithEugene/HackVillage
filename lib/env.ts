@@ -30,6 +30,12 @@ const serverEnvSchema = z.object({
 
   // Paystack (optional — absent key switches payments to dev simulation)
   PAYSTACK_SECRET_KEY: z.string().optional(),
+  // Explicit opt-in to run the SIMULATION payment port in production (the
+  // pre-go-live state). Without this, a keyless production boot fails closed.
+  PAYSTACK_ALLOW_SIMULATION_IN_PROD: z
+    .string()
+    .optional()
+    .transform((value) => value === "true"),
 
   // Chain (optional — absent config switches attestations to simulation)
   SMART_CONTRACT_ADDRESS: z.string().optional(),

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AppNavLink } from "@/components/patterns/app-nav-link";
 import { UserMenu } from "@/components/patterns/user-menu";
 import { ThemeSwitcher } from "@/components/patterns/theme-switcher";
 import { cn } from "@/lib/utils";
@@ -54,13 +55,9 @@ export default function AppTopNav({
           className="flex min-w-0 items-center gap-1 overflow-x-auto py-2 sm:gap-4"
         >
           {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="shrink-0 rounded-control px-2 py-1 text-sm font-medium text-ink-soft hover:bg-ink/5 hover:text-ink sm:px-3"
-            >
+            <AppNavLink key={link.href} href={link.href}>
               {link.label}
-            </Link>
+            </AppNavLink>
           ))}
         </nav>
 

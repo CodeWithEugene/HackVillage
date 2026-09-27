@@ -55,6 +55,33 @@ export default async function EventWinnersPage({
   const results = event.status === "JUDGING" ? await computeEventResults(event.id) : null;
   const scoreFor = (teamId: string) => results?.results.find((r) => r.teamId === teamId) ?? null;
 
+  /** The final-50% due for a winner: the milestone tranche when it exists, else pool minus instant. */
+  const milestoneDueKes = (winner: (typeof event.winners)[number]): number => {
+    const instant = winner.payouts.find((p) => p.tranche === "INSTANT");
+    const milestonePayout = winner.payouts.find((p) => p.tranche === "MILESTONE");
+    return (
+      milestonePayout?.amountKes ??
+      (winner.milestoneRequired ? winner.amountKes - (instant?.amountKes ?? 0) : 0)
+    );
+  };
+
+  const milestoneDues = event.winners
+    .filter((winner) => winner.milestoneRequired)
+    .map((winner) => {
+      const milestonePayout = winner.payouts.find((p) => p.tranche === "MILESTONE");
+      return {
+        id: winner.id,
+        place: winner.place,
+        teamName: winner.team.name,
+        amountKes: milestoneDueKes(winner),
+        dueAt: winner.milestone?.dueAt ?? null,
+        confirmedAt: winner.milestone?.confirmedAt ?? null,
+        payoutStatus: milestonePayout?.status ?? null,
+      };
+    })
+    .sort((a, b) => a.place - b.place);
+  const outstandingDues = milestoneDues.filter((due) => due.payoutStatus !== "SUCCEEDED");
+
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
@@ -181,20 +208,68 @@ export default async function EventWinnersPage({
                         </div>
                       </div>
                       {winner.milestone && !winner.milestone.confirmedAt ? (
-                        <MilestoneConfirmer winnerId={winner.id} />
+                        <MilestoneConfirmer
+                          winnerId={winner.id}
+                          amountKes={milestoneDueKes(winner)}
+                        />
                       ) : null}
                     </li>
                   );
                 })}
             </ul>
           </Card>
-          <Card>
-            <CardTitle>Milestone Dues</CardTitle>
-            <CardDescription>
-              The final 50% releases when you confirm each winner&apos;s handover. Confirming
-              triggers the milestone payout immediately.
-            </CardDescription>
-          </Card>
+          {milestoneDues.length > 0 ? (
+            <Card>
+              <CardTitle>Milestone Dues</CardTitle>
+              <CardDescription>
+                {outstandingDues.length === 0
+                  ? "Every milestone tranche is settled."
+                  : `${formatKes(outstandingDues.reduce((sum, due) => sum + due.amountKes, 0))} outstanding across ${outstandingDues.length} handover${outstandingDues.length === 1 ? "" : "s"}. Confirming a handover releases the tranche immediately.`}
+              </CardDescription>
+              <ul className="mt-4 space-y-2">
+                {milestoneDues.map((due) => (
+                  <li
+                    key={due.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-control border border-ink/10 bg-paper px-3 py-2 text-sm"
+                  >
+                    <span className="font-semibold text-ink">
+                      {due.place}
+                      {["st", "nd", "rd"][due.place - 1] ?? "th"} · {due.teamName}
+                    </span>
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="font-display font-bold text-ink">
+                        {formatKes(due.amountKes)}
+                      </span>
+                      <Badge
+                        variant={
+                          due.payoutStatus === "SUCCEEDED"
+                            ? "success"
+                            : due.payoutStatus
+                              ? "warning"
+                              : "neutral"
+                        }
+                      >
+                        {due.payoutStatus
+                          ? due.payoutStatus.toLowerCase().replace("_", " ")
+                          : due.confirmedAt
+                            ? "releasing"
+                            : "awaiting handover"}
+                      </Badge>
+                      {due.dueAt ? (
+                        <span className="text-xs text-muted">
+                          due{" "}
+                          {new Date(due.dueAt).toLocaleDateString("en-KE", {
+                            day: "numeric",
+                            month: "short",
+                          })}
+                        </span>
+                      ) : null}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          ) : null}
         </>
       ) : null}
 

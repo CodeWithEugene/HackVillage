@@ -25,6 +25,7 @@ const TEST_KEY = `payout-int-${Date.now().toString(36)}`;
 
 let orgId: string | null = null;
 let adminId: string | null = null;
+const extraOrgIds: string[] = [];
 
 interface PayoutWorld {
   eventId: string;
@@ -172,8 +173,18 @@ beforeAll(async () => {
 afterAll(async () => {
   if (orgId) {
     await prisma.organization.delete({ where: { id: orgId } }).catch(() => undefined);
-    await prisma.user.deleteMany({ where: { email: { contains: TEST_KEY } } });
   }
+  for (const extra of extraOrgIds) {
+    await prisma.organization.delete({ where: { id: extra } }).catch(() => undefined);
+  }
+  await prisma.user.deleteMany({ where: { email: { contains: TEST_KEY } } });
+  // Remove the pg-boss jobs this suite enqueued (attest assertions below).
+  await prisma
+    .$executeRawUnsafe(
+      `DELETE FROM pgboss.job WHERE name IN ('payout.attest', 'payout.execute') AND data::text LIKE $1`,
+      `%${TEST_KEY}%`
+    )
+    .catch(() => undefined);
   await prisma.$disconnect();
 });
 
@@ -443,5 +454,575 @@ describe("payout engine (integration)", () => {
         expect(match.attemptCount).toBe(payout.attemptCount);
       }
     }
+  });
+});
+
+// ── Remediation suites (audit money-path hardening) ─────────────────────
+
+/** Minimal organizer+org+event world for the remediation suites. */
+async function createRemWorld(
+  label: string,
+  options: { status?: "JUDGING" | "WINNERS_ANNOUNCED" | "LIVE"; poolKes?: number } = {}
+) {
+  const key = `${TEST_KEY}-${label}`;
+  const organizer = await createUser(`${label}-org`);
+  const org = await prisma.organization.create({
+    data: { name: `Rem Org ${key}`, slug: key, ownerId: organizer.id, kycStatus: "VERIFIED" },
+  });
+  extraOrgIds.push(org.id);
+  await prisma.orgMember.create({
+    data: { orgId: org.id, userId: organizer.id, role: "OWNER", status: "ACTIVE" },
+  });
+  const event = await prisma.event.create({
+    data: {
+      orgId: org.id,
+      slug: `evt-${key}`,
+      title: `Rem ${label} Event`,
+      venueType: "ONLINE",
+      startsAt: new Date(Date.now() - 48 * 3600 * 1000),
+      endsAt: new Date(Date.now() - 2 * 3600 * 1000),
+      registrationDeadline: new Date(Date.now() - 72 * 3600 * 1000),
+      problemStatement: "Remediation suite event.",
+      status: options.status ?? "WINNERS_ANNOUNCED",
+      prizeVerifiedAt: new Date(),
+      publishedAt: new Date(Date.now() - 96 * 3600 * 1000),
+    },
+  });
+  return { organizer, org, event };
+}
+
+/** Team + leader + submission (+ payout recipient when asked). */
+async function createRemTeam(eventId: string, label: string, withRecipient = false) {
+  const leader = await createUser(label);
+  const team = await prisma.team.create({
+    data: {
+      eventId,
+      name: `Rem Team ${label}`,
+      leaderId: leader.id,
+      inviteCode: `rm${Math.random().toString(36).slice(2, 8)}`,
+    },
+  });
+  await prisma.teamMember.create({
+    data: { teamId: team.id, userId: leader.id, status: "JOINED" },
+  });
+  await prisma.submission.create({
+    data: {
+      teamId: team.id,
+      repoUrl: `https://github.com/test/rem-${label}`,
+      description: `Remediation suite submission ${label} — descriptive enough.`,
+      splitDeclaration: [{ userId: leader.id, percent: 100 }],
+    },
+  });
+  if (withRecipient) {
+    await savePayoutRecipient(leader.id, {
+      type: "MPESA",
+      name: "Rem Leader",
+      accountNumber: "254712345678",
+    });
+  }
+  return { leader, team };
+}
+
+describe("announce validation (audit remediation)", () => {
+  let validation: Awaited<ReturnType<typeof createRemWorld>> & {
+    teamIds: string[];
+    judgeId: string;
+  };
+
+  beforeAll(async () => {
+    const base = await createRemWorld("avl", { status: "JUDGING" });
+    await prisma.prizeBreakdown.createMany({
+      data: [
+        { eventId: base.event.id, place: 1, label: "1st", amountKes: 80_000, milestoneRequired: false },
+        { eventId: base.event.id, place: 2, label: "2nd", amountKes: 40_000, milestoneRequired: false },
+      ],
+    });
+    const judge = await createUser("avl-judge");
+    await prisma.judgeAssignment.create({
+      data: { eventId: base.event.id, userId: judge.id, status: "ACTIVE" },
+    });
+    const teamIds: string[] = [];
+    for (const label of ["avl-t1", "avl-t2"]) {
+      const { team } = await createRemTeam(base.event.id, label, true);
+      teamIds.push(team.id);
+      await prisma.judgingProgress.create({
+        data: { judgeId: judge.id, teamId: team.id, finalizedAt: new Date() },
+      });
+    }
+    validation = { ...base, teamIds, judgeId: judge.id };
+  });
+
+  it("rejects empty placements", async () => {
+    await expect(
+      announceWinners({ eventId: validation.event.id, organizerId: validation.organizer.id, placements: [] })
+    ).rejects.toMatchObject({ code: "WRONG_STATE", message: expect.stringContaining("every prize place") });
+  });
+
+  it("rejects partial coverage — every prize place needs exactly one team", async () => {
+    await expect(
+      announceWinners({
+        eventId: validation.event.id,
+        organizerId: validation.organizer.id,
+        placements: [{ place: 1, teamId: validation.teamIds[0] }],
+      })
+    ).rejects.toMatchObject({ code: "WRONG_STATE", message: expect.stringContaining("Every prize place") });
+  });
+
+  it("rejects a place assigned twice", async () => {
+    await expect(
+      announceWinners({
+        eventId: validation.event.id,
+        organizerId: validation.organizer.id,
+        placements: [
+          { place: 1, teamId: validation.teamIds[0] },
+          { place: 1, teamId: validation.teamIds[1] },
+        ],
+      })
+    ).rejects.toMatchObject({ code: "WRONG_STATE", message: expect.stringContaining("only once") });
+  });
+
+  it("rejects the same team winning two places", async () => {
+    await expect(
+      announceWinners({
+        eventId: validation.event.id,
+        organizerId: validation.organizer.id,
+        placements: [
+          { place: 1, teamId: validation.teamIds[0] },
+          { place: 2, teamId: validation.teamIds[0] },
+        ],
+      })
+    ).rejects.toMatchObject({ code: "WRONG_STATE", message: expect.stringContaining("only one prize place") });
+  });
+
+  it("accepts a complete, distinct placement set", async () => {
+    await announceWinners({
+      eventId: validation.event.id,
+      organizerId: validation.organizer.id,
+      placements: [
+        { place: 1, teamId: validation.teamIds[0] },
+        { place: 2, teamId: validation.teamIds[1] },
+      ],
+    });
+    const event = await prisma.event.findUnique({ where: { id: validation.event.id } });
+    expect(event?.status).toBe("WINNERS_ANNOUNCED");
+
+    // A concurrent re-announce surfaces the friendly unique-constraint error.
+    await expect(
+      announceWinners({
+        eventId: validation.event.id,
+        organizerId: validation.organizer.id,
+        placements: [
+          { place: 1, teamId: validation.teamIds[1] },
+          { place: 2, teamId: validation.teamIds[0] },
+        ],
+      })
+    ).rejects.toMatchObject({ code: "WRONG_STATE", message: expect.stringContaining("already announced") });
+  });
+});
+
+describe("zero-KES milestone (audit remediation)", () => {
+  it("confirms the milestone WITHOUT a payout row and settles the vault", async () => {
+    const rem = await createRemWorld("zero", { status: "WINNERS_ANNOUNCED" });
+    await prisma.prizeBreakdown.create({
+      data: { eventId: rem.event.id, place: 1, label: "Tiny prize", amountKes: 1, milestoneRequired: true },
+    });
+    await prisma.vaultState.create({
+      data: { eventId: rem.event.id, amountKes: 1, chainState: "HALF_RELEASED", lockedAt: new Date(), halfReleasedAt: new Date() },
+    });
+    const { leader, team } = await createRemTeam(rem.event.id, "zero-t1", true);
+    const winner = await prisma.winner.create({
+      data: {
+        eventId: rem.event.id,
+        teamId: team.id,
+        place: 1,
+        userId: leader.id,
+        amountKes: 1,
+        milestoneRequired: true,
+      },
+    });
+    await prisma.milestone.create({
+      data: { winnerId: winner.id, title: "Milestone handover", dueAt: new Date(Date.now() + 30 * 24 * 3600 * 1000) },
+    });
+    // The 1-KES instant tranche already paid (KES 1 instant, KES 0 milestone).
+    await prisma.payout.create({
+      data: {
+        winnerId: winner.id,
+        tranche: "INSTANT",
+        amountKes: 1,
+        idempotencyKey: `${winner.id}:INSTANT`,
+        recipientCode: "RCP_SIM_ZERO",
+        status: "SUCCEEDED",
+        paidAt: new Date(),
+      },
+    });
+
+    const result = await confirmMilestone(winner.id, rem.organizer.id);
+    expect(result.outcome).toBe("confirmed");
+
+    const milestonePayouts = await prisma.payout.count({
+      where: { winnerId: winner.id, tranche: "MILESTONE" },
+    });
+    expect(milestonePayouts).toBe(0); // no KES 0 transfer ever exists
+
+    const milestone = await prisma.milestone.findUnique({ where: { winnerId: winner.id } });
+    expect(milestone?.confirmedAt).not.toBeNull();
+
+    // Vault accounting advanced as if the milestone tranche had settled.
+    const [vault, event] = await Promise.all([
+      prisma.vaultState.findUnique({ where: { eventId: rem.event.id } }),
+      prisma.event.findUnique({ where: { id: rem.event.id } }),
+    ]);
+    expect(vault?.chainState).toBe("SETTLED");
+    expect(event?.status).toBe("SETTLED");
+  });
+});
+
+describe("stuck-PROCESSING recovery matrix (audit remediation)", () => {
+  it("resolves stuck payouts from provider truth: success→confirm, failed→review, pending→leave+alert", async () => {
+    const rem = await createRemWorld("sweep", { status: "WINNERS_ANNOUNCED" });
+    await prisma.prizeBreakdown.createMany({
+      data: [1, 2, 3].map((place) => ({
+        eventId: rem.event.id,
+        place,
+        label: `Place ${place}`,
+        amountKes: 10_000,
+        milestoneRequired: false,
+      })),
+    });
+    await prisma.vaultState.create({
+      data: { eventId: rem.event.id, amountKes: 30_000, chainState: "LOCKED", lockedAt: new Date() },
+    });
+
+    const specs = [
+      { label: "sweep-ok", ref: `trf-${TEST_KEY}-plain-1`, attempts: 1, ageMin: 30 },
+      { label: "sweep-fail", ref: `trf-${TEST_KEY}-simfail-1`, attempts: 5, ageMin: 30 },
+      { label: "sweep-pend", ref: `trf-${TEST_KEY}-simpending-1`, attempts: 1, ageMin: 25 * 60 },
+    ];
+    const payoutIds: Record<string, string> = {};
+    for (const [index, spec] of specs.entries()) {
+      const { leader, team } = await createRemTeam(rem.event.id, spec.label, true);
+      const winner = await prisma.winner.create({
+        data: {
+          eventId: rem.event.id,
+          teamId: team.id,
+          place: index + 1,
+          userId: leader.id,
+          amountKes: 10_000,
+          milestoneRequired: false,
+        },
+      });
+      const payout = await prisma.payout.create({
+        data: {
+          winnerId: winner.id,
+          tranche: "INSTANT",
+          amountKes: 10_000,
+          idempotencyKey: `${winner.id}:INSTANT`,
+          recipientCode: "RCP_SIM_SWEEP",
+          status: "PROCESSING",
+          attemptCount: spec.attempts,
+          paystackReference: spec.ref,
+          paystackTransferCode: `TRF_SIM_${spec.ref}`,
+          queuedAt: new Date(Date.now() - spec.ageMin * 60 * 1000),
+        },
+      });
+      payoutIds[spec.label] = payout.id;
+    }
+
+    const driven = await sweepStuckPayouts();
+    expect(driven).toBeGreaterThanOrEqual(2); // success + failed paths
+
+    const ok = await prisma.payout.findUnique({ where: { id: payoutIds["sweep-ok"] } });
+    expect(ok?.status).toBe("SUCCEEDED"); // provider truth: success → confirmed
+    expect(ok?.paidAt).not.toBeNull();
+
+    const failed = await prisma.payout.findUnique({ where: { id: payoutIds["sweep-fail"] } });
+    expect(failed?.status).toBe("MANUAL_REVIEW"); // attempt cap reached → ops queue
+
+    const pending = await prisma.payout.findUnique({ where: { id: payoutIds["sweep-pend"] } });
+    expect(pending?.status).toBe("PROCESSING"); // left alone (fail-closed)
+    expect(pending?.lastError).toContain("[stuck>24h]"); // ops paged once
+  });
+});
+
+describe("adminRetryPayout provider-truth gate (audit remediation)", () => {
+  it("refuses to re-drive while the original transfer is live at the provider", async () => {
+    const rem = await createRemWorld("retry", { status: "WINNERS_ANNOUNCED" });
+    const { leader, team } = await createRemTeam(rem.event.id, "retry-t1", true);
+    const winner = await prisma.winner.create({
+      data: {
+        eventId: rem.event.id,
+        teamId: team.id,
+        place: 1,
+        userId: leader.id,
+        amountKes: 10_000,
+        milestoneRequired: false,
+      },
+    });
+    const liveAtProvider = await prisma.payout.create({
+      data: {
+        winnerId: winner.id,
+        tranche: "INSTANT",
+        amountKes: 10_000,
+        idempotencyKey: `${winner.id}:INSTANT`,
+        recipientCode: "RCP_SIM_RETRY",
+        status: "FAILED",
+        attemptCount: 2,
+        paystackReference: `trf-${TEST_KEY}-plain-9`, // simulation: plain → success
+      },
+    });
+
+    const refused = await adminRetryPayout(adminId!, liveAtProvider.id);
+    expect(refused.outcome).toBe("unverified");
+    const still = await prisma.payout.findUnique({ where: { id: liveAtProvider.id } });
+    expect(still?.status).toBe("FAILED"); // untouched — admin must verify first
+  });
+
+  it("re-drives once the original transfer is verified dead (failed)", async () => {
+    const rem = await createRemWorld("retry2", { status: "WINNERS_ANNOUNCED" });
+    const { leader, team } = await createRemTeam(rem.event.id, "retry2-t1", true);
+    const winner = await prisma.winner.create({
+      data: {
+        eventId: rem.event.id,
+        teamId: team.id,
+        place: 1,
+        userId: leader.id,
+        amountKes: 10_000,
+        milestoneRequired: false,
+      },
+    });
+    const deadAtProvider = await prisma.payout.create({
+      data: {
+        winnerId: winner.id,
+        tranche: "INSTANT",
+        amountKes: 10_000,
+        idempotencyKey: `${winner.id}:INSTANT`,
+        recipientCode: "RCP_SIM_RETRY2",
+        status: "FAILED",
+        attemptCount: 2,
+        paystackReference: `trf-${TEST_KEY}-simfail-9`, // simulation: failed
+      },
+    });
+
+    const retried = await adminRetryPayout(adminId!, deadAtProvider.id);
+    expect(retried.outcome).not.toBe("unverified");
+    const after = await prisma.payout.findUnique({ where: { id: deadAtProvider.id } });
+    expect(after?.status).toBe("SUCCEEDED"); // fresh attempt pays in simulation
+  });
+});
+
+describe("vault healing (audit remediation)", () => {
+  it("advances a stuck LOCKED vault whose payouts are all terminal", async () => {
+    const rem = await createRemWorld("heal", { status: "WINNERS_ANNOUNCED" });
+    await prisma.vaultState.create({
+      data: { eventId: rem.event.id, amountKes: 10_000, chainState: "LOCKED", lockedAt: new Date() },
+    });
+    const { leader, team } = await createRemTeam(rem.event.id, "heal-t1", true);
+    const winner = await prisma.winner.create({
+      data: {
+        eventId: rem.event.id,
+        teamId: team.id,
+        place: 1,
+        userId: leader.id,
+        amountKes: 10_000,
+        milestoneRequired: false,
+      },
+    });
+    await prisma.payout.create({
+      data: {
+        winnerId: winner.id,
+        tranche: "INSTANT",
+        amountKes: 10_000,
+        idempotencyKey: `${winner.id}:INSTANT`,
+        recipientCode: "RCP_SIM_HEAL",
+        status: "SUCCEEDED",
+        paidAt: new Date(),
+      },
+    });
+
+    const { healVaultStates } = await import("@/services/payout/service");
+    const healed = await healVaultStates();
+    expect(healed).toBeGreaterThanOrEqual(1);
+    const vault = await prisma.vaultState.findUnique({ where: { eventId: rem.event.id } });
+    expect(vault?.chainState).toBe("SETTLED"); // single winner, instant succeeded, no milestone
+    const event = await prisma.event.findUnique({ where: { id: rem.event.id } });
+    expect(event?.status).toBe("SETTLED");
+  });
+
+  it("leaves vaults with open payouts alone", async () => {
+    const rem = await createRemWorld("healopen", { status: "WINNERS_ANNOUNCED" });
+    await prisma.vaultState.create({
+      data: { eventId: rem.event.id, amountKes: 10_000, chainState: "LOCKED", lockedAt: new Date() },
+    });
+    const { leader, team } = await createRemTeam(rem.event.id, "healopen-t1", true);
+    const winner = await prisma.winner.create({
+      data: {
+        eventId: rem.event.id,
+        teamId: team.id,
+        place: 1,
+        userId: leader.id,
+        amountKes: 10_000,
+        milestoneRequired: false,
+      },
+    });
+    await prisma.payout.create({
+      data: {
+        winnerId: winner.id,
+        tranche: "INSTANT",
+        amountKes: 10_000,
+        idempotencyKey: `${winner.id}:INSTANT`,
+        recipientCode: "RCP_SIM_HEALOPEN",
+        status: "QUEUED", // fresh — not sweepable, not terminal
+      },
+    });
+
+    const { healVaultStates } = await import("@/services/payout/service");
+    await healVaultStates();
+    const vault = await prisma.vaultState.findUnique({ where: { eventId: rem.event.id } });
+    expect(vault?.chainState).toBe("LOCKED");
+  });
+});
+
+describe("manual-paid attestation (audit remediation)", () => {
+  it("adminMarkManuallyPaid enqueues payout.attest with the receipt as txRef", async () => {
+    const rem = await createRemWorld("manual", { status: "WINNERS_ANNOUNCED" });
+    await prisma.vaultState.create({
+      data: { eventId: rem.event.id, amountKes: 10_000, chainState: "LOCKED", lockedAt: new Date() },
+    });
+    const { leader, team } = await createRemTeam(rem.event.id, "manual-t1", true);
+    const winner = await prisma.winner.create({
+      data: {
+        eventId: rem.event.id,
+        teamId: team.id,
+        place: 1,
+        userId: leader.id,
+        amountKes: 10_000,
+        milestoneRequired: false,
+      },
+    });
+    const payout = await prisma.payout.create({
+      data: {
+        winnerId: winner.id,
+        tranche: "INSTANT",
+        amountKes: 10_000,
+        idempotencyKey: `${winner.id}:INSTANT`,
+        recipientCode: "RCP_SIM_MANUAL",
+        status: "MANUAL_REVIEW",
+      },
+    });
+
+    const receipt = `receipt-${TEST_KEY}-manual`;
+    await adminMarkManuallyPaid(adminId!, payout.id, receipt);
+    const after = await prisma.payout.findUnique({ where: { id: payout.id } });
+    expect(after?.status).toBe("SUCCEEDED");
+
+    // The attestation job carries the receipt as txRef — same shape as the
+    // normal confirmTransferSuccess path.
+    const jobs = await prisma.$queryRawUnsafe<{ data: Record<string, unknown> }[]>(
+      `SELECT data FROM pgboss.job WHERE name = 'payout.attest' AND data->>'txRef' = $1`,
+      receipt
+    );
+    expect(jobs.length).toBeGreaterThanOrEqual(1);
+    expect(jobs[0].data.winnerId).toBe(winner.id);
+    expect(jobs[0].data.tranche).toBe("INSTANT");
+
+    // And the handler records the ledger entry idempotently under that txRef.
+    await attestPayout({
+      eventId: rem.event.id,
+      winnerId: winner.id,
+      tranche: "INSTANT",
+      amountKes: 10_000,
+      txRef: receipt,
+    });
+    await attestPayout({
+      eventId: rem.event.id,
+      winnerId: winner.id,
+      tranche: "INSTANT",
+      amountKes: 10_000,
+      txRef: receipt,
+    });
+    const entries = await prisma.ledgerEntry.findMany({
+      where: { eventId: rem.event.id, type: "INSTANT_PAYOUT" },
+    });
+    expect(entries).toHaveLength(1);
+    expect((entries[0].payload as Record<string, unknown>).txRef).toBe(receipt);
+  });
+});
+
+describe("judge/participant mutual exclusion (audit remediation)", () => {
+  it("respondToInvite re-checks participation at activation (judge joined a team after invite)", async () => {
+    const rem = await createRemWorld("jex1", { status: "LIVE" });
+    const { leader } = await createRemTeam(rem.event.id, "jex1-t1");
+    await prisma.judgeAssignment.create({
+      data: { eventId: rem.event.id, userId: leader.id, status: "INVITED" },
+    });
+    const assignment = await prisma.judgeAssignment.findFirst({
+      where: { eventId: rem.event.id, userId: leader.id },
+    });
+
+    const { respondToInvite } = await import("@/services/judging/service");
+    await expect(respondToInvite(assignment!.id, leader.id, true)).rejects.toMatchObject({
+      code: "WRONG_STATE",
+      message: expect.stringContaining("participating"),
+    });
+
+    // Declining still works — the guard only blocks activation.
+    await respondToInvite(assignment!.id, leader.id, false);
+    const after = await prisma.judgeAssignment.findUnique({ where: { id: assignment!.id } });
+    expect(after?.status).toBe("DECLINED");
+  });
+
+  it("assertNotJudgeForEvent blocks ACTIVE and INVITED judges from team paths", async () => {
+    const rem = await createRemWorld("jex2", { status: "LIVE" });
+    const { assertNotJudgeForEvent } = await import("@/services/judging/service");
+    const judgeUser = await createUser("jex2-judge");
+    const otherUser = await createUser("jex2-other");
+
+    await prisma.judgeAssignment.create({
+      data: { eventId: rem.event.id, userId: judgeUser.id, status: "INVITED" },
+    });
+    await expect(assertNotJudgeForEvent(rem.event.id, judgeUser.id)).rejects.toMatchObject({
+      code: "WRONG_STATE",
+    });
+    await expect(assertNotJudgeForEvent(rem.event.id, otherUser.id)).resolves.toBeUndefined();
+
+    await prisma.judgeAssignment.updateMany({
+      where: { eventId: rem.event.id, userId: judgeUser.id },
+      data: { status: "ACTIVE" },
+    });
+    await expect(assertNotJudgeForEvent(rem.event.id, judgeUser.id)).rejects.toMatchObject({
+      code: "WRONG_STATE",
+    });
+
+    // A declined judge may participate again.
+    await prisma.judgeAssignment.updateMany({
+      where: { eventId: rem.event.id, userId: judgeUser.id },
+      data: { status: "DECLINED" },
+    });
+    await expect(assertNotJudgeForEvent(rem.event.id, judgeUser.id)).resolves.toBeUndefined();
+  });
+
+  it("openJudging refuses to open while an ACTIVE judge is a participant (fail-closed)", async () => {
+    const rem = await createRemWorld("jex3", { status: "LIVE" });
+    const { leader } = await createRemTeam(rem.event.id, "jex3-t1");
+    await prisma.judgeAssignment.create({
+      data: { eventId: rem.event.id, userId: leader.id, status: "ACTIVE" },
+    });
+
+    const { openJudging } = await import("@/services/judging/service");
+    await expect(openJudging(rem.event.id, rem.organizer.id)).rejects.toMatchObject({
+      code: "WRONG_STATE",
+      message: expect.stringContaining("also participants"),
+    });
+    const blocked = await prisma.event.findUnique({ where: { id: rem.event.id } });
+    expect(blocked?.status).toBe("LIVE"); // unchanged — fail closed
+
+    // Removing the conflict unblocks judging.
+    await prisma.judgeAssignment.updateMany({
+      where: { eventId: rem.event.id, userId: leader.id },
+      data: { status: "DECLINED" },
+    });
+    await openJudging(rem.event.id, rem.organizer.id);
+    const opened = await prisma.event.findUnique({ where: { id: rem.event.id } });
+    expect(opened?.status).toBe("JUDGING");
   });
 });

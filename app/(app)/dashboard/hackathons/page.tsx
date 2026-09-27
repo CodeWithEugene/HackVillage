@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendarDays } from "lucide-react";
 
+import { PrizeVerifiedBadge } from "@/components/patterns/prize-verified-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -65,7 +66,7 @@ export default async function DashboardEventsPage() {
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       {verified ? (
-                        <Badge variant="brand">Prize Verified</Badge>
+                        <PrizeVerifiedBadge />
                       ) : (
                         <Badge variant="warning">{STATUS_LABELS[event.status]}</Badge>
                       )}

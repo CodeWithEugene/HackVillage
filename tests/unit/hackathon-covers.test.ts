@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { HACKATHON_CATEGORIES } from "@/lib/events/categories";
-import { coverFor, DEFAULT_COVER } from "@/lib/events/covers";
+import { coverFor } from "@/lib/events/covers";
+
+// The module no longer exports its fallback — assert against the known value.
+const DEFAULT_COVER = "/marketing/blog/kenyan-developers-building-together.webp";
 
 describe("coverFor", () => {
   it("uses the hackathon's own cover when it has one", () => {

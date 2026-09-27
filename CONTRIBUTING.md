@@ -81,14 +81,14 @@ Large features (new escrow flows, DAO mechanics, cross-border payment rails) sho
 | Requirement | Minimum Version |
 |---|---|
 | Node.js | 22.13+ |
-| pnpm | 9.x |
+| pnpm | 11.x (`corepack enable` pins the version from `package.json`) |
 | PostgreSQL | 15.x |
 | Git | 2.x |
 
 You will also need:
 
 - A **Paystack** account — test keys are sufficient for local development.
-- An RPC endpoint for the target chain (Polygon Mumbai testnet or Solana Devnet) for escrow contract work.
+- An RPC endpoint for the target chain (Polygon Amoy testnet) for escrow contract work.
 
 ### Installation
 
@@ -112,12 +112,16 @@ cp .env.example .env.local
 | Variable | Description |
 |---|---|
 | `DATABASE_URL` | PostgreSQL connection string |
-| `PAYSTACK_SECRET_KEY` | Paystack secret key (`sk_test_...` for local) |
-| `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Paystack public key (`pk_test_...` for local) |
-| `SMART_CONTRACT_ADDRESS` | Deployed escrow contract address |
-| `RPC_URL` | JSON-RPC endpoint for the target chain |
 | `NEXTAUTH_SECRET` | Random secret for session signing |
 | `NEXTAUTH_URL` | Base URL (`http://localhost:3000` locally) |
+| `NEXT_PUBLIC_APP_URL` | Public base URL used in links/metadata |
+| `PAYSTACK_SECRET_KEY` | Paystack secret key (`sk_test_...` for local; absent = simulation) |
+| `SMART_CONTRACT_ADDRESS` | Deployed escrow contract address |
+| `RPC_URL` | JSON-RPC endpoint for the target chain |
+| `ATTESTER_PRIVATE_KEY` | Platform signer for chain attestations (env-only) |
+
+The full, annotated variable list lives in `.env.example` and is validated by
+`lib/env.ts`.
 
 Never commit `.env.local` or any file containing real credentials.
 
@@ -146,8 +150,12 @@ HackVillage/
 ├── components/           # Shared React components
 ├── lib/                  # Shared utilities, DB client, API helpers
 ├── services/
-│   ├── escrow/           # Escrow microservice — Paystack + smart contract calls
-│   └── payout/           # Split disbursement logic
+│   ├── escrow/           # Deposits, vault, webhook, attestations, reconcile
+│   ├── payout/           # Split disbursement engine, tranches, milestones
+│   ├── judging/          # Rubrics, scoring, feedback gate, results
+│   ├── media/            # 48h deadline, trust events, notifications
+│   ├── legacy/           # 3-month check-ins, disputes
+│   └── pow/              # Endorsements, portfolio, hiring intros
 ├── contracts/            # Smart contract source and ABI
 ├── db/
 │   ├── migrations/       # PostgreSQL migrations
@@ -292,9 +300,10 @@ CI will fail on lint or type errors. Do not disable rules with `eslint-disable` 
 Tests live in the `tests/` directory, mirroring the source structure.
 
 ```bash
-pnpm test              # Run all tests
-pnpm run test:unit     # Unit tests only
-pnpm run test:e2e      # End-to-end tests (requires running dev server)
+pnpm test                  # Run all tests
+pnpm run test:unit         # Unit tests only
+pnpm run test:integration  # Integration tests (live Postgres — see tests/integration)
+pnpm run test:coverage     # Suite + coverage gate on services/escrow + services/payout
 ```
 
 ### Requirements

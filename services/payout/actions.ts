@@ -26,6 +26,11 @@ function toState(error: unknown): PayoutActionState {
   return { error: "Something went wrong. Try again in a moment." };
 }
 
+/** True for Prisma unique-constraint violations (double-submit races). */
+function isUniqueViolation(error: unknown): boolean {
+  return (error as { code?: string })?.code === "P2002";
+}
+
 // ── Developer: payout method (recipient onboarding) ──────────────────────
 
 const recipientSchema = z.object({
@@ -97,6 +102,10 @@ export async function announceWinnersAction(
     }
     return { message: "Winners announced. The instant 50% payouts are on their way." };
   } catch (error) {
+    // The unique ({eventId, place}) constraint — a double-click announce.
+    if (isUniqueViolation(error)) {
+      return { error: "Winners are already announced for this hackathon." };
+    }
     return toState(error);
   }
 }
@@ -107,18 +116,27 @@ export async function confirmMilestoneAction(winnerId: string): Promise<PayoutAc
   const user = await requireUser();
   try {
     const result = await confirmMilestone(winnerId, user.id);
-    if (result.outcome === "queued") {
+    if (result.outcome === "queued" || result.outcome === "confirmed") {
       const winner = await prisma.winner.findUnique({
         where: { id: winnerId },
         include: { event: { select: { slug: true } } },
       });
       if (winner) revalidatePath(`/organizer/hackathons/${winner.event.slug}`);
-      return { message: "Milestone confirmed. The final 50% is releasing." };
+      return {
+        message:
+          result.outcome === "confirmed"
+            ? "Milestone confirmed. This prize is fully settled."
+            : "Milestone confirmed. The final 50% is releasing.",
+      };
     }
     if (result.outcome === "forbidden") return { error: "Only organization admins can confirm milestones." };
     if (result.outcome === "not-required") return { error: "This prize pays fully on the day, with no milestone." };
     return { error: "The milestone can't be confirmed yet (instant tranche unfinished or already confirmed)." };
   } catch (error) {
+    // The unique idempotency key — a double-click milestone confirm.
+    if (isUniqueViolation(error)) {
+      return { error: "That milestone was already confirmed — refresh the page." };
+    }
     return toState(error);
   }
 }
@@ -130,6 +148,12 @@ export async function adminRetryPayoutAction(payoutId: string): Promise<PayoutAc
   try {
     const result = await adminRetryPayout(user.id, payoutId);
     if (result.outcome === "duplicate") return { error: "That payout already succeeded." };
+    if (result.outcome === "unverified") {
+      return {
+        error:
+          "The original transfer still shows as live at Paystack. Verify it in the Paystack dashboard before retrying.",
+      };
+    }
     revalidatePath("/admin/payments");
     return { message: "Retry triggered." };
   } catch (error) {

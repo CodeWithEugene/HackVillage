@@ -1,8 +1,12 @@
+import { rm } from "node:fs/promises";
+import path from "node:path";
+
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { prisma } from "@/lib/db";
 import { coverKey } from "@/lib/events/cover-upload";
 import { CoverError, issueCoverUpload, removeCover, setCover } from "@/lib/events/cover-service";
+import { getStoragePort } from "@/lib/ports/storage";
 
 /**
  * Hackathon cover images: only the organization's owners and admins can
@@ -73,6 +77,10 @@ afterAll(async () => {
   await prisma.auditLog.deleteMany({ where: { entityId: { in: [eventId, otherEventId] } } });
   await prisma.organization.deleteMany({ where: { id: orgId } });
   await prisma.user.deleteMany({ where: { id: { in: userIds } } });
+  await rm(path.join(process.cwd(), "public", "uploads", "covers", eventId), {
+    recursive: true,
+    force: true,
+  }).catch(() => undefined);
 });
 
 describe("hackathon covers", () => {
@@ -115,8 +123,15 @@ describe("hackathon covers", () => {
     ).rejects.toThrow(/under 10MB/);
   });
 
-  it("sets the cover from an issued key and logs it", async () => {
+  it("refuses a key whose object never landed in storage", async () => {
     const key = coverKey(eventId, "image/webp");
+    await expect(setCover({ userId: owner, eventId, key })).rejects.toThrow(/never landed/);
+  });
+
+  it("sets the cover from an issued key once the upload landed, and logs it", async () => {
+    const key = coverKey(eventId, "image/webp");
+    await getStoragePort().saveLocalAt(key, Buffer.from("fake-webp-bytes"));
+
     const { coverUrl } = await setCover({ userId: owner, eventId, key });
 
     const event = await prisma.event.findUniqueOrThrow({ where: { id: eventId } });

@@ -36,8 +36,8 @@ export default async function EditEventPage({
       <header>
         <h1 className="font-display text-2xl font-bold text-ink">Edit Draft Hackathon</h1>
         <p className="mt-1 text-sm text-muted">
-          Drafts stay editable. Once published, the hackathon locks until the vault deposit flow
-          arrives.
+          Drafts stay editable. Once published, the hackathon locks and goes live when the vault
+          deposit confirms.
         </p>
       </header>
       <EventWizard

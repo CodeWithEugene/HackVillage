@@ -51,6 +51,10 @@ export async function registerJobs(): Promise<void> {
   await registerJob(boss, "escrow.attest-vault-locked", async (data) =>
     attestations.attestVaultLocked(String(data.eventId))
   );
+  // Refund attestation (escrow.refund primitive) — state-aware handler.
+  await registerJob(boss, "escrow.attest-refund", async (data) =>
+    attestations.attestRefund(String(data.eventId), String(data.refundRef))
+  );
 
   // New Prize Verified hackathon alert to builders (fan-out off the money path).
   await registerJob(boss, "hackathon.announce", async (data) => {
@@ -73,7 +77,7 @@ export async function registerJobs(): Promise<void> {
     });
   });
 
-  // Hourly cron: deposit expiry + payout recovery sweep.
+  // Hourly cron: deposit expiry + webhook outbox repair + event lifecycle.
   await boss.createQueue("escrow.cron").catch((error: { code?: string }) => {
     if (error?.code !== "B03") throw error;
   });
@@ -85,6 +89,16 @@ export async function registerJobs(): Promise<void> {
       if (job.data?.kind !== "expire-deposits") continue;
       const expired = await deposits.expireStaleDeposits();
       if (expired > 0) console.log(`[cron] expired ${expired} stale deposit(s)`);
+
+      // Webhook outbox: re-drive events recorded but never processed (>1h).
+      const { reprocessStaleWebhookEvents } = await import("@/services/escrow/webhook");
+      const reprocessed = await reprocessStaleWebhookEvents();
+      if (reprocessed > 0) console.log(`[cron] reprocessed ${reprocessed} stale webhook event(s)`);
+
+      // Lifecycle: LIVE events past their start time become IN_PROGRESS.
+      const { advanceStartedEvents } = await import("@/lib/events/status-jobs");
+      const advanced = await advanceStartedEvents();
+      if (advanced > 0) console.log(`[cron] advanced ${advanced} event(s) to IN_PROGRESS`);
     }
   });
 
@@ -99,6 +113,9 @@ export async function registerJobs(): Promise<void> {
       if (job.data?.kind !== "sweep-payouts") continue;
       const driven = await payouts.sweepStuckPayouts();
       if (driven > 0) console.log(`[cron] payout sweep re-drove ${driven} payout(s)`);
+      // Vault healing: recompute stuck WINNERS_ANNOUNCED vaults from payout facts.
+      const healed = await payouts.healVaultStates();
+      if (healed > 0) console.log(`[cron] healed ${healed} vault state(s)`);
     }
   });
 

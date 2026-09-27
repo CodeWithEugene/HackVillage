@@ -12,6 +12,11 @@ import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol"
  *         instantly, and that milestones settled. Every deposit and payout
  *         recorded here carries the off-chain payment reference for
  *         cross-verification on /trust.
+ *
+ * @dev Roles: the hot attester key holds ONLY ATTESTER_ROLE — never admin.
+ *      DEFAULT_ADMIN_ROLE belongs to the factory (the vault's deployer), which
+ *      uses it for key ceremonies: a compromised hot key is rotated on-chain
+ *      via `PrizeVaultFactory.rotateAttester` — no redeploy, no ledger fork.
  */
 contract PrizeVault is AccessControl {
     // ── Roles ────────────────────────────────────────────────────────────
@@ -59,11 +64,11 @@ contract PrizeVault is AccessControl {
         amountKes = _amountKes;
         state = State.AWAITING;
 
-        // The attester rotates by re-deploying (immutable contract — plan §11.4):
-        // the factory holds DEFAULT_ADMIN on child vaults for key ceremonies.
+        // The factory (msg.sender) holds DEFAULT_ADMIN_ROLE so it can run key
+        // ceremonies (rotateAttester) on this vault. The hot attester key gets
+        // ATTESTER_ROLE and nothing more — least privilege for an env-held key.
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(ATTESTER_ROLE, attester);
-        _grantRole(DEFAULT_ADMIN_ROLE, attester);
     }
 
     /// @notice Record the locked deposit once the pool webhook is confirmed.

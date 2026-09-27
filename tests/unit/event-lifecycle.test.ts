@@ -8,7 +8,7 @@ import {
   statusTone,
   submissionWindowOpen,
 } from "@/lib/events/lifecycle";
-import { eventSlugStem, placesAreUnique, poolFromPrizes } from "@/lib/events/validation";
+import { eventSlugStem, placesAreUnique } from "@/lib/events/validation";
 
 const MIN_POOL = 10_000;
 
@@ -110,10 +110,6 @@ describe("phases and trust marks", () => {
 });
 
 describe("prize helpers", () => {
-  it("pools sum the places", () => {
-    expect(poolFromPrizes([{ amountKes: 250_000 }, { amountKes: 150_000 }, { amountKes: 100_000 }])).toBe(500_000);
-  });
-
   it("places must be unique", () => {
     expect(placesAreUnique([{ place: 1 }, { place: 2 }])).toBe(true);
     expect(placesAreUnique([{ place: 1 }, { place: 1 }])).toBe(false);

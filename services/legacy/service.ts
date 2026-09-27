@@ -6,6 +6,7 @@ import { alertAdmins } from "@/lib/notifications/admin-alert";
 import {
   disputeOpenedAdminEmail,
   disputeOpenedOrganizerEmail,
+  disputeRefundedEmail,
   disputeResolvedEmail,
 } from "@/lib/notifications/templates/admin";
 import {
@@ -310,13 +311,15 @@ export async function openMilestoneDispute(input: {
   }).catch((error: unknown) => console.error("[legacy] dispute organizer notice failed", error));
 }
 
-/** Admin resolution: release (audited override — the payout engine takes over) or reject. */
+/** Admin resolution: release (audited override — the payout engine takes over), refund (two admins), or reject. */
 export async function resolveDispute(input: {
   disputeId: string;
   adminId: string;
-  resolution: "RELEASE" | "REJECT";
+  resolution: "RELEASE" | "REJECT" | "REFUND";
   note: string;
-}): Promise<{ outcome: "released" | "rejected" }> {
+  /** REFUND only: a second, DIFFERENT admin must co-approve (schema 2-admin rule). */
+  secondApproverId?: string;
+}): Promise<{ outcome: "released" | "rejected" | "refunded" }> {
   const [dispute, adminGrant] = await Promise.all([
     prisma.dispute.findUnique({
       where: { id: input.disputeId },
@@ -340,6 +343,80 @@ export async function resolveDispute(input: {
     if (opener) await sendMail({ to: opener.email, ...template }).catch(() => undefined);
     await sendMail({ to: dispute.winner.event.org.owner.email, ...template }).catch(() => undefined);
   };
+
+  if (input.resolution === "REFUND") {
+    // The schema's 2-admin rule: a refund moves money back to the organizer,
+    // so a SECOND, different admin must co-sign.
+    if (!input.secondApproverId) {
+      throw new LegacyError("A refund needs a second admin to co-approve.", "FORBIDDEN");
+    }
+    if (input.secondApproverId === input.adminId) {
+      throw new LegacyError("The second approver must be a different admin.", "FORBIDDEN");
+    }
+    const secondGrant = await prisma.roleGrant.findFirst({
+      where: { userId: input.secondApproverId, role: "ADMIN" },
+    });
+    if (!secondGrant) {
+      throw new LegacyError("The second approver isn't an admin.", "FORBIDDEN");
+    }
+
+    // Refunds are only available while NO milestone payout exists — once a
+    // paid MILESTONE tranche is out the door the recovery is a manual ops
+    // process (see the payout runbook), never a button.
+    const milestonePayout = await prisma.payout.findFirst({
+      where: { winnerId: dispute.winnerId, tranche: "MILESTONE" },
+      select: { id: true },
+    });
+    if (milestonePayout) {
+      throw new LegacyError(
+        "A milestone payout already exists — refunds after a paid tranche are a manual ops process.",
+        "WRONG_STATE"
+      );
+    }
+
+    await prisma.$transaction([
+      prisma.dispute.update({
+        where: { id: input.disputeId },
+        data: {
+          status: "RESOLVED_REFUND",
+          resolvedBy: input.adminId,
+          secondApproverId: input.secondApproverId,
+          resolvedAt: new Date(),
+          resolutionNote: input.note,
+        },
+      }),
+      prisma.auditLog.create({
+        data: {
+          actorId: input.adminId,
+          action: "dispute.refunded",
+          entity: "Dispute",
+          entityId: input.disputeId,
+          reason: input.note.slice(0, 300),
+          meta: { secondApproverId: input.secondApproverId },
+        },
+      }),
+    ]);
+
+    // The vault refund runs outside the dispute transaction: it owns its own
+    // state machine, attestation enqueue, and admin alert (idempotent).
+    const vault = await prisma.vaultState.findUnique({
+      where: { eventId: dispute.winner.eventId },
+      select: { chainState: true },
+    });
+    if (vault && (vault.chainState === "LOCKED" || vault.chainState === "HALF_RELEASED")) {
+      const { refundLockedVault } = await import("@/services/escrow/refund");
+      await refundLockedVault(
+        dispute.winner.eventId,
+        `Dispute ${input.disputeId} resolved as refund: ${input.note.slice(0, 200)}`,
+        input.adminId
+      );
+    }
+
+    const template = disputeRefundedEmail(dispute.winner.event.title, input.note);
+    if (opener) await sendMail({ to: opener.email, ...template }).catch(() => undefined);
+    await sendMail({ to: dispute.winner.event.org.owner.email, ...template }).catch(() => undefined);
+    return { outcome: "refunded" };
+  }
 
   if (input.resolution === "REJECT") {
     await prisma.$transaction([

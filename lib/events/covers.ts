@@ -1,7 +1,8 @@
 import { isCategory, type HackathonCategory } from "@/lib/events/categories";
 import { RENAMED_IMAGES } from "@/lib/seo/renamed-images";
 
-export const DEFAULT_COVER = "/marketing/blog/kenyan-developers-building-together.webp";
+// Fallback when no category matches — module-private (not part of the API).
+const DEFAULT_COVER = "/marketing/blog/kenyan-developers-building-together.webp";
 
 /** Category-specific compositions work in both the 21:9 cards and 16:9 detail panel. */
 const CATEGORY_COVERS: Record<HackathonCategory, string> = {

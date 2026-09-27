@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarX2, Rocket } from "lucide-react";
+import { CalendarX2 } from "lucide-react";
 
 import { LegacyCheckinCard } from "@/components/legacy/legacy-cards";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { requireOnboardedUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
@@ -71,34 +70,17 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
-      <EmptyState
-        icon={CalendarX2}
-        title={dueCheckins.length > 0 ? "" : "No active hackathons right now"}
-        description={
-          dueCheckins.length > 0
-            ? ""
-            : "Prize Verified hackathons appear here the moment you register: active hackathons, teams, and in-flight payouts at a glance."
-        }
-        action={
-          dueCheckins.length > 0 ? undefined : (
+      {dueCheckins.length === 0 ? (
+        <EmptyState
+          icon={CalendarX2}
+          title="No active hackathons right now"
+          description="Prize Verified hackathons appear here the moment you register: active hackathons, teams, and in-flight payouts at a glance."
+          action={
             <Link href="/hackathons">
               <Button arrow>Browse Hackathons</Button>
             </Link>
-          )
-        }
-      />
-
-      {dueCheckins.length === 0 ? (
-        <Card>
-          <CardTitle className="flex items-center gap-2">
-            <Rocket aria-hidden className="size-5" /> The Full Loop Is Live
-          </CardTitle>
-          <CardDescription>
-            Escrowed prize pools, 50/50 payouts, structured judge feedback, verified Proof-of-Work
-            profiles, hiring intros, the 48-hour media standard, and 3-month legacy tracking. The
-            platform runs end to end. Next: production hardening (runbooks, load tests, audit).
-          </CardDescription>
-        </Card>
+          }
+        />
       ) : null}
     </div>
   );

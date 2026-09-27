@@ -1,12 +1,16 @@
+import { rm } from "node:fs/promises";
+import path from "node:path";
+
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { prisma } from "@/lib/db";
+import { getStoragePort } from "@/lib/ports/storage";
 import {
   MediaError,
   applyManualTrustAdjustment,
+  confirmMediaUpload,
   createUploadTarget,
   enforceMediaDeadlines,
-  registerMediaAsset,
   setMediaStatus,
 } from "@/services/media/service";
 import { mediaDeadlineFor } from "@/services/media/trust";
@@ -93,6 +97,13 @@ afterAll(async () => {
     await prisma.organization.delete({ where: { id: orgId } }).catch(() => undefined);
     await prisma.user.deleteMany({ where: { email: { contains: TEST_KEY } } });
   }
+  // Uploaded test files live under public/uploads/events/<eventId>.
+  if (world) {
+    await rm(path.join(process.cwd(), "public", "uploads", "events", world.eventId), {
+      recursive: true,
+      force: true,
+    }).catch(() => undefined);
+  }
   await prisma.$disconnect();
 });
 
@@ -131,7 +142,7 @@ describe("media vault (integration)", () => {
     ).rejects.toMatchObject({ code: "BAD_FILE" });
   });
 
-  it("issues a local upload target and registers the asset", async () => {
+  it("confirm gates on the object existing: no phantom rows, then the row appears", async () => {
     const target = await createUploadTarget({
       eventId: world.eventId,
       userId: world.organizerId,
@@ -142,7 +153,32 @@ describe("media vault (integration)", () => {
     expect(target.key).toContain(`events/${world.eventId}/`);
     expect(target.uploadUrl).toContain("/api/dev/media/upload/");
 
-    await registerMediaAsset({
+    // The file never landed — confirm refuses and NO row is created.
+    await expect(
+      confirmMediaUpload({
+        eventId: world.eventId,
+        userId: world.organizerId,
+        key: target.key,
+        kind: "PHOTO",
+      })
+    ).rejects.toMatchObject({ code: "BAD_FILE" });
+    expect(await prisma.mediaAsset.findUnique({ where: { r2Key: target.key } })).toBeNull();
+
+    // Keys from another event are refused even when they exist.
+    await expect(
+      confirmMediaUpload({
+        eventId: world.eventId,
+        userId: world.organizerId,
+        key: "events/somebody-elses-event/abc123-photo.jpg",
+        kind: "PHOTO",
+      })
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+
+    // The upload lands, then confirm creates the row.
+    const storage = getStoragePort();
+    await storage.saveLocalAt(target.key, Buffer.from("fake-jpeg-bytes"));
+
+    await confirmMediaUpload({
       eventId: world.eventId,
       userId: world.organizerId,
       key: target.key,
@@ -152,6 +188,7 @@ describe("media vault (integration)", () => {
 
     const asset = await prisma.mediaAsset.findUnique({ where: { r2Key: target.key } });
     expect(asset).toMatchObject({ status: "PENDING", kind: "PHOTO" });
+    expect(asset?.url).toBe(`/uploads/${target.key}`);
 
     await setMediaStatus(asset!.id, world.organizerId, "APPROVED");
     const approved = await prisma.mediaAsset.findUnique({ where: { id: asset!.id } });

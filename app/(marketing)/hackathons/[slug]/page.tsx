@@ -5,6 +5,7 @@ import { CalendarDays, Clock, MapPin, Users } from "lucide-react";
 
 import { KeyDatesCard } from "@/components/patterns/key-dates-card";
 import { OrganizerCard } from "@/components/patterns/organizer-card";
+import { PrizeVerifiedBadge } from "@/components/patterns/prize-verified-badge";
 import { StatusTimeline } from "@/components/patterns/status-timeline";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
@@ -175,6 +176,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
             <Users aria-hidden className="size-3.5" /> {event._count.teams} team
             {event._count.teams === 1 ? "" : "s"}
           </Badge>
+          {event.prizeVerifiedAt ? <PrizeVerifiedBadge /> : null}
         </div>
         {event.summary ? (
           <p className="mx-auto mt-2 max-w-2xl text-lg text-muted">{event.summary}</p>

@@ -8,9 +8,9 @@ import { prisma } from "@/lib/db";
 import {
   MediaError,
   applyManualTrustAdjustment,
+  confirmMediaUpload,
   createUploadTarget,
   grantMediaAppeal,
-  registerMediaAsset,
   setMediaStatus,
 } from "@/services/media/service";
 
@@ -20,6 +20,8 @@ export interface MediaActionState {
   uploadUrl?: string;
   uploadHeaders?: Record<string, string>;
   publicUrl?: string;
+  /** The key the client confirms against after the upload lands. */
+  key?: string;
 }
 
 function toState(error: unknown): MediaActionState {
@@ -28,8 +30,18 @@ function toState(error: unknown): MediaActionState {
   return { error: "Something went wrong. Try again in a moment." };
 }
 
+/** The organizer media page is routed by slug — never revalidate by id. */
+async function revalidateMediaPage(eventId: string): Promise<void> {
+  const event = await prisma.event.findUnique({ where: { id: eventId }, select: { slug: true } });
+  if (event) revalidatePath(`/organizer/hackathons/${event.slug}/media`);
+}
+
 // ── Organizer: media vault ───────────────────────────────────────────────
 
+/**
+ * Step 1: issue the upload target ONLY — no MediaAsset row exists until the
+ * client confirms the landed upload (confirmMediaUploadAction).
+ */
 export async function requestUploadUrlAction(
   _prev: MediaActionState,
   formData: FormData
@@ -39,7 +51,6 @@ export async function requestUploadUrlAction(
   const filename = z.string().trim().min(3).max(120).safeParse(String(formData.get("filename") ?? ""));
   const contentType = z.string().trim().min(3).max(60).safeParse(String(formData.get("contentType") ?? ""));
   const sizeBytes = z.coerce.number().int().positive().safeParse(String(formData.get("sizeBytes") ?? "0"));
-  const caption = String(formData.get("caption") ?? "").trim().slice(0, 300) || undefined;
 
   if (!eventId.success || !filename.success || !contentType.success || !sizeBytes.success) {
     return { error: "Pick a valid file first." };
@@ -53,27 +64,42 @@ export async function requestUploadUrlAction(
       contentType: contentType.data,
       sizeBytes: sizeBytes.data,
     });
+    return {
+      message: "Upload ready. Complete it in your browser.",
+      uploadUrl: target.uploadUrl,
+      uploadHeaders: target.headers,
+      publicUrl: target.publicUrl,
+      key: target.key,
+    };
+  } catch (error) {
+    return toState(error);
+  }
+}
 
-    // Dev/local mode: the client posts the file to our own route which calls
-    // registerMediaAsset. Prod (R2): the client PUTs directly, then registers.
-    if (target.uploadUrl.includes("/api/dev/media/upload/")) {
-      return {
-        message: "dev-upload",
-        uploadUrl: target.uploadUrl,
-        uploadHeaders: target.headers,
-        publicUrl: target.publicUrl,
-      };
-    }
+/** Step 2: the client PUT the file — verify it landed, then create the row. */
+export async function confirmMediaUploadAction(input: {
+  eventId: string;
+  key: string;
+  kind: "PHOTO" | "VIDEO";
+  caption?: string;
+}): Promise<MediaActionState> {
+  const user = await requireUser();
+  const eventId = z.string().cuid().safeParse(input.eventId);
+  const key = z.string().trim().min(10).max(200).safeParse(input.key);
+  if (!eventId.success || !key.success || (input.kind !== "PHOTO" && input.kind !== "VIDEO")) {
+    return { error: "The upload confirmation was malformed. Try the upload again." };
+  }
 
-    await registerMediaAsset({
+  try {
+    await confirmMediaUpload({
       eventId: eventId.data,
       userId: user.id,
-      key: target.key,
-      kind: contentType.data.startsWith("video/") ? "VIDEO" : "PHOTO",
-      caption,
+      key: key.data,
+      kind: input.kind,
+      caption: input.caption?.trim().slice(0, 300) || undefined,
     });
-    revalidatePath(`/organizer/hackathons/${eventId.data}/media`);
-    return { message: "Upload ready. Complete it in your browser.", uploadUrl: target.uploadUrl, uploadHeaders: target.headers };
+    await revalidateMediaPage(eventId.data);
+    return { message: "Added to the vault." };
   } catch (error) {
     return toState(error);
   }
@@ -90,7 +116,7 @@ export async function setMediaStatusAction(
       select: { eventId: true },
     });
     await setMediaStatus(assetId, user.id, status);
-    if (asset) revalidatePath(`/organizer/hackathons/${asset.eventId}/media`);
+    if (asset) await revalidateMediaPage(asset.eventId);
   } catch (error) {
     console.error("[media] status change failed", error);
   }

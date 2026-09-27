@@ -59,26 +59,39 @@ export default async function AdminUsersPage({
 
       <Card>
         <CardTitle>Results ({users.length})</CardTitle>
-        <ul className="mt-3 divide-y divide-ink/5">
-          {users.map((user) => (
-            <li key={user.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
-              <span>
-                <strong className="text-ink">{user.name ?? `@${user.handle}`}</strong>{" "}
-                <span className="text-muted">@{user.handle}</span>
-                <span className="block text-xs text-muted">{user.email}</span>
-              </span>
-              <span className="flex flex-wrap items-center gap-1.5">
-                {user.deletedAt ? <Badge variant="danger">deleted</Badge> : null}
-                <Badge variant={user.emailVerified ? "success" : "warning"}>
-                  {user.emailVerified ? "verified" : "unverified"}
-                </Badge>
-                {user.roleGrants.map((grant) => (
-                  <Badge key={grant.role}>{grant.role.toLowerCase()}</Badge>
-                ))}
-              </span>
-            </li>
-          ))}
-        </ul>
+        {users.length === 0 ? (
+          <p className="mt-4 rounded-control border border-dashed border-ink/15 bg-paper p-6 text-center text-sm text-muted">
+            {q ? (
+              <>
+                No users match <strong className="text-ink">&ldquo;{q}&rdquo;</strong>. Try a
+                different name, handle, or email.
+              </>
+            ) : (
+              "No users yet."
+            )}
+          </p>
+        ) : (
+          <ul className="mt-3 divide-y divide-ink/5">
+            {users.map((user) => (
+              <li key={user.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+                <span>
+                  <strong className="text-ink">{user.name ?? `@${user.handle}`}</strong>{" "}
+                  <span className="text-muted">@{user.handle}</span>
+                  <span className="block text-xs text-muted">{user.email}</span>
+                </span>
+                <span className="flex flex-wrap items-center gap-1.5">
+                  {user.deletedAt ? <Badge variant="danger">deleted</Badge> : null}
+                  <Badge variant={user.emailVerified ? "success" : "warning"}>
+                    {user.emailVerified ? "verified" : "unverified"}
+                  </Badge>
+                  {user.roleGrants.map((grant) => (
+                    <Badge key={grant.role}>{grant.role.toLowerCase()}</Badge>
+                  ))}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </Card>
     </div>
   );

@@ -11,6 +11,13 @@ export interface SendNotificationInput {
   template: EmailTemplate;
   /** Omit for security or money critical mail, which always sends. */
   category?: NotificationCategory;
+  /**
+   * Caller has ALREADY verified this user's category preference in the
+   * current batch (the announce fan-out batch-loads preferences to avoid an
+   * N+1). Skips the per-user preference query. Never set unless the caller
+   * really checked — a wrong true emails an opted-out user.
+   */
+  preferencePrechecked?: boolean;
 }
 
 const MUTED = "#6b6b6b";
@@ -23,7 +30,7 @@ const INK = "#000092";
  * header (RFC 8058) so Gmail and Yahoo show their own unsubscribe control too.
  */
 export async function sendNotification(input: SendNotificationInput): Promise<{ delivered: boolean }> {
-  if (input.category) {
+  if (input.category && !input.preferencePrechecked) {
     const preference = await prisma.notificationPreference.findUnique({
       where: { userId: input.userId },
     });

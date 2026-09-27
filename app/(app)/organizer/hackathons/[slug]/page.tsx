@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Lock } from "lucide-react";
 
 import { CoverUploader } from "@/components/organizer/cover-uploader";
+import { EventCancelButton } from "@/components/organizer/event-cancel-button";
 import { PublishGate } from "@/components/organizer/publish-gate";
 import { JudgingSection } from "@/components/judging/judging-section";
 import { Badge } from "@/components/ui/badge";
@@ -78,11 +79,16 @@ export default async function EventCommandCenterPage({ params }: PageProps) {
             hackvillage.xyz/hackathons/{event.slug}
           </p>
         </div>
-        {isDraft ? (
-          <Link href={`/organizer/hackathons/${event.slug}/edit`}>
-            <Button variant="secondary" arrow>Edit Draft</Button>
-          </Link>
-        ) : null}
+        <div className="flex flex-wrap items-center gap-2">
+          {isDraft ? (
+            <Link href={`/organizer/hackathons/${event.slug}/edit`}>
+              <Button variant="secondary" arrow>Edit Draft</Button>
+            </Link>
+          ) : null}
+          {event.status === "DRAFT" || event.status === "PENDING_DEPOSIT" ? (
+            <EventCancelButton eventId={event.id} eventTitle={event.title} />
+          ) : null}
+        </div>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-3">

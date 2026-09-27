@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Plus, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,14 @@ import { Card } from "@/components/ui/card";
 import { FormError, Input, Label, Textarea } from "@/components/ui/input";
 import { HACKATHON_CATEGORIES, MAX_CATEGORIES } from "@/lib/events/categories";
 import { COVER_HEIGHT, COVER_WIDTH } from "@/lib/events/cover-upload";
+import {
+  eventBasicsSchema,
+  eventProblemSchema,
+  eventPrizesSchema,
+  eventSettingsSchema,
+  eventWizardSchema,
+  placesAreUnique,
+} from "@/lib/events/validation";
 import { formatKes } from "@/lib/utils";
 import { saveEventAction, type EventActionState } from "@/lib/events/actions";
 
@@ -38,6 +46,23 @@ interface PrizeRow {
 
 const STEPS = ["Basics", "Problem", "Prizes", "Teams", "Review"] as const;
 
+/** Which step a schema field lives on — validation failures jump back to it. */
+const STEP_FOR_FIELD: Record<string, number> = {
+  title: 0,
+  summary: 0,
+  venueType: 0,
+  location: 0,
+  startsAt: 0,
+  endsAt: 0,
+  registrationDeadline: 0,
+  categories: 0,
+  problemStatement: 1,
+  rules: 1,
+  rolesWanted: 1,
+  prizes: 2,
+  maxTeams: 3,
+};
+
 function toLocalInput(date?: Date): string {
   if (!date) return "";
   return new Date(date.getTime() - date.getTimezoneOffset() * 60_000)
@@ -48,6 +73,8 @@ function toLocalInput(date?: Date): string {
 export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefaults; minPoolKes: number }) {
   const [state, action, pending] = useActionState<EventActionState, FormData>(saveEventAction, {});
   const [step, setStep] = useState(0);
+  const [stepError, setStepError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const [venueType, setVenueType] = useState<"PHYSICAL" | "ONLINE" | "HYBRID">(
     defaults?.venueType ?? "PHYSICAL"
   );
@@ -82,6 +109,115 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
 
   const visible = (index: number) => (step === index ? "block" : "hidden");
 
+  /**
+   * The steps hide instead of unmounting, so the answers persist across
+   * steps — and the form is noValidate, because a required input inside a
+   * display:none step can silently block the final submit. Validation runs
+   * per step (and again on submit) through the same zod schemas the server
+   * uses.
+   */
+  const fieldValue = (name: string): string => {
+    const element = formRef.current?.elements.namedItem(name);
+    return element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement
+      ? element.value
+      : "";
+  };
+
+  const completePrizes = () =>
+    prizes
+      .filter((p) => p.label.trim() && Number(p.amount) > 0)
+      .map((p) => ({
+        place: p.place,
+        label: p.label.trim(),
+        amountKes: Number(p.amount),
+        milestoneRequired: p.milestoneRequired,
+      }));
+
+  /** First problem on a step, or null when the step passes the server's schema. */
+  const validateStep = (index: number): string | null => {
+    switch (index) {
+      case 0: {
+        if (!fieldValue("registrationDeadline") || !fieldValue("startsAt") || !fieldValue("endsAt")) {
+          return "Set the registration deadline, start, and end dates.";
+        }
+        const parsed = eventBasicsSchema.safeParse({
+          title: fieldValue("title"),
+          summary: fieldValue("summary"),
+          venueType,
+          location: fieldValue("location"),
+          startsAt: fieldValue("startsAt"),
+          endsAt: fieldValue("endsAt"),
+          registrationDeadline: fieldValue("registrationDeadline"),
+          categories: categories.join(","),
+        });
+        if (!parsed.success) return parsed.error.issues[0]?.message ?? "Check the basics.";
+        const { startsAt, endsAt, registrationDeadline } = parsed.data;
+        if (!(registrationDeadline < startsAt)) {
+          return "Registration must close before the hackathon starts.";
+        }
+        if (!(startsAt < endsAt)) return "The hackathon must end after it starts.";
+        return null;
+      }
+      case 1: {
+        const parsed = eventProblemSchema.safeParse({
+          problemStatement: fieldValue("problemStatement"),
+          rules: fieldValue("rules") || undefined,
+          rolesWanted: fieldValue("rolesWanted") || undefined,
+        });
+        return parsed.success ? null : (parsed.error.issues[0]?.message ?? "Check the problem.");
+      }
+      case 2: {
+        const halfFilled = prizes.some(
+          (p) => Boolean(p.label.trim()) !== Boolean(Number(p.amount) > 0)
+        );
+        if (halfFilled) return "Finish or remove the half-filled prize row: label and KES amount.";
+        const parsed = eventPrizesSchema.safeParse({ prizes: completePrizes() });
+        if (!parsed.success) return parsed.error.issues[0]?.message ?? "Check the prizes.";
+        if (!placesAreUnique(parsed.data.prizes)) {
+          return "Prize places must be unique: 1st, 2nd, 3rd…";
+        }
+        return null;
+      }
+      case 3: {
+        const parsed = eventSettingsSchema.safeParse({ maxTeams: fieldValue("maxTeams") });
+        return parsed.success ? null : (parsed.error.issues[0]?.message ?? "Check the team settings.");
+      }
+      default:
+        return null;
+    }
+  };
+
+  /** Whole-form check before the real submit; jumps to the failing step. */
+  const validateAll = (): { error: string; step: number } | null => {
+    const parsed = eventWizardSchema.safeParse({
+      title: fieldValue("title"),
+      summary: fieldValue("summary"),
+      venueType,
+      location: fieldValue("location"),
+      startsAt: fieldValue("startsAt"),
+      endsAt: fieldValue("endsAt"),
+      registrationDeadline: fieldValue("registrationDeadline"),
+      categories: categories.join(","),
+      problemStatement: fieldValue("problemStatement"),
+      rules: fieldValue("rules") || undefined,
+      rolesWanted: fieldValue("rolesWanted") || undefined,
+      prizes: completePrizes(),
+      maxTeams: fieldValue("maxTeams"),
+    });
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      const field = String(issue?.path[0] ?? "");
+      return {
+        error: issue?.message ?? "Check the hackathon details and try again.",
+        step: STEP_FOR_FIELD[field] ?? 0,
+      };
+    }
+    if (!placesAreUnique(parsed.data.prizes)) {
+      return { error: "Prize places must be unique: 1st, 2nd, 3rd…", step: 2 };
+    }
+    return null;
+  };
+
   return (
     <div className="mx-auto w-full max-w-2xl">
       {/* Stepper */}
@@ -102,24 +238,26 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
         ))}
       </ol>
 
-      <form action={action} className="space-y-6">
+      <form
+        ref={formRef}
+        action={action}
+        noValidate
+        onSubmit={(event) => {
+          const problem = validateAll();
+          if (problem) {
+            event.preventDefault();
+            setStep(problem.step);
+            setStepError(problem.error);
+          } else {
+            setStepError(null);
+          }
+        }}
+        className="space-y-6"
+      >
         <input type="hidden" name="eventId" value={defaults?.eventId ?? ""} />
         <input type="hidden" name="venueType" value={venueType} />
         <input type="hidden" name="categories" value={categories.join(",")} />
-        <input
-          type="hidden"
-          name="prizes"
-          value={JSON.stringify(
-            prizes
-              .filter((p) => p.label.trim() && Number(p.amount) > 0)
-              .map((p) => ({
-                place: p.place,
-                label: p.label.trim(),
-                amountKes: Number(p.amount),
-                milestoneRequired: p.milestoneRequired,
-              }))
-          )}
-        />
+        <input type="hidden" name="prizes" value={JSON.stringify(completePrizes())} />
 
         {/* Step 1 — Basics */}
         <div className={visible(0)}>
@@ -259,7 +397,7 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
                       type="checkbox"
                       checked={prize.milestoneRequired}
                       onChange={(e) => setPrize(index, { milestoneRequired: e.target.checked })}
-                      className="size-3.5 accent-[#222]"
+                      className="size-3.5 accent-ink"
                     />
                     Milestone required before the final 50% releases
                   </label>
@@ -315,19 +453,34 @@ export function EventWizard({ defaults, minPoolKes }: { defaults?: WizardDefault
           </Card>
         </div>
 
+        <FormError message={stepError ?? undefined} />
         <FormError message={state.error} />
 
         <div className="flex items-center justify-between">
           <Button
             type="button"
             variant="secondary"
-            onClick={() => setStep((s) => Math.max(0, s - 1))}
+            onClick={() => {
+              setStepError(null);
+              setStep((s) => Math.max(0, s - 1));
+            }}
             disabled={step === 0}
           >
             <ArrowLeft aria-hidden className="size-4" /> Back
           </Button>
           {step < STEPS.length - 1 ? (
-            <Button type="button" onClick={() => setStep((s) => s + 1)}>
+            <Button
+              type="button"
+              onClick={() => {
+                const error = validateStep(step);
+                if (error) {
+                  setStepError(error);
+                  return;
+                }
+                setStepError(null);
+                setStep((s) => s + 1);
+              }}
+            >
               Continue <ArrowRight aria-hidden className="size-4" />
             </Button>
           ) : (

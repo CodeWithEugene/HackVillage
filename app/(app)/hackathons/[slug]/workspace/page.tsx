@@ -90,6 +90,12 @@ export default async function WorkspacePage({
     },
   });
 
+  // The endorse page is judge-only; only surface the link to active judges.
+  const activeJudgeship = await prisma.judgeAssignment.findFirst({
+    where: { eventId: event.id, userId: user.id, status: "ACTIVE" },
+    select: { id: true },
+  });
+
   const windowOpen = submissionWindowOpen(event);
 
   return (
@@ -201,17 +207,19 @@ export default async function WorkspacePage({
         )
       ) : null}
 
-      <Card>
-        <CardTitle>What Happens After Announcement</CardTitle>
-        <CardDescription>
-          Endorse the winners you judged:{" "}
-          <a href={`/judge/hackathons/${event.slug}/endorse`} className="underline hover:text-ink">
-            write endorsements
-          </a>{" "}
-          once results are announced. Your one-liner becomes permanent proof on their
-          Proof-of-Work profiles.
-        </CardDescription>
-      </Card>
+      {activeJudgeship ? (
+        <Card>
+          <CardTitle>What Happens After Announcement</CardTitle>
+          <CardDescription>
+            Endorse the winners you judged:{" "}
+            <a href={`/judge/hackathons/${event.slug}/endorse`} className="underline hover:text-ink">
+              write endorsements
+            </a>{" "}
+            once results are announced. Your one-liner becomes permanent proof on their
+            Proof-of-Work profiles.
+          </CardDescription>
+        </Card>
+      ) : null}
     </div>
   );
 }

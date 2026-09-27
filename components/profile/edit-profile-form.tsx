@@ -108,7 +108,7 @@ export function EditProfileForm({ handle, defaults }: { handle: string; defaults
               name="visible"
               checked={visible}
               onChange={(event) => setVisible(event.target.checked)}
-              className="size-4 accent-[#222]"
+              className="size-4 accent-ink"
             />
             <span>
               <strong>Public profile.</strong> Uncheck to hide yourself from developer browse.

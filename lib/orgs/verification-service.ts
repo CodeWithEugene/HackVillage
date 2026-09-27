@@ -6,6 +6,62 @@ import { kybSubmittedEmail } from "@/lib/notifications/templates/organizations";
 
 export class KybSubmissionError extends Error {}
 
+export class KybDecisionError extends Error {}
+
+/**
+ * Admin KYB decision (the other half of submitKyb). Decisions are only valid
+ * while the organization is actually awaiting review — deciding a VERIFIED or
+ * FAILED org again would clobber the earlier audited outcome and re-mail the
+ * organizer, so anything but PENDING is refused. Returns what the caller
+ * needs for the outcome email.
+ */
+export async function decideKyb(input: {
+  adminId: string;
+  orgId: string;
+  decision: "APPROVE" | "REJECT";
+  reason: string;
+}): Promise<{ orgName: string; ownerEmail: string }> {
+  const admin = await prisma.roleGrant.findFirst({
+    where: { userId: input.adminId, role: "ADMIN" },
+    select: { id: true },
+  });
+  if (!admin) throw new KybDecisionError("Admins only.");
+
+  const org = await prisma.organization.findUnique({
+    where: { id: input.orgId },
+    select: { name: true, kycStatus: true, owner: { select: { email: true } } },
+  });
+  if (!org) throw new KybDecisionError("Organization not found.");
+  if (org.kycStatus !== "PENDING") {
+    throw new KybDecisionError(
+      "That organization isn't awaiting review — refresh and take the next pending one."
+    );
+  }
+
+  await prisma.$transaction([
+    prisma.organization.update({
+      where: { id: input.orgId },
+      data: { kycStatus: input.decision === "APPROVE" ? "VERIFIED" : "FAILED" },
+    }),
+    // Organizations that asked before structured submissions have no row; updateMany skips them.
+    prisma.kybSubmission.updateMany({
+      where: { orgId: input.orgId },
+      data: { reviewedAt: new Date(), reviewNote: input.reason || null },
+    }),
+    prisma.auditLog.create({
+      data: {
+        actorId: input.adminId,
+        action: input.decision === "APPROVE" ? "kyc.approved" : "kyc.rejected",
+        entity: "Organization",
+        entityId: input.orgId,
+        reason: input.reason || null,
+      },
+    }),
+  ]);
+
+  return { orgName: org.name, ownerEmail: org.owner.email };
+}
+
 /**
  * An organization's owner or admin submits its business details for review.
  * Moves the organization to PENDING; a later decision sets VERIFIED or FAILED.
