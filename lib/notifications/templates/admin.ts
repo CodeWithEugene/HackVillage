@@ -74,7 +74,7 @@ export function disputeRefundedEmail(eventTitle: string, note: string): EmailTem
       preheader: "The prize pool goes back to the organizer.",
       section: {
         heading: "Dispute Resolved: Refund",
-        bodyHtml: html`<p style="margin:0;">Your dispute on <strong>${eventTitle}</strong> was upheld. The remaining prize pool is refunded to the organizer — no milestone payout will be made.</p>
+        bodyHtml: html`<p style="margin:0;">Your dispute on <strong>${eventTitle}</strong> was upheld. The remaining prize pool is refunded to the organizer. No milestone payout will be made.</p>
           <p style="margin:12px 0 0;">Note from our team: ${note}</p>`,
       },
     }),

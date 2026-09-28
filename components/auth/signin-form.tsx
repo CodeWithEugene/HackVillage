@@ -7,6 +7,7 @@ import { OAuthButtons } from "@/components/auth/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormError, FormSuccess, Input, Label } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { signInAction, type AuthActionState } from "@/lib/auth/actions";
 
 export function SignInForm({
@@ -25,8 +26,8 @@ export function SignInForm({
 
   return (
     <Card>
-      <h1 className="font-display text-2xl font-bold text-ink">Welcome Back</h1>
-      <p className="mt-1 text-sm text-muted">Sign in to your HackVillage account.</p>
+      <h1 className="text-center font-display text-2xl font-bold text-ink">Welcome Back</h1>
+      <p className="mt-1 text-center text-sm text-muted">Sign in to your HackVillage account.</p>
 
       {notice ? <FormSuccess message={notice} /> : null}
       {errorNotice ? <FormError message={errorNotice} /> : null}
@@ -44,10 +45,9 @@ export function SignInForm({
         </div>
         <div>
           <Label htmlFor="password">Password</Label>
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
             required
           />

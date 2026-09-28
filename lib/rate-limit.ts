@@ -98,6 +98,21 @@ export async function rateLimit(
   }
 }
 
+/**
+ * Deletes buckets whose window has already ended. An expired row carries no
+ * state (the next hit resets it to 1), so dropping it is behavior-neutral and
+ * keeps one-off keys (per-IP sign-in attempts, newsletter emails) from piling
+ * up forever. Runs from the hourly cron.
+ */
+export async function purgeExpiredRateLimits(now: number = Date.now()): Promise<number> {
+  // Raw SQL on purpose: rateLimitInDb writes resetAt through raw parameters,
+  // which Postgres converts using the session timezone. Comparing the same way
+  // keeps the purge correct even when the database isn't set to UTC.
+  return prisma.$executeRaw`
+    DELETE FROM "RateLimitBucket" WHERE "resetAt" < ${new Date(now)}
+  `;
+}
+
 /** Test helper — clears both the durable buckets and the fallback windows. */
 export async function resetRateLimits(): Promise<void> {
   fallbackWindows.clear();

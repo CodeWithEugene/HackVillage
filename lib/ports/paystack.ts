@@ -65,9 +65,13 @@ export interface TransferResult {
   simulated: boolean;
 }
 
-/** Provider-truth lookup for the stuck-PROCESSING recovery sweep (P4). */
+/**
+ * Provider-truth lookup for the stuck-PROCESSING recovery sweep (P4).
+ * "not_found" means Paystack answered and has no record of the transfer (safe
+ * to retry); "unknown" means the lookup itself failed (never safe to retry).
+ */
 export interface TransferStatusResult {
-  status: "success" | "failed" | "pending" | "reversed" | "unknown";
+  status: "success" | "failed" | "pending" | "reversed" | "not_found" | "unknown";
 }
 
 /** Maps Paystack transfer statuses onto the platform's recovery vocabulary. */
@@ -240,10 +244,12 @@ export class PaystackLive implements PaystackPort {
       `${PAYSTACK_BASE}/transfer/verify/${encodeURIComponent(referenceOrCode)}`,
       `${PAYSTACK_BASE}/transfer/${encodeURIComponent(referenceOrCode)}`,
     ];
+    let notFoundCount = 0;
     for (const url of endpoints) {
       const response = await fetch(url, {
         headers: { Authorization: `Bearer ${this.secretKey}` },
       }).catch(() => null);
+      if (response?.status === 404) notFoundCount += 1;
       if (!response || !response.ok) continue;
       const payload = (await response.json().catch(() => null)) as {
         status?: boolean;
@@ -252,7 +258,8 @@ export class PaystackLive implements PaystackPort {
       if (!payload?.status || !payload.data) continue;
       return { status: mapTransferStatus(payload.data.status) };
     }
-    return { status: "unknown" };
+    // Only a clean 404 from both lookups proves the transfer never existed.
+    return { status: notFoundCount === endpoints.length ? "not_found" : "unknown" };
   }
 }
 
@@ -316,6 +323,7 @@ export class PaystackSimulation implements PaystackPort {
     if (reference.includes("-simreverse")) return { status: "reversed" };
     if (reference.includes("-simpending")) return { status: "pending" };
     if (reference.includes("-simunknown")) return { status: "unknown" };
+    if (reference.includes("-simnotfound")) return { status: "not_found" };
     return { status: "success" };
   }
 }

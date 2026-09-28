@@ -107,7 +107,7 @@ export function ScoringScreen({
                           : "w-8 text-right font-mono text-sm font-bold text-ink"
                       }
                     >
-                      {value ?? "–"}
+                      {value ?? "Not scored"}
                     </output>
                   </div>
                 </div>
@@ -124,8 +124,8 @@ export function ScoringScreen({
               </Button>
               {!allScored ? (
                 <p className="text-xs font-semibold text-muted">
-                  {unscoredCount} {unscoredCount === 1 ? "criterion" : "criteria"} still unscored —
-                  move every slider to enable saving.
+                  {unscoredCount} {unscoredCount === 1 ? "criterion" : "criteria"} still unscored.
+                  Move every slider to enable saving.
                 </p>
               ) : null}
             </div>

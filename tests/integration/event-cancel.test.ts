@@ -161,6 +161,29 @@ describe("admin cancel", () => {
     expect(vault.chainState).toBe("REFUNDED");
   });
 
+  it("loses the race cleanly when winners are announced after its read", async () => {
+    const { event } = await createEvent("race", { status: "WINNERS_ANNOUNCED", withVault: "HALF_RELEASED" });
+    // Stale read: cancel saw JUDGING, but the announce committed first.
+    const delegate = prisma.event as unknown as Record<string, unknown>;
+    const realFindUnique = prisma.event.findUnique;
+    delegate.findUnique = (args: Parameters<typeof realFindUnique>[0]) => {
+      delegate.findUnique = realFindUnique;
+      return realFindUnique(args).then((row) => (row ? { ...row, status: "JUDGING" } : row));
+    };
+    try {
+      await expect(
+        cancelEventAsAdmin({ eventId: event.id, adminId, reason: "race" })
+      ).rejects.toMatchObject({ code: "WRONG_STATE" });
+    } finally {
+      delegate.findUnique = realFindUnique;
+    }
+    expect((await prisma.event.findUniqueOrThrow({ where: { id: event.id } })).status).toBe(
+      "WINNERS_ANNOUNCED"
+    );
+    const vault = await prisma.vaultState.findUniqueOrThrow({ where: { eventId: event.id } });
+    expect(vault.chainState).toBe("HALF_RELEASED");
+  });
+
   it("cancels a JUDGING event without a vault (no refund)", async () => {
     const { event } = await createEvent("judging", { status: "JUDGING" });
     const result = await cancelEventAsAdmin({ eventId: event.id, adminId, reason: "no show" });

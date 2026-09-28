@@ -8,6 +8,7 @@ import { OAuthButtons } from "@/components/auth/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormError, Input, Label } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { signUpAction, type AuthActionState } from "@/lib/auth/actions";
 import type { SignUpRole } from "@/lib/auth/signup-links";
 
@@ -40,8 +41,8 @@ export function SignUpForm({
 
   return (
     <Card>
-      <h1 className="font-display text-2xl font-bold text-ink">Create Your Account</h1>
-      <p className="mt-1 text-sm text-muted">
+      <h1 className="text-center font-display text-2xl font-bold text-ink">Create Your Account</h1>
+      <p className="mt-1 text-center text-sm text-muted">
         {role === "ORGANIZER"
           ? "Start with your own account. Next, you'll set up your organization."
           : "One account, many roles: you can add organizer or judge access later."}
@@ -95,7 +96,7 @@ export function SignUpForm({
         {role === "DEVELOPER" ? (
           <div>
             <Label htmlFor="handle">Handle (optional)</Label>
-            <Input
+            <PasswordInput
               id="handle"
               name="handle"
               placeholder="your public profile address"
@@ -110,10 +111,9 @@ export function SignUpForm({
 
         <div>
           <Label htmlFor="password">Password</Label>
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="new-password"
             required
             minLength={10}

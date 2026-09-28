@@ -34,7 +34,7 @@ export function AdminEventCancelForm({
       onConfirm={async (formData) => {
         const reason = String(formData.get("reason") ?? "").trim();
         if (reason.length < 4) {
-          return { error: "Give a reason (at least 4 characters) — the organizer sees it." };
+          return { error: "Give a reason (at least 4 characters), since the organizer sees it." };
         }
         return adminCancelEventAction(eventId, reason);
       }}

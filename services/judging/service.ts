@@ -218,7 +218,7 @@ export async function openJudging(eventId: string, organizerId: string): Promise
   });
   if (conflicts.length > 0) {
     throw new JudgingError(
-      `Judging can't open — these judges are also participants; remove them first: ${conflicts
+      `Judging can't open: these judges are also participants; remove them first: ${conflicts
         .map((conflict) => `@${conflict.user.handle}`)
         .join(", ")}.`,
       "WRONG_STATE"

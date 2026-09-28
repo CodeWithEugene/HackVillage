@@ -369,7 +369,7 @@ export async function resolveDispute(input: {
     });
     if (milestonePayout) {
       throw new LegacyError(
-        "A milestone payout already exists — refunds after a paid tranche are a manual ops process.",
+        "A milestone payout already exists. Refunds after a paid tranche are a manual ops process.",
         "WRONG_STATE"
       );
     }

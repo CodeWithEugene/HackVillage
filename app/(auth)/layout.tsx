@@ -37,7 +37,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <ThemeSwitcher />
           </div>
         </div>
-        <div className="auth-form-slot w-full max-w-md">{children}</div>
+        <div className="auth-form-slot">{children}</div>
       </main>
       <AuthVisual />
     </div>

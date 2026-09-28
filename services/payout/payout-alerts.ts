@@ -21,8 +21,8 @@ export function confirmOnReversedAdminEmail(
     html: renderEmail({
       preheader: "A success signal arrived for a payout Paystack already clawed back.",
       section: {
-        heading: "Reversed Payout — Success Refused",
-        bodyHtml: html`<p style="margin:0;">A transfer success for <strong>${eventTitle}</strong> arrived AFTER Paystack had reversed the transfer. The payout stays REVERSED — the money was clawed back. Verify the winner's position with them before any retry.</p>`,
+        heading: "Reversed Payout: Success Refused",
+        bodyHtml: html`<p style="margin:0;">A transfer success for <strong>${eventTitle}</strong> arrived AFTER Paystack had reversed the transfer. The payout stays REVERSED. The money was clawed back. Verify the winner's position with them before any retry.</p>`,
         details: [
           { label: "Payout", value: payoutId },
           { label: "Winner", value: `@${winnerHandle}` },
@@ -36,7 +36,7 @@ export function confirmOnReversedAdminEmail(
     text: renderText([
       `A success signal arrived for REVERSED payout ${payoutId} (${eventTitle}).`,
       `Winner @${winnerHandle}, KES ${amountKes}, reference ${reference}.`,
-      `The payout stays REVERSED — verify manually before any retry.`,
+      `The payout stays REVERSED. Verify manually before any retry.`,
       appUrl("/admin/payments"),
     ]),
   };
@@ -55,7 +55,7 @@ export function stuckPayoutAdminEmail(input: {
     html: renderEmail({
       preheader: "A payout has been in flight for over a day without provider truth.",
       section: {
-        heading: "Payout Stuck — Manual Check",
+        heading: "Payout Stuck: Manual Check",
         bodyHtml: html`<p style="margin:0;">Payout <strong>${input.payoutId}</strong> for <strong>${input.eventTitle}</strong> has been PROCESSING for over 24 hours and Paystack still reports "${input.providerStatus}". The funds remain locked (fail-closed). Check the transfer in the Paystack dashboard and resolve it by hand.</p>`,
         details: [
           { label: "Payout", value: input.payoutId },

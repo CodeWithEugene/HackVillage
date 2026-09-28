@@ -112,10 +112,10 @@ function refundAdminEmail(input: {
   return {
     subject: `Vault Refund Initiated: ${input.eventTitle}`,
     html: renderEmail({
-      preheader: "A prize vault was marked REFUNDED — complete the refund in Paystack.",
+      preheader: "A prize vault was marked REFUNDED. Complete the refund in Paystack.",
       section: {
-        heading: "Vault Refund — Manual Step Required",
-        bodyHtml: html`<p style="margin:0;">The prize vault for <strong>${input.eventTitle}</strong> was marked REFUNDED (was ${input.previousState}). Reason: ${input.reason}. The ledger attestation is queued. <strong>Now refund the deposit(s) manually in the Paystack dashboard</strong> — references: ${referenceLines}.</p>`,
+        heading: "Vault Refund: Manual Step Required",
+        bodyHtml: html`<p style="margin:0;">The prize vault for <strong>${input.eventTitle}</strong> was marked REFUNDED (was ${input.previousState}). Reason: ${input.reason}. The ledger attestation is queued. <strong>Now refund the deposit(s) manually in the Paystack dashboard</strong>. References: ${referenceLines}.</p>`,
         details: [
           { label: "Hackathon", value: input.eventSlug },
           { label: "Total deposited (gross)", value: `KES ${totalGross.toLocaleString("en-KE")}` },

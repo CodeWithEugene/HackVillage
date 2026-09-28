@@ -126,5 +126,9 @@ describe("robots.txt", () => {
     expect(text).toMatch(/^User-Agent: GPTBot$/m);
     expect(text).toMatch(/^Sitemap: .+\/sitemap\.xml$/m);
     expect(text).not.toMatch(/^Host:/m);
+    // Private organizer pages are blocked, public /organizers/<slug> pages aren't.
+    expect(text).toContain("Disallow: /organizer$");
+    expect(text).toContain("Disallow: /organizer/");
+    expect(text).not.toMatch(/^Disallow: \/organizer$/m);
   });
 });

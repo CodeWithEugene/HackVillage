@@ -99,6 +99,11 @@ export async function registerJobs(): Promise<void> {
       const { advanceStartedEvents } = await import("@/lib/events/status-jobs");
       const advanced = await advanceStartedEvents();
       if (advanced > 0) console.log(`[cron] advanced ${advanced} event(s) to IN_PROGRESS`);
+
+      // Housekeeping: expired rate-limit buckets carry no state.
+      const { purgeExpiredRateLimits } = await import("@/lib/rate-limit");
+      const purged = await purgeExpiredRateLimits();
+      if (purged > 0) console.log(`[cron] purged ${purged} expired rate-limit bucket(s)`);
     }
   });
 

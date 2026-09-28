@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { prisma } from "@/lib/db";
-import { rateLimit, resetRateLimits } from "@/lib/rate-limit";
+import { purgeExpiredRateLimits, rateLimit, resetRateLimits } from "@/lib/rate-limit";
 
 /** True when the durable bucket table is reachable (CI/dev DATABASE_URL). */
 async function dbAvailable(): Promise<boolean> {
@@ -63,6 +63,21 @@ describe("rateLimit", () => {
     // After the reset the key gets a full fresh allowance.
     const result = await rateLimit("db-reset", 1, 60_000);
     expect(result.ok).toBe(true);
+    await resetRateLimits();
+  });
+
+  it("purgeExpiredRateLimits drops only buckets whose window has ended", async () => {
+    if (!(await dbAvailable())) return;
+    await resetRateLimits();
+    const now = Date.now();
+    await rateLimit("db-expired", 5, 1000, now - 10_000); // window ended 9s ago
+    await rateLimit("db-live", 5, 60_000, now);
+    expect(await purgeExpiredRateLimits(now)).toBe(1);
+    const keys = (await prisma.rateLimitBucket.findMany({ select: { key: true } })).map((b) => b.key);
+    expect(keys).toEqual(["db-live"]);
+    // The live bucket keeps its count.
+    expect((await rateLimit("db-live", 2, 60_000, now)).ok).toBe(true);
+    expect((await rateLimit("db-live", 2, 60_000, now)).ok).toBe(false);
     await resetRateLimits();
   });
 });

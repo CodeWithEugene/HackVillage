@@ -288,7 +288,7 @@ describe("escrow deposit flow (integration)", () => {
         where: { action: "escrow.deposit-overpayment", entityId: second.id },
       });
       expect(audit).not.toBeNull();
-      expect(audit?.reason).toContain("refund manually");
+      expect(audit?.reason).toMatch(/refund manually/i);
     } finally {
       await prisma.organization.delete({ where: { id: overpaid.org.id } });
     }
