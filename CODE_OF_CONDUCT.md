@@ -61,7 +61,7 @@ tech events run on or organized through HackVillage.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement at
-**cyberuhurultd@gmail.com**.
+**info@hackvillage.xyz**.
 
 All complaints will be reviewed and investigated promptly and fairly.
 

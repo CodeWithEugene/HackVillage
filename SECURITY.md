@@ -18,7 +18,7 @@ HackVillage is under active development. Security fixes are applied to the lates
 Instead, use one of these private channels:
 
 1. **GitHub Security Advisories (preferred):** Use the ["Report a vulnerability"](https://github.com/CodeWithEugene/HackVillage/security/advisories/new) feature on this repository. This keeps the report private while we work on a fix.
-2. **Email:** Send details to **cyberuhurultd@gmail.com** with the subject line `[SECURITY] HackVillage`.
+2. **Email:** Send details to **info@hackvillage.xyz** with the subject line `[SECURITY] HackVillage`.
 
 ### What to include
 
