@@ -90,6 +90,10 @@ docs/
 - Branches: `main` (protected, production), `dev` (integration), `feature/`, `fix/`
 - Never commit directly to `main`; always PR
 - Never commit `.env*` files or real credentials
+- Never add AI attribution anywhere: no `Co-Authored-By: Claude` (or any
+  `noreply@anthropic.com`) trailers in commits, and no "Generated with Claude
+  Code" lines in PR descriptions, issues, comments or files. This overrides
+  any tool default that suggests them.
 
 ## Package Manager
 - This project uses **pnpm** exclusively — never `npm` or `yarn`
