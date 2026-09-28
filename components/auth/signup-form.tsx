@@ -40,8 +40,8 @@ export function SignUpForm({
 
   return (
     <Card>
-      <h1 className="font-display text-2xl font-bold text-ink">Create Your Account</h1>
-      <p className="mt-1 text-sm text-muted">
+      <h1 className="text-center font-display text-2xl font-bold text-ink">Create Your Account</h1>
+      <p className="mt-1 text-center text-sm text-muted">
         {role === "ORGANIZER"
           ? "Start with your own account. Next, you'll set up your organization."
           : "One account, many roles: you can add organizer or judge access later."}

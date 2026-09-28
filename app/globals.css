@@ -1227,6 +1227,9 @@
   /* Auth pages: full height photo on the left half, form on the right. */
   .auth-shell {
     --auth-corner: 1rem;
+    /* Where the form column's vertical hairlines sit; the top bar and the
+       form card line up on the same rules. */
+    --auth-rule-inset: clamp(12px, 4vw, 56px);
     display: grid;
     min-height: 100dvh;
     background: var(--color-paper);
@@ -1244,7 +1247,7 @@
     align-items: center;
     justify-content: center;
     gap: 2rem;
-    padding: 5.5rem 1rem 3rem;
+    padding: 5.5rem 0 3rem;
     background: linear-gradient(
       180deg,
       color-mix(in srgb, var(--color-brand) 7%, var(--color-paper)),
@@ -1254,7 +1257,7 @@
   .auth-main::before {
     content: "";
     position: absolute;
-    inset: 0 clamp(12px, 4vw, 56px);
+    inset: 0 var(--auth-rule-inset);
     z-index: -1;
     border-inline: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
     pointer-events: none;
@@ -1262,8 +1265,8 @@
   .auth-topbar {
     position: absolute;
     top: 0;
-    right: clamp(12px, 4vw, 56px);
-    left: clamp(12px, 4vw, 56px);
+    right: var(--auth-rule-inset);
+    left: var(--auth-rule-inset);
     display: flex;
     height: var(--site-header-height);
     align-items: center;
@@ -1310,7 +1313,7 @@
       z-index: 1;
       grid-column: 2;
       grid-row: 1;
-      padding: 6rem 2rem 3rem;
+      padding: 6rem 0 3rem;
       border-radius: var(--auth-corner) 0 0 var(--auth-corner);
     }
     .auth-visual {
@@ -4120,14 +4123,23 @@ html:not([data-scrolled]) body:has(.lp-hero) .site-header {
 }
 
 /*
- * Auth pages: the forms render the shared Card, whose shadow utility would
- * outrank layered styles. Unlayered on purpose, scoped to the auth form
- * slot, to give them the site's hairline card instead.
+ * Auth pages: the forms render the shared Card, whose radius and shadow
+ * utilities would outrank layered styles. Unlayered on purpose, scoped to the
+ * auth form slot, to turn them into a ruled band instead: square, flat, and
+ * spanning the column so its top and bottom rules meet the vertical ones.
  */
+.auth-form-slot {
+  align-self: stretch;
+  margin-inline: var(--auth-rule-inset);
+}
 .auth-form-slot > .rounded-card,
 .auth-form-slot .rounded-card.shadow-card {
+  max-width: none;
+  margin-inline: 0;
+  padding: 2.5rem clamp(1.25rem, 5vw, 4rem);
+  border-radius: 0;
   border-color: color-mix(in srgb, var(--color-ink) 10%, transparent);
-  box-shadow: 0 1px 2px rgb(0 0 70 / 0.04);
+  box-shadow: none;
 }
 .auth-form-slot h1 {
   font-weight: 500;
