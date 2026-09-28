@@ -1,4 +1,4 @@
-/** The four point brand star used as decoration on the home and How It Works pages. */
+/** The four point brand star used as decoration on the How It Works page. */
 export function Sparkle({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 80 80" aria-hidden="true">
