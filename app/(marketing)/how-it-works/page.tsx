@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 
 export default function HowItWorksPage() {
   return (
-    <div className="pt-8 font-display">
-      <HowItWorks headingLevel="h1" />
+    <div className="lp">
+      <HowItWorks />
       <CtaBanner photoSide="left" />
     </div>
   );
