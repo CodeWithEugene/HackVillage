@@ -959,6 +959,140 @@
     }
   }
 
+  /* Public profiles (developers/[handle], organizers/[slug]). */
+  .pf-hero-grid {
+    align-items: start;
+  }
+  .pf-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    color: var(--color-muted);
+    font-size: 14px;
+  }
+  .pf-bio {
+    max-width: 60ch;
+    margin-top: 16px;
+    color: var(--color-body-copy);
+    font-size: 15.5px;
+    line-height: 1.7;
+  }
+  .pf-skills {
+    margin-top: 18px;
+  }
+  .pf-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  .pf-links a,
+  .pf-item-links a,
+  .pf-endorsements a,
+  .pf-hiring a {
+    color: var(--color-ink-soft);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-brand) 45%, transparent);
+    text-underline-offset: 3px;
+  }
+  .pf-links a:hover,
+  .pf-item-links a:hover,
+  .pf-endorsements a:hover,
+  .pf-hiring a:hover {
+    color: var(--color-ink);
+  }
+  /* Tick-line stats, as on the hackathon rail. */
+  .pf-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 24px;
+  }
+  .pf-stats div {
+    position: relative;
+    padding-left: 14px;
+    border-left: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  }
+  .pf-stats div::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: -1px;
+    width: 1px;
+    height: 20px;
+    background: var(--color-brand);
+  }
+  .pf-stats dt {
+    color: var(--color-muted);
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+  .pf-stats dd {
+    margin-top: 2px;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2vw, 28px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .pf-portfolio {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+  .pf-item {
+    padding: 20px;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+  }
+  .pf-item-title {
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .pf-item-summary {
+    margin-top: 8px;
+    color: var(--color-body-copy);
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+  .pf-item-links {
+    margin-top: 12px;
+    font-size: 14px;
+  }
+  .pf-endorsements {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 40px;
+    margin-top: 28px;
+  }
+  .pf-endorsements li {
+    padding-left: 18px;
+    border-left: 2px solid var(--color-brand);
+  }
+  .pf-endorsements blockquote {
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .pf-endorsements p {
+    margin-top: 8px;
+    color: var(--color-muted);
+    font-size: 13.5px;
+  }
+  @media (max-width: 639px) {
+    .pf-portfolio,
+    .pf-endorsements {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
   /* Shared marketing page hero (components/patterns/page-hero.tsx). */
   .pg-hero-copy {
     max-width: 860px;
