@@ -7,6 +7,7 @@ import { OAuthButtons } from "@/components/auth/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormError, FormSuccess, Input, Label } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { signInAction, type AuthActionState } from "@/lib/auth/actions";
 
 export function SignInForm({
@@ -44,10 +45,9 @@ export function SignInForm({
         </div>
         <div>
           <Label htmlFor="password">Password</Label>
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
             required
           />

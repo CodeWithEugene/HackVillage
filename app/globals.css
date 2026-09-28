@@ -4145,3 +4145,9 @@ html:not([data-scrolled]) body:has(.lp-hero) .site-header {
   font-weight: 500;
   letter-spacing: -0.02em;
 }
+
+/* PasswordInput renders its own show/hide toggle; hide Edge's built-in one. */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
