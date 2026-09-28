@@ -1445,7 +1445,6 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 440px;
     overflow: hidden;
     border: 1px solid var(--lp-line);
     border-radius: var(--radius-card);
@@ -1500,13 +1499,15 @@
     background: var(--color-brand);
     color: var(--color-brand-ink);
   }
+  /* Cards size to their content: the mock sits right under the title, and any
+     height the row adds goes to the gradient below it, not a gap mid-card. */
   .lp-card-visual {
     position: relative;
     display: flex;
     flex: 1;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: center;
-    margin-top: 24px;
+    margin-top: 16px;
     padding: 24px;
     background:
       radial-gradient(120% 90% at 100% 100%, color-mix(in srgb, var(--color-brand) 26%, transparent), transparent 62%),
@@ -2445,9 +2446,6 @@
     }
     .lp-bento {
       grid-template-columns: minmax(0, 1fr);
-    }
-    .lp-card {
-      min-height: 380px;
     }
     .lp-mock-pair {
       grid-template-columns: minmax(0, 1fr);
