@@ -1234,23 +1234,50 @@
   .auth-visual {
     display: none;
   }
+  /* The form half sits in the site's ruled frame: a soft tint at the top and
+     hairline rules down both sides of the form column. */
   .auth-main {
     position: relative;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 2rem;
-    padding: 4.5rem 1rem 3rem;
+    padding: 5.5rem 1rem 3rem;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-brand) 7%, var(--color-paper)),
+      var(--color-paper) 45%
+    );
+  }
+  .auth-main::before {
+    content: "";
+    position: absolute;
+    inset: 0 clamp(12px, 4vw, 56px);
+    z-index: -1;
+    border-inline: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+    pointer-events: none;
   }
   .auth-topbar {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    left: 1rem;
+    top: 0;
+    right: clamp(12px, 4vw, 56px);
+    left: clamp(12px, 4vw, 56px);
     display: flex;
+    height: var(--site-header-height);
     align-items: center;
     justify-content: space-between;
+    padding-inline: clamp(12px, 1.5vw, 20px);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  }
+  .auth-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .auth-logo {
+    display: inline-flex;
   }
   .auth-home {
     display: inline-flex;
@@ -1283,8 +1310,7 @@
       z-index: 1;
       grid-column: 2;
       grid-row: 1;
-      padding: 4.5rem 2rem 3rem;
-      background: var(--color-paper);
+      padding: 6rem 2rem 3rem;
       border-radius: var(--auth-corner) 0 0 var(--auth-corner);
     }
     .auth-visual {
@@ -1319,16 +1345,14 @@
   }
   .auth-visual-eyebrow {
     margin-bottom: 0.75rem;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
     color: var(--color-brand-soft);
   }
   .auth-visual-heading {
     font-family: var(--font-display);
-    font-size: clamp(28px, 2.6vw, 40px);
-    font-weight: 700;
+    font-size: clamp(30px, 2.8vw, 44px);
+    font-weight: 500;
     line-height: 1.05;
     letter-spacing: -0.02em;
   }
@@ -1370,19 +1394,33 @@
     bottom: clamp(1.5rem, 3.5vw, 3rem);
     width: min(19rem, calc(100% - 3rem));
     padding: 1.25rem 1.25rem 1.375rem;
-    border: 1px solid rgb(255 255 255 / 0.18);
-    border-radius: 1.25rem;
-    background: color-mix(in srgb, var(--color-brand-ink) 70%, transparent);
-    backdrop-filter: blur(12px);
-    box-shadow: 6px 6px 0 var(--color-brand);
+    border: 1px solid rgb(255 255 255 / 0.22);
+    border-radius: var(--radius-card);
+    background: color-mix(in srgb, var(--color-brand-ink) 62%, transparent);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 24px 48px -16px rgb(0 0 40 / 0.55);
     color: #fff;
   }
+  /* A tick-line stat, as on the rest of the site. */
   .auth-visual-stat {
+    position: relative;
+    padding-left: 14px;
+    border-left: 1px solid rgb(255 255 255 / 0.25);
     font-family: var(--font-display);
     font-size: 40px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1;
+    letter-spacing: -0.02em;
     color: var(--color-brand-soft);
+  }
+  .auth-visual-stat::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: -1px;
+    width: 1px;
+    height: 24px;
+    background: var(--color-brand);
   }
   .auth-visual-card-text {
     margin-top: 0.5rem;
@@ -4079,4 +4117,19 @@
 html:not([data-scrolled]) body:has(.lp-hero) .site-header {
   background-color: transparent;
   backdrop-filter: none;
+}
+
+/*
+ * Auth pages: the forms render the shared Card, whose shadow utility would
+ * outrank layered styles. Unlayered on purpose, scoped to the auth form
+ * slot, to give them the site's hairline card instead.
+ */
+.auth-form-slot > .rounded-card,
+.auth-form-slot .rounded-card.shadow-card {
+  border-color: color-mix(in srgb, var(--color-ink) 10%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 70 / 0.04);
+}
+.auth-form-slot h1 {
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
