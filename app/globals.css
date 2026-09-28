@@ -4001,6 +4001,75 @@
 }
 
 /*
+ * Large monitors: past 1800px the headings keep growing with the screen,
+ * starting from exactly the size they stop at below it (so nothing jumps)
+ * and capped about 45% larger. Width limits switch to em so line breaks
+ * keep their shape as the type grows.
+ */
+@layer components {
+  @media (min-width: 1800px) {
+    .lp-hero-heading {
+      font-size: clamp(52px, 2.889vw, 75px);
+      max-width: 17.5em;
+    }
+    .hk-hero-heading {
+      font-size: clamp(52px, 2.889vw, 75px);
+    }
+    .pg-title {
+      font-size: clamp(56px, 3.111vw, 81px);
+    }
+    .hkd-title {
+      font-size: clamp(60px, 3.333vw, 87px);
+    }
+    .lp-statement {
+      font-size: clamp(36px, 2.000vw, 52px);
+      max-width: 21.5em;
+    }
+    .lp-statement-sm {
+      font-size: clamp(26px, 1.444vw, 38px);
+      max-width: 27em;
+    }
+    .lp-band-heading {
+      font-size: clamp(48px, 2.667vw, 70px);
+    }
+    .lp-split-heading {
+      font-size: clamp(28px, 1.556vw, 41px);
+    }
+    .hk-featured-title {
+      font-size: clamp(38px, 2.111vw, 55px);
+    }
+    .lp-latest-title {
+      font-size: clamp(32px, 1.778vw, 46px);
+    }
+    .cta-banner-heading {
+      font-size: clamp(36px, 2.000vw, 52px);
+    }
+    .hkd-section-title {
+      font-size: clamp(26px, 1.444vw, 38px);
+    }
+    .legal h2 {
+      font-size: clamp(26px, 1.444vw, 38px);
+    }
+    .lp-card-title {
+      font-size: clamp(20px, 1.111vw, 29px);
+    }
+    .hk-card-title {
+      font-size: clamp(18px, 1.000vw, 26px);
+    }
+    .lp-stat-value {
+      font-size: clamp(46px, 2.556vw, 67px);
+    }
+    .hk-stats-value {
+      font-size: clamp(28px, 1.556vw, 41px);
+    }
+    /* 860px at 1800px, growing in step with the title. */
+    .pg-hero-copy {
+      max-width: min(47.8vw, 1250px);
+    }
+  }
+}
+
+/*
  * Landing page: the header is see-through while the hero is under it, so
  * the ribbon shows behind the nav, and turns solid once the page scrolls
  * (data-scrolled comes from components/patterns/header-scroll-state.tsx).
