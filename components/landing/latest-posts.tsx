@@ -12,7 +12,7 @@ export function LatestPosts() {
 
   return (
     <section className="lp-section" aria-labelledby="lp-latest-heading">
-      <div className="lp-frame lp-block">
+      <div className="lp-frame lp-block lp-block-follow">
         <h2 id="lp-latest-heading" className="lp-statement lp-statement-stack">
           What&apos;s happening
           <span>The latest from the HackVillage blog.</span>

@@ -1285,6 +1285,11 @@
   .lp-block-flush {
     padding-bottom: var(--lp-space);
   }
+  /* For a section that directly follows one ending in a full block of
+     padding: only a little extra space before its heading. */
+  .lp-block-follow {
+    padding-top: clamp(16px, 2.5vw, 32px);
+  }
   .lp-divided {
     border-top: 1px solid var(--lp-line);
   }
