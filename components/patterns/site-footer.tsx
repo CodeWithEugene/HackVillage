@@ -57,6 +57,27 @@ const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[]
 
 const LINK_CLASS = "text-sm text-body-copy transition-colors hover:text-ink";
 
+function Partnership() {
+  return (
+    <>
+      <p className="text-sm text-body-copy">In partnership with:</p>
+      <a
+        href="https://salamandertechhub.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 inline-block transition-opacity hover:opacity-80"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- SVG wordmark, no raster source */}
+        <img
+          src="/images/salamander-logo-yellow.svg"
+          alt="Salamander Tech Hub"
+          className="h-9 w-auto max-w-full"
+        />
+      </a>
+    </>
+  );
+}
+
 export function SiteFooter() {
   const year = new Date().getFullYear();
 
@@ -149,20 +170,15 @@ export function SiteFooter() {
               </span>
             </li>
           </ul>
-          <p className="mt-6 text-sm text-body-copy">In partnership with:</p>
-          <a
-            href="https://salamandertechhub.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-block transition-opacity hover:opacity-80"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element -- SVG wordmark, no raster source */}
-            <img
-              src="/images/salamander-logo-yellow.svg"
-              alt="Salamander Tech Hub"
-              className="h-9 w-auto max-w-full"
-            />
-          </a>
+          <div className="mt-6 hidden lg:block">
+            <Partnership />
+          </div>
+        </div>
+
+        {/* Mobile: the partnership gets its own centered row under the columns
+            (lg keeps it at the foot of "Contact Us"). */}
+        <div className="col-span-2 text-center lg:hidden">
+          <Partnership />
         </div>
       </div>
 

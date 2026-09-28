@@ -905,25 +905,33 @@
     color: var(--color-ink);
   }
 
-  /* Blog (app/(marketing)/blog, components/patterns/blog-card.tsx). */
+  /* Blog (app/(marketing)/blog, components/patterns/blog-card.tsx).
+     Posts sit in a ruled band: it runs out to the frame's side rules and the
+     cells share hairlines (right and bottom), like the landing page grids. */
   .blog-grid {
+    --blog-line: color-mix(in srgb, var(--color-ink) 10%, transparent);
+    --blog-cols: 3;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(var(--blog-cols), minmax(0, 1fr));
+    margin-inline: calc(-1 * var(--lp-gutter, 0px));
+    border-top: 1px solid var(--blog-line);
   }
   .blog-card {
     display: flex;
     height: 100%;
     flex-direction: column;
     overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
-    border-radius: var(--radius-card);
+    border-right: 1px solid var(--blog-line);
+    border-bottom: 1px solid var(--blog-line);
     background: var(--color-surface);
-    transition: border-color 200ms ease, box-shadow 200ms ease;
+    transition: background-color 200ms ease;
+  }
+  /* The last cell in each row leans on the frame's own side rule. */
+  .blog-grid > .blog-card:nth-child(3n) {
+    border-right-color: transparent;
   }
   .blog-card:hover {
-    border-color: color-mix(in srgb, var(--color-brand) 45%, transparent);
-    box-shadow: var(--shadow-card);
+    background: color-mix(in srgb, var(--color-brand) 5%, var(--color-surface));
   }
   .blog-back {
     display: inline-flex;
@@ -953,12 +961,21 @@
   }
   @media (max-width: 1023px) {
     .blog-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      --blog-cols: 2;
+    }
+    .blog-grid > .blog-card:nth-child(3n) {
+      border-right-color: var(--blog-line);
+    }
+    .blog-grid > .blog-card:nth-child(2n) {
+      border-right-color: transparent;
     }
   }
   @media (max-width: 639px) {
     .blog-grid {
-      grid-template-columns: minmax(0, 1fr);
+      --blog-cols: 1;
+    }
+    .blog-grid > .blog-card:nth-child(n) {
+      border-right-color: transparent;
     }
   }
 
