@@ -200,83 +200,6 @@ function LedgerMock() {
   );
 }
 
-const TEAMS = [
-  { name: "Team Jua", track: "AI", score: "8.4", status: "Paid", tone: "done" },
-  { name: "Shamba Labs", track: "AgriTech", score: "8.1", status: "Paid", tone: "done" },
-  { name: "Matatu OS", track: "Mobility", score: "7.9", status: "Paid", tone: "done" },
-  { name: "Kilimo Data", track: "ClimateTech", score: "7.6", status: "Scored", tone: "idle" },
-  { name: "Soko Pay", track: "Fintech", score: "7.2", status: "Scored", tone: "idle" },
-  { name: "Afya Link", track: "HealthTech", score: "—", status: "Submitted", tone: "idle" },
-] as const;
-
-function DashboardMock() {
-  return (
-    <div className="lp-mock lp-mock-dashboard">
-      <div className="lp-mock-browser">
-        <span />
-        <span />
-        <span />
-        <em>hackvillage.xyz/organizer</em>
-      </div>
-      <div className="lp-mock-dash-body">
-        <nav className="lp-mock-dash-nav">
-          <strong>Nairobi AI Hackathon</strong>
-          <span className="lp-mock-dash-active">Overview</span>
-          <span>Teams</span>
-          <span>Submissions</span>
-          <span>Judging</span>
-          <span>Payouts</span>
-          <span>Media</span>
-        </nav>
-        <div className="lp-mock-dash-main">
-          <div className="lp-mock-dash-stats">
-            <div>
-              <span>Teams</span>
-              <strong>48</strong>
-            </div>
-            <div>
-              <span>Submissions</span>
-              <strong>41</strong>
-            </div>
-            <div>
-              <span>Judges</span>
-              <strong>6</strong>
-            </div>
-            <div>
-              <span>Escrowed</span>
-              <strong>KES 500K</strong>
-            </div>
-          </div>
-          <table className="lp-mock-table">
-            <thead>
-              <tr>
-                <th>Team</th>
-                <th>Track</th>
-                <th>Score</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {TEAMS.map((team) => (
-                <tr key={team.name}>
-                  <td>{team.name}</td>
-                  <td>{team.track}</td>
-                  <td>{team.score}</td>
-                  <td>
-                    <span className={`lp-mock-status lp-mock-status-${team.tone}`}>
-                      {team.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function PlatformGrid() {
   return (
     <section className="lp-section" aria-labelledby="lp-platform-heading">
@@ -308,13 +231,6 @@ export function PlatformGrid() {
           </PlatformCard>
           <PlatformCard title="Attest every payout on a public ledger" href="/trust">
             <LedgerMock />
-          </PlatformCard>
-          <PlatformCard
-            title="Run the whole event from one dashboard"
-            href="/for-organizers"
-            className="lp-bento-full"
-          >
-            <DashboardMock />
           </PlatformCard>
         </div>
       </div>

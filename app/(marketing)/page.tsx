@@ -3,10 +3,8 @@ import type { Metadata } from "next";
 import { AudienceSections } from "@/components/landing/audience-sections";
 import { GetStarted } from "@/components/landing/get-started";
 import { LandingAbout } from "@/components/landing/landing-about";
-import { LandingBanner } from "@/components/landing/landing-banner";
 import { LandingHero } from "@/components/landing/landing-hero";
 import { LatestPosts } from "@/components/landing/latest-posts";
-import { OpenInfrastructure } from "@/components/landing/open-infrastructure";
 import { PartnerStrip } from "@/components/landing/partner-strip";
 import { PlatformGrid } from "@/components/landing/platform-grid";
 import { TrustBand } from "@/components/landing/trust-band";
@@ -32,11 +30,9 @@ export default function LandingPage() {
       <LandingHero />
       <PartnerStrip />
       <PlatformGrid />
-      <LandingBanner />
       <TrustBand />
       <LandingAbout />
       <AudienceSections />
-      <OpenInfrastructure />
       <LatestPosts />
       <GetStarted />
     </div>
