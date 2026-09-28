@@ -1347,9 +1347,11 @@
   }
 
   /* ---- Hero ---- */
+  /* Pulled up under the sticky header so the ribbon runs behind the nav. */
   .lp-hero {
     position: relative;
     overflow: hidden;
+    margin-top: calc(-1 * var(--site-header-height));
   }
   .lp-ribbon {
     position: absolute;
@@ -1360,7 +1362,8 @@
     pointer-events: none;
   }
   .lp-hero-inner {
-    padding-block: clamp(72px, 10vw, 148px) clamp(64px, 8vw, 112px);
+    padding-block: calc(var(--site-header-height) + clamp(72px, 10vw, 148px))
+      clamp(64px, 8vw, 112px);
   }
   .lp-hero-ticker {
     font-size: 14px;
@@ -2915,7 +2918,7 @@
       opacity: 0.85;
     }
     .lp-hero-inner {
-      padding-top: 42vw;
+      padding-top: calc(var(--site-header-height) + 42vw);
     }
     .lp-hero-actions > * {
       flex: 1 1 100%;
@@ -2993,4 +2996,15 @@
       grid-template-columns: minmax(0, 1fr);
     }
   }
+}
+
+/*
+ * Landing page: the header is see-through while the hero is under it, so
+ * the ribbon shows behind the nav, and turns solid once the page scrolls
+ * (data-scrolled comes from components/patterns/header-scroll-state.tsx).
+ * Unlayered on purpose, so it outranks the header's Tailwind utilities.
+ */
+html:not([data-scrolled]) body:has(.lp-hero) .site-header {
+  background-color: transparent;
+  backdrop-filter: none;
 }
