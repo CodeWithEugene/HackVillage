@@ -13,6 +13,7 @@ export function PageHero({
   lead,
   children,
   aside,
+  centered = false,
 }: {
   id?: string;
   /** Short label for the top bar, e.g. the page's existing eyebrow. */
@@ -25,9 +26,14 @@ export function PageHero({
   children?: React.ReactNode;
   /** A visual beside the copy on wide screens. */
   aside?: React.ReactNode;
+  /** Centre the bar, title and lead (document pages). */
+  centered?: boolean;
 }) {
   return (
-    <section className="hk-hero pg-hero" aria-labelledby={id}>
+    <section
+      className={centered ? "hk-hero pg-hero pg-hero-centered" : "hk-hero pg-hero"}
+      aria-labelledby={id}
+    >
       <div className="lp-frame hk-hero-frame">
         {kicker || bar ? (
           <div className="hk-hero-bar">

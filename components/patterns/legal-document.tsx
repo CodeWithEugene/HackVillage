@@ -19,7 +19,7 @@ const CONTENT_ID = "legal-content";
 export function LegalDocument({ title, lastUpdated, intro, children }: LegalDocumentProps) {
   return (
     <div className="lp">
-      <PageHero kicker={`Last updated ${lastUpdated}`} title={title} lead={intro} />
+      <PageHero kicker={`Last updated ${lastUpdated}`} title={title} lead={intro} centered />
       <div className="lp-frame lp-divided legal-layout">
         <aside className="legal-aside">
           <LegalToc containerId={CONTENT_ID} />

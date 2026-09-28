@@ -1142,6 +1142,16 @@
     font-size: 18px;
     line-height: 1.6;
   }
+  .pg-hero-centered .hk-hero-bar {
+    justify-content: center;
+  }
+  .pg-hero-centered .pg-hero-copy {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .pg-hero-centered .pg-lead {
+    margin-inline: auto;
+  }
   @media (max-width: 1023px) {
     .pg-hero-grid {
       grid-template-columns: minmax(0, 1fr);
