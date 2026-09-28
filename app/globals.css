@@ -807,8 +807,8 @@
   }
 
   /* Each section opens on a hairline, the way the landing page divides ideas. */
+  /* The text fills the column beside the contents rail. */
   .legal {
-    max-width: 760px;
     min-width: 0;
   }
   .legal h2 {
