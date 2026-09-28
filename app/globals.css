@@ -2700,7 +2700,8 @@
     flex-shrink: 0;
     aspect-ratio: 4 / 5;
     overflow: hidden;
-    border-radius: var(--radius-card);
+    /* Square corners: the wall reads as one continuous grid of covers. */
+    border-radius: 0;
     box-shadow: 0 18px 40px -18px rgb(0 0 70 / 0.45);
     isolation: isolate;
   }
