@@ -15,37 +15,86 @@ const PHASE_LINKS: { key: HackathonPhase; label: string }[] = [
   { key: "past", label: "Past" },
 ];
 
-/** A staggered wall of live hackathon covers, like a customer-stories collage. */
+const WALL_COLUMNS = 3;
+/** Each column needs a few tiles to scroll through without looking sparse. */
+const MIN_PER_COLUMN = 3;
+/** Seconds each tile takes to scroll past, so columns of any length move at one pace. */
+const SECONDS_PER_TILE = 7;
+
+/**
+ * Deal the tiles round-robin into columns, topping short columns up by
+ * cycling through the list (starting at a different point per column, so
+ * neighbours don't mirror each other).
+ */
+function dealColumns(tiles: ListingCard[]): ListingCard[][] {
+  return Array.from({ length: WALL_COLUMNS }, (_, c) => {
+    const column = tiles.filter((_, i) => i % WALL_COLUMNS === c);
+    for (let k = 0; column.length < MIN_PER_COLUMN && k < tiles.length * 2; k++) {
+      const next = tiles[(c + k) % tiles.length];
+      if (next && (!column.includes(next) || tiles.length < MIN_PER_COLUMN)) column.push(next);
+    }
+    return column;
+  });
+}
+
+function Tile({
+  event,
+  hidden,
+  priority,
+}: {
+  event: ListingCard;
+  hidden: boolean;
+  priority: boolean;
+}) {
+  const category = event.categories.find(isCategory);
+  return (
+    <li className="hk-tile" aria-hidden={hidden || undefined}>
+      <HackathonCover event={event} priority={priority} sizes="(min-width: 1024px) 180px, 45vw" />
+      <span className="hk-tile-scrim" aria-hidden="true" />
+      {category ? <span className="hk-tile-tag">{categoryLabel(category)}</span> : null}
+      <Link
+        href={`/hackathons/${event.slug}`}
+        className="hk-tile-link"
+        tabIndex={hidden ? -1 : undefined}
+      >
+        <span className="hk-tile-title">{event.title}</span>
+        <span className="hk-tile-prize">
+          {formatKes(event.poolKes)} <ChevronRight aria-hidden className="size-3.5" />
+        </span>
+      </Link>
+    </li>
+  );
+}
+
+/**
+ * A wall of live hackathon covers in three columns that scroll forever:
+ * the outer two drift up, the middle one down. Each column's tiles are
+ * rendered twice so the loop has no seam; the copy is hidden from
+ * assistive tech and the keyboard. Pauses on hover or focus, and holds
+ * still for reduced motion (the global reduced-motion rule).
+ */
 function CoverWall({ tiles }: { tiles: ListingCard[] }) {
   if (tiles.length === 0) return null;
-  const columns = [tiles.slice(0, 2), tiles.slice(2, 4), tiles.slice(4, 5)].filter(
-    (column) => column.length > 0,
-  );
   return (
     <div className="hk-wall" aria-label="Featured hackathons">
-      {columns.map((column, c) => (
-        <ul key={c} className={`hk-wall-col hk-wall-col-${c}`}>
-          {column.map((event, i) => {
-            const category = event.categories.find(isCategory);
-            return (
-              <li key={event.slug} className="hk-tile">
-                <HackathonCover
+      {dealColumns(tiles).map((column, c) => (
+        <div key={c} className={`hk-wall-col hk-wall-col-${c}`}>
+          <ul
+            className={c % 2 === 0 ? "hk-wall-track hk-wall-up" : "hk-wall-track hk-wall-down"}
+            style={{ animationDuration: `${column.length * SECONDS_PER_TILE}s` }}
+          >
+            {[false, true].map((hidden) =>
+              column.map((event, i) => (
+                <Tile
+                  key={`${hidden ? "b" : "a"}-${i}-${event.slug}`}
                   event={event}
-                  priority={c === 0 && i === 0}
-                  sizes="(min-width: 1024px) 200px, 40vw"
+                  hidden={hidden}
+                  priority={!hidden && c === 0 && i === 0}
                 />
-                <span className="hk-tile-scrim" aria-hidden="true" />
-                {category ? <span className="hk-tile-tag">{categoryLabel(category)}</span> : null}
-                <Link href={`/hackathons/${event.slug}`} className="hk-tile-link">
-                  <span className="hk-tile-title">{event.title}</span>
-                  <span className="hk-tile-prize">
-                    {formatKes(event.poolKes)} <ChevronRight aria-hidden className="size-3.5" />
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+              )),
+            )}
+          </ul>
+        </div>
       ))}
     </div>
   );

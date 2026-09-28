@@ -36,7 +36,7 @@ function heroTiles(cards: ListingCard[], now: Date): ListingCard[] {
   const byPool = [...cards].sort((a, b) => b.poolKes - a.poolKes);
   const current = byPool.filter((card) => hackathonPhase(card, now) !== "past");
   const past = byPool.filter((card) => hackathonPhase(card, now) === "past");
-  return [...current, ...past].slice(0, 5);
+  return [...current, ...past].slice(0, 9);
 }
 
 export default async function EventsPage({
