@@ -917,21 +917,22 @@
     }
   }
 
-  /* Long-form legal document typography (Privacy Policy, Terms of Service) —
-     no @tailwindcss/typography plugin installed, so this scopes plain
-     semantic markup instead of repeating utility classes per element. */
-  /* Full width text pages: contents sidebar on large screens, one column below. */
+  /* Long-form document pages (components/patterns/legal-document.tsx):
+     privacy, terms, how escrow works, for organizers, contribute. No
+     typography plugin is installed, so this scopes plain semantic markup.
+     The layout sits in the landing page's ruled frame (.lp-frame). */
   .legal-layout {
     display: grid;
     gap: 2.5rem;
+    padding-block: clamp(40px, 5vw, 72px) clamp(56px, 7vw, 96px);
   }
   .legal-aside {
     display: none;
   }
   @media (min-width: 1024px) {
     .legal-layout {
-      grid-template-columns: 260px minmax(0, 1fr);
-      gap: clamp(2.5rem, 5vw, 5rem);
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: clamp(2.5rem, 6vw, 6rem);
     }
     .legal-aside {
       display: block;
@@ -944,24 +945,23 @@
     }
   }
   .legal-toc-title {
-    margin-bottom: 0.75rem;
-    font-size: 11px;
+    margin-bottom: 0.875rem;
+    color: var(--color-ink);
+    font-size: 13px;
     font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-ink-soft);
   }
   .legal-toc ol {
-    border-left: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+    border-left: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
   }
   .legal-toc-link {
     display: block;
     margin-left: -1px;
     padding: 0.375rem 0 0.375rem 0.875rem;
-    border-left: 2px solid transparent;
-    font-size: 14px;
+    border-left: 1px solid transparent;
+    font-size: 13.5px;
     line-height: 1.4;
     color: var(--color-muted);
+    transition: color 150ms ease;
   }
   .legal-toc-link:hover {
     color: var(--color-ink);
@@ -969,30 +969,76 @@
   .legal-toc-link.is-active {
     border-left-color: var(--color-brand);
     font-weight: 600;
-    color: var(--color-ink);
+    color: var(--color-ink-soft);
   }
 
+  /* Each section opens on a hairline, the way the landing page divides ideas. */
+  .legal {
+    max-width: 760px;
+    min-width: 0;
+  }
   .legal h2 {
-    @apply mt-10 font-display text-xl font-bold text-ink first:mt-0;
+    margin-top: 3rem;
+    padding-top: 2.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2vw, 26px);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
     scroll-margin-top: calc(var(--site-header-height, 64px) + 1.5rem);
   }
-
+  .legal h2:first-of-type {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
   .legal h3 {
-    @apply mt-6 text-base font-semibold text-ink;
+    margin-top: 1.75rem;
+    color: var(--color-ink);
+    font-size: 16px;
+    font-weight: 600;
   }
-
   .legal p {
-    @apply mt-3 leading-7 text-ink-soft;
+    margin-top: 0.875rem;
+    color: var(--color-body-copy);
+    font-size: 16px;
+    line-height: 1.75;
   }
-
+  .legal ul,
+  .legal ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    margin-top: 0.875rem;
+    padding-left: 1.5rem;
+    color: var(--color-body-copy);
+    font-size: 16px;
+    line-height: 1.7;
+  }
   .legal ul {
-    @apply mt-3 list-disc space-y-2 pl-6 leading-7 text-ink-soft;
+    list-style: disc;
   }
-
+  .legal ol {
+    list-style: decimal;
+  }
+  .legal li::marker {
+    color: var(--color-ink-soft);
+    font-weight: 600;
+  }
   .legal a {
-    @apply text-brand underline underline-offset-2 hover:text-ink-soft;
+    color: var(--color-ink-soft);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-brand) 45%, transparent);
+    text-underline-offset: 3px;
+    transition: color 150ms ease, text-decoration-color 150ms ease;
   }
-
+  .legal a:hover {
+    color: var(--color-ink);
+    text-decoration-color: currentColor;
+  }
   .legal code {
     padding: 0.1em 0.35em;
     border-radius: 6px;
@@ -1002,11 +1048,11 @@
     color: var(--color-ink);
   }
   .legal pre {
-    margin-top: 0.75rem;
+    margin-top: 0.875rem;
     overflow-x: auto;
     padding: 1rem 1.25rem;
-    border-radius: 12px;
-    background: var(--color-brand-ink);
+    border-radius: var(--radius-card);
+    background: color-mix(in srgb, var(--lp-navy, #000092) 72%, #000);
     line-height: 1.7;
   }
   .legal pre code {
@@ -1016,9 +1062,46 @@
     font-size: 13px;
     white-space: pre;
   }
-
   .legal strong {
-    @apply font-semibold text-ink;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  /* Shared marketing page hero (components/patterns/page-hero.tsx). */
+  .pg-hero-copy {
+    max-width: 860px;
+    margin-top: clamp(28px, 4vw, 48px);
+  }
+  .pg-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(32px, 5vw, 72px);
+    margin-top: clamp(28px, 4vw, 48px);
+  }
+  .pg-title {
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: clamp(34px, 4vw, 56px);
+    font-weight: 500;
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .pg-title span {
+    color: var(--lp-quiet);
+  }
+  .pg-lead {
+    max-width: 60ch;
+    margin-top: 20px;
+    color: var(--color-body-copy);
+    font-size: 18px;
+    line-height: 1.6;
+  }
+  @media (max-width: 1023px) {
+    .pg-hero-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   /* 404 illustration — the face built into the middle "0" gets a little life. */
