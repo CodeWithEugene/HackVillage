@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import {
   CalendarCheck,
   Camera,
@@ -11,8 +10,6 @@ import {
 
 import { JourneyCarousel } from "@/components/landing/journey-carousel";
 import { LandingLink, TextLink } from "@/components/landing/landing-link";
-
-const GITHUB_URL = "https://github.com/CodeWithEugene/HackVillage";
 
 const ORGANIZER_FACTS = [
   { value: "100%", label: "deposited before launch" },
@@ -187,25 +184,6 @@ function BuildersBlock() {
             </li>
           ))}
         </JourneyCarousel>
-
-        <div className="lp-promos">
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="lp-promo">
-            <p>
-              <strong>Open source, end to end.</strong> Read every line of the escrow and payout
-              code, open an issue, or ship a fix.
-            </p>
-            <span className="lp-text-link">View on GitHub</span>
-            <span className="lp-promo-art lp-promo-art-a" aria-hidden="true" />
-          </a>
-          <Link href="/blog/your-first-hackathon" className="lp-promo">
-            <p>
-              <strong>New to hackathons?</strong> What to bring, how teams form, and how to finish
-              your first one with something you are proud of.
-            </p>
-            <span className="lp-text-link">Read the guide</span>
-            <span className="lp-promo-art lp-promo-art-b" aria-hidden="true" />
-          </Link>
-        </div>
 
         <figure className="lp-quote">
           <blockquote>

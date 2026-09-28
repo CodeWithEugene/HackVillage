@@ -2148,53 +2148,6 @@
     color: var(--color-ink);
   }
 
-  .lp-promos {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    margin-top: 40px;
-  }
-  .lp-promo {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 16px;
-    min-height: 160px;
-    padding: 24px 44% 24px 24px;
-    overflow: hidden;
-    border: 1px solid var(--lp-line);
-    border-radius: var(--radius-card);
-    background: var(--lp-tint);
-    transition: border-color 200ms ease;
-  }
-  .lp-promo:hover {
-    border-color: color-mix(in srgb, var(--color-brand) 45%, transparent);
-  }
-  .lp-promo p {
-    color: var(--color-body-copy);
-    font-size: 14.5px;
-    line-height: 1.55;
-  }
-  .lp-promo strong {
-    color: var(--color-ink);
-  }
-  .lp-promo-art {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 40%;
-  }
-  .lp-promo-art-a {
-    background: linear-gradient(135deg, var(--color-brand-soft), var(--color-brand) 45%, var(--lp-navy));
-    clip-path: polygon(38% 0, 100% 0, 100% 100%, 0 100%);
-  }
-  .lp-promo-art-b {
-    background: linear-gradient(200deg, var(--lp-blue-deep), var(--color-brand) 50%, var(--color-brand-soft));
-    clip-path: polygon(100% 0, 100% 100%, 0 100%);
-  }
-
   .lp-features {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2412,8 +2365,7 @@
       background: color-mix(in srgb, var(--color-brand) 7%, transparent);
     }
     .lp-split,
-    .lp-latest,
-    .lp-promos {
+    .lp-latest {
       grid-template-columns: minmax(0, 1fr);
     }
     .lp-carousel-track {
@@ -2468,15 +2420,6 @@
     }
     .lp-carousel-track {
       grid-auto-columns: 75%;
-    }
-    .lp-promo {
-      padding-right: 24px;
-      padding-bottom: 96px;
-    }
-    .lp-promo-art {
-      top: auto;
-      width: 100%;
-      height: 72px;
     }
     .lp-latest-feature {
       min-height: 0;
