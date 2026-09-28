@@ -19,7 +19,7 @@ export default function Loading() {
             <div className="hk-wall" aria-hidden="true">
               {[0, 1, 2].map((column) => (
                 <div key={column} className={`hk-wall-col hk-wall-col-${column}`}>
-                  <Skeleton className="aspect-[3/4] w-full rounded-card" />
+                  <Skeleton className="aspect-[4/5] w-full rounded-none" />
                 </div>
               ))}
             </div>
