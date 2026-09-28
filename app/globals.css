@@ -1093,6 +1093,24 @@
     }
   }
 
+  /* One-card utility pages (unsubscribe links) and the 404 page. */
+  .pg-utility-frame {
+    display: flex;
+    min-height: 60vh;
+    align-items: center;
+    justify-content: center;
+    padding-block: clamp(48px, 7vw, 96px);
+  }
+  .pg-404 {
+    display: flex;
+    min-height: 100dvh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    text-align: center;
+  }
+
   /* Shared marketing page hero (components/patterns/page-hero.tsx). */
   .pg-hero-copy {
     max-width: 860px;
