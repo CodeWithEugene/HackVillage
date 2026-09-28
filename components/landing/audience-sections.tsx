@@ -1,21 +1,15 @@
 import Image from "next/image";
-import Link from "next/link";
 import {
-  BadgeCheck,
   CalendarCheck,
   Camera,
-  Handshake,
   ListChecks,
   Plus,
   ShieldCheck,
-  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 
 import { JourneyCarousel } from "@/components/landing/journey-carousel";
 import { LandingLink, TextLink } from "@/components/landing/landing-link";
-
-const GITHUB_URL = "https://github.com/CodeWithEugene/HackVillage";
 
 const ORGANIZER_FACTS = [
   { value: "100%", label: "deposited before launch" },
@@ -84,42 +78,14 @@ const JOURNEY = [
   },
 ] as const;
 
-const HIRING_FEATURES: {
-  Icon: LucideIcon;
-  title: string;
-  body: string;
-  href: string;
-  link: string;
-}[] = [
-  {
-    Icon: BadgeCheck,
-    title: "Verified results.",
-    body: "Every win on a profile is tied to a real hackathon with a funded, escrowed prize.",
-    href: "/how-escrow-works",
-    link: "How results are verified",
-  },
-  {
-    Icon: Sparkles,
-    title: "Judge endorsements.",
-    body: "Judges who scored a project can endorse its builders, on the record and by name.",
-    href: "/blog/proof-of-work-portfolio",
-    link: "Read about Proof-of-Work",
-  },
-  {
-    Icon: Handshake,
-    title: "Warm introductions.",
-    body: "Request an intro from a builder's profile. They decide whether to reply, and when.",
-    href: "/hiring/join",
-    link: "Become a hiring partner",
-  },
-];
-
 function OrganizersBlock() {
   return (
-    <>
+    <section className="lp-section" aria-labelledby="lp-organizers-heading">
       <div className="lp-frame lp-block lp-split lp-divided">
         <div>
-          <h3 className="lp-split-heading">Host a hackathon people trust from day one</h3>
+          <h2 id="lp-organizers-heading" className="lp-split-heading">
+            Host a hackathon people trust from day one
+          </h2>
           <LandingLink href="/for-organizers" className="mt-6">
             HackVillage For Organizers
           </LandingLink>
@@ -176,16 +142,18 @@ function OrganizersBlock() {
           </div>
         </div>
       </div>
-    </>
+    </section>
   );
 }
 
 function BuildersBlock() {
   return (
-    <>
+    <section className="lp-section" aria-labelledby="lp-builders-heading">
       <div className="lp-frame lp-block lp-split lp-divided">
         <div>
-          <h3 className="lp-split-heading">Build a portfolio that proves what you shipped</h3>
+          <h2 id="lp-builders-heading" className="lp-split-heading">
+            Build a portfolio that proves what you shipped
+          </h2>
           <LandingLink href="/hackathons" className="mt-6">
             Explore Hackathons
           </LandingLink>
@@ -217,90 +185,6 @@ function BuildersBlock() {
           ))}
         </JourneyCarousel>
 
-        <div className="lp-promos">
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="lp-promo">
-            <p>
-              <strong>Open source, end to end.</strong> Read every line of the escrow and payout
-              code, open an issue, or ship a fix.
-            </p>
-            <span className="lp-text-link">View on GitHub</span>
-            <span className="lp-promo-art lp-promo-art-a" aria-hidden="true" />
-          </a>
-          <Link href="/blog/your-first-hackathon" className="lp-promo">
-            <p>
-              <strong>New to hackathons?</strong> What to bring, how teams form, and how to finish
-              your first one with something you are proud of.
-            </p>
-            <span className="lp-text-link">Read the guide</span>
-            <span className="lp-promo-art lp-promo-art-b" aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
-    </>
-  );
-}
-
-function HiringBlock() {
-  return (
-    <>
-      <div className="lp-frame lp-block lp-split lp-divided">
-        <div>
-          <h3 className="lp-split-heading">Hire from verified Proof-of-Work, not CVs</h3>
-          <LandingLink href="/hiring/join" className="mt-6">
-            Join The Hiring Network
-          </LandingLink>
-        </div>
-        <p className="lp-split-text">
-          Every HackVillage profile is built from real results: projects scored by judges, prizes
-          actually paid, and follow-ups three months on. Find builders by what they shipped.
-        </p>
-      </div>
-
-      <div className="lp-frame lp-block-flush">
-        <div className="lp-showcase" aria-hidden="true">
-          <div className="lp-showcase-card">
-            <div className="lp-mock-person">
-              <span className="lp-mock-avatar">WK</span>
-              <div>
-                <strong>Wanjiku K.</strong>
-                <span>Full-stack engineer · Nairobi</span>
-              </div>
-            </div>
-            <ul className="lp-showcase-rows">
-              <li>
-                <span>1st place</span>
-                <strong>Nairobi AI Hackathon</strong>
-                <em>Paid</em>
-              </li>
-              <li>
-                <span>Finalist</span>
-                <strong>Mombasa Fintech Sprint</strong>
-                <em>Endorsed</em>
-              </li>
-              <li>
-                <span>Winner</span>
-                <strong>Kisumu Climate Build</strong>
-                <em>Shipped</em>
-              </li>
-            </ul>
-            <p className="lp-showcase-cta">Request an introduction</p>
-          </div>
-        </div>
-
-        <ul className="lp-features">
-          {HIRING_FEATURES.map(({ Icon, title, body, href, link }) => (
-            <li key={title}>
-              <span className="lp-feature-icon">
-                <Icon aria-hidden className="size-4" />
-              </span>
-              <p>
-                <strong>{title}</strong> {body}
-              </p>
-              <TextLink href={href}>{link}</TextLink>
-            </li>
-          ))}
-        </ul>
-
         <figure className="lp-quote">
           <blockquote>
             &ldquo;If the prize isn&apos;t in the vault, the hackathon doesn&apos;t go live. Every
@@ -312,25 +196,16 @@ function HiringBlock() {
           <TextLink href="/trust">See the public ledger</TextLink>
         </figure>
       </div>
-    </>
+    </section>
   );
 }
 
+/** Who HackVillage is for: organizers first, then builders. */
 export function AudienceSections() {
   return (
-    <section className="lp-section" aria-labelledby="lp-audience-heading">
-      <div className="lp-frame lp-block lp-divided">
-        <h2 id="lp-audience-heading" className="lp-statement">
-          Built for everyone in the room.{" "}
-          <span>
-            Organizers, builders, judges and hiring teams each get tools that fit how they already
-            work.
-          </span>
-        </h2>
-      </div>
+    <>
       <OrganizersBlock />
       <BuildersBlock />
-      <HiringBlock />
-    </section>
+    </>
   );
 }

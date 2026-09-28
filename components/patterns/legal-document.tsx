@@ -1,4 +1,5 @@
 import { LegalToc } from "@/components/patterns/legal-toc";
+import { PageHero } from "@/components/patterns/page-hero";
 
 interface LegalDocumentProps {
   title: string;
@@ -10,16 +11,16 @@ interface LegalDocumentProps {
 
 const CONTENT_ID = "legal-content";
 
-/** Full width text page (terms, privacy, how escrow works) with an "On This Page" sidebar. */
+/**
+ * Long-form text page (terms, privacy, how escrow works, for organizers,
+ * contribute) in the ruled frame: a hero with the title and intro, then an
+ * "On This Page" rail that stays put beside the sections as they scroll.
+ */
 export function LegalDocument({ title, lastUpdated, intro, children }: LegalDocumentProps) {
   return (
-    <div className="site-container py-16">
-      <header className="mb-12 text-center">
-        <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">{title}</h1>
-        {intro ? <p className="mx-auto mt-3 max-w-2xl text-lg text-muted">{intro}</p> : null}
-        <p className="mt-3 text-sm text-muted">Last updated {lastUpdated}</p>
-      </header>
-      <div className="legal-layout">
+    <div className="lp">
+      <PageHero kicker={`Last updated ${lastUpdated}`} title={title} lead={intro} centered />
+      <div className="lp-frame lp-divided legal-layout">
         <aside className="legal-aside">
           <LegalToc containerId={CONTENT_ID} />
         </aside>

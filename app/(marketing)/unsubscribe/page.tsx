@@ -15,10 +15,14 @@ export default async function UnsubscribePage({
 }) {
   const { token } = await searchParams;
   return (
-    <div className="flex min-h-[60vh] items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md">
-        <UnsubscribeClient token={token ?? ""} />
-      </div>
+    <div className="lp">
+      <section className="hk-hero pg-utility">
+        <div className="lp-frame pg-utility-frame">
+          <div className="w-full max-w-md">
+            <UnsubscribeClient token={token ?? ""} />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

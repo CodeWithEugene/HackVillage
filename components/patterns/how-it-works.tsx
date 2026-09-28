@@ -1,10 +1,8 @@
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 
-import { Sparkle } from "@/components/patterns/sparkle";
+import { LandingLink } from "@/components/landing/landing-link";
+import { PageHero } from "@/components/patterns/page-hero";
 import { HOST_HACKATHON_HREF } from "@/lib/auth/signup-links";
-
 const STEPS = [
   {
     number: "01",
@@ -44,66 +42,62 @@ const STEPS = [
   },
 ];
 
-/** `headingLevel` is h1 on the standalone /how-it-works page; it looks the same either way. */
-export function HowItWorks({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" }) {
-  const Heading = headingLevel;
+/**
+ * The /how-it-works page body: the shared page hero, then the four steps as
+ * story cards in the ruled frame. The copy is unchanged from the original
+ * section.
+ */
+export function HowItWorks() {
   return (
-    <section
-      id="how-it-works"
-      className="site-container how-it-works"
-      aria-labelledby="how-it-works-heading"
-    >
-      <header className="how-it-works-header">
-        <Sparkle className="how-it-works-star how-it-works-star-left" />
-        <Sparkle className="how-it-works-star how-it-works-star-right" />
-        <div className="how-it-works-heading-block">
-          <p className="how-it-works-eyebrow">How It Works</p>
-          <Heading id="how-it-works-heading" className="how-it-works-title">
-            From First Idea
-            <br />
-            <span>to Final Payday.</span>
-          </Heading>
+    <>
+      <PageHero
+        id="how-it-works-heading"
+        kicker="How It Works"
+        title={
+          <>
+            From First Idea <span>to Final Payday.</span>
+          </>
+        }
+        lead={
+          <>
+            One simple flow: lock in the prize money, bring people together, judge everyone the same
+            way, and pay winners the moment they&apos;re announced.
+          </>
+        }
+      >
+        <div className="lp-hero-actions">
+          <LandingLink href="/hackathons">Browse Hackathons</LandingLink>
+          <LandingLink href={HOST_HACKATHON_HREF} variant="secondary">
+            Host A Hackathon
+          </LandingLink>
         </div>
-        <p className="how-it-works-description">
-          One simple flow: lock in the prize money, bring people together, judge everyone the same
-          way, and pay winners the moment they&apos;re announced.
-        </p>
-        {/* Same pills as the home page hero. */}
-        <div className="hero-actions">
-          <Link href="/hackathons" className="hero-action-primary btn-pill">
-            <span className="btn-fill" aria-hidden />
-            <span className="btn-content">
-              Browse Hackathons <ArrowUpRight aria-hidden="true" size={17} className="btn-arrow" />
-            </span>
-          </Link>
-          <Link href={HOST_HACKATHON_HREF} className="hero-action-secondary btn-pill">
-            Host A Hackathon <ArrowUpRight aria-hidden="true" size={16} className="btn-arrow" />
-          </Link>
+      </PageHero>
+
+      <section id="how-it-works" className="lp-section" aria-label="The four steps">
+        <div className="lp-frame lp-block lp-divided">
+          <ol className="hiw-steps">
+            {STEPS.map((step) => (
+              <li key={step.number} className="hiw-step">
+                <span className="hiw-number" aria-hidden="true">
+                  {step.number}
+                </span>
+                <p className="hiw-intro">{step.intro}</p>
+                <div className="hiw-photo">
+                  <Image
+                    src={`/marketing/process/${step.image}.webp`}
+                    alt={step.alt}
+                    fill
+                    sizes="(max-width: 599px) 94vw, (max-width: 1023px) 46vw, 23vw"
+                    className="object-cover"
+                  />
+                </div>
+                <h3 className="hiw-title">{step.title}</h3>
+                <p className="hiw-description">{step.description}</p>
+              </li>
+            ))}
+          </ol>
         </div>
-      </header>
-      <ol className="how-it-works-grid">
-        {STEPS.map((step) => (
-          <li key={step.number} className="how-it-works-step">
-            <span className="how-it-works-number" aria-hidden="true">
-              {step.number}
-            </span>
-            <p className="how-it-works-intro">{step.intro}</p>
-            <div className="how-it-works-photo">
-              <Image
-                src={`/marketing/process/${step.image}.webp`}
-                alt={step.alt}
-                fill
-                sizes="(max-width: 599px) 94vw, (max-width: 1023px) 46vw, 23vw"
-                className="object-cover"
-              />
-              <div className="how-it-works-caption">
-                <h3>{step.title}</h3>
-                <p>{step.description}</p>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </section>
+      </section>
+    </>
   );
 }

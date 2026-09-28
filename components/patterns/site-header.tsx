@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Github } from "lucide-react";
 
+import { HeaderScrollState } from "@/components/patterns/header-scroll-state";
 import { MobileNav } from "@/components/patterns/mobile-nav";
 import { NavDropdown } from "@/components/patterns/nav-dropdown";
 import { NavLink } from "@/components/patterns/nav-link";
@@ -32,8 +33,14 @@ const TRAILING_LINKS: NavItem[] = [
 
 export function SiteHeader({ className }: { className?: string }) {
   return (
-    <header className={cn("sticky top-0 z-50 shrink-0 bg-paper/95 backdrop-blur", className)}>
-      <div className="site-container site-header-grid">
+    <header
+      className={cn(
+        "site-header sticky top-0 z-50 shrink-0 bg-paper/95 backdrop-blur transition-[background-color,backdrop-filter] duration-200",
+        className,
+      )}
+    >
+      <HeaderScrollState />
+      <div className="site-header-grid">
         <Link href="/" className="flex shrink-0 items-center gap-3" aria-label="HackVillage home">
           {/* eslint-disable-next-line @next/next/no-img-element -- animated brand lockup, no static/SVG source */}
           <img

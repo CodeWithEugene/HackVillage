@@ -46,7 +46,8 @@ function seededRays(): Ray[] {
 /**
  * Each stat drives the fan into a state that shows what the number means:
  * 100% lights every ray, 50% lights half, 1hr sweeps like a clock hand,
- * and 0% evens every ray out (nothing is cut from anyone's prize).
+ * and 0% keeps every ray at full reach (nothing is cut from anyone's
+ * prize) with a glow rippling outward from the centre.
  */
 function targetFor(stat: number, ray: Ray, index: number, time: number) {
   const t = index / (RAY_COUNT - 1);
@@ -59,8 +60,14 @@ function targetFor(stat: number, ray: Ray, index: number, time: number) {
       const near = Math.exp(-(d * d) / 0.006);
       return { len: ray.reach * (0.7 + 0.35 * near), lit: 0.22 + 0.78 * near };
     }
-    case 3:
-      return { len: 0.78, lit: 0.72 };
+    case 3: {
+      // Every ray keeps its full reach (nothing is cut), while a soft glow
+      // ripples out from the centre to both edges, over and over.
+      const ripple = ((time / 2400) % 1) * 0.5;
+      const d = Math.abs(t - 0.5) - ripple;
+      const near = Math.exp(-(d * d) / 0.004);
+      return { len: ray.reach * (0.94 + 0.1 * near), lit: 0.5 + 0.5 * near };
+    }
     default:
       return { len: ray.reach, lit: 1 };
   }

@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { KeepReading } from "@/components/patterns/keep-reading";
 import { LegalToc } from "@/components/patterns/legal-toc";
+import { PageHero } from "@/components/patterns/page-hero";
 import { JsonLd } from "@/components/seo/json-ld";
 import { allPosts, formatPostDate, getPost, morePosts } from "@/lib/blog";
 import { articleSchema, breadcrumbSchema } from "@/lib/seo/schema";
@@ -66,41 +67,38 @@ export default async function BlogPostPage({ params }: PageProps) {
           ]),
         ]}
       />
-      <article className="site-container py-12">
-        <Link
-          href="/blog"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft hover:text-ink"
+      <article className="lp">
+        <PageHero
+          kicker={meta.category}
+          bar={
+            <Link href="/blog" className="blog-back">
+              <ArrowLeft aria-hidden className="size-4" /> All Posts
+            </Link>
+          }
+          title={meta.title}
+          lead={meta.excerpt}
         >
-          <ArrowLeft aria-hidden className="size-4" /> All Posts
-        </Link>
-
-        <header className="mx-auto mt-6 max-w-3xl text-center">
-          <p className="text-[11px] font-semibold tracking-[0.18em] text-ink-soft uppercase">
-            {meta.category}
-          </p>
-          <h1 className="mt-3 font-display text-3xl leading-tight font-bold text-ink sm:text-4xl">
-            {meta.title}
-          </h1>
-          <p className="mt-3 text-lg text-muted">{meta.excerpt}</p>
-          <p className="mt-4 text-sm text-muted">
+          <p className="blog-byline">
             By {meta.author} ·{" "}
             <time dateTime={meta.publishedAt}>{formatPostDate(meta.publishedAt)}</time> ·{" "}
             {meta.readingMinutes} min read
           </p>
-        </header>
+        </PageHero>
 
-        <div className="relative mt-10 aspect-[21/9] overflow-hidden rounded-card bg-brand/10 shadow-card">
-          <Image
-            src={meta.cover}
-            alt={meta.coverAlt}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
+        <div className="lp-frame lp-divided blog-cover-frame">
+          <div className="blog-cover">
+            <Image
+              src={meta.cover}
+              alt={meta.coverAlt}
+              fill
+              priority
+              sizes="(min-width: 1440px) 1392px, 100vw"
+              className="object-cover"
+            />
+          </div>
         </div>
 
-        <div className="legal-layout mt-12">
+        <div className="lp-frame legal-layout">
           <aside className="legal-aside">
             <LegalToc containerId={CONTENT_ID} />
           </aside>

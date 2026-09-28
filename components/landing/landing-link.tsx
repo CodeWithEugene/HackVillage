@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 interface LandingLinkProps {
   href: string;
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "inverse";
+  variant?: "primary" | "secondary";
   className?: string;
   external?: boolean;
 }
@@ -15,7 +15,7 @@ interface LandingLinkProps {
 /**
  * A navigation link dressed as the pill button, so the landing page keeps the
  * button design system (sweep fill + nudging arrow) without nesting a
- * <button> inside an <a>. `inverse` is the outline pill on the navy band.
+ * <button> inside an <a>.
  */
 export function LandingLink({
   href,
@@ -24,17 +24,11 @@ export function LandingLink({
   className,
   external = false,
 }: LandingLinkProps) {
-  const variantClass =
-    variant === "inverse"
-      ? "btn-pill-inverse border border-on-inverse/30 bg-transparent text-on-inverse"
-      : buttonVariants({ variant, size: "md" });
   return (
     <Link
       href={href}
       className={cn(
-        variant === "inverse" &&
-          "btn-pill group relative isolate inline-flex h-11 items-center justify-center gap-2 overflow-hidden rounded-full px-5 font-semibold",
-        variantClass,
+        buttonVariants({ variant, size: "md" }),
         "text-[15px] whitespace-nowrap",
         className,
       )}
