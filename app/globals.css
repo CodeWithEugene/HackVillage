@@ -49,9 +49,10 @@
     --site-header-height: 4rem;
     /* The landing page frame (and the header aligned to it): a hairline-ruled
        column with a narrow edge outside the rules and a gutter inside them. */
-    --frame-max: 1440px;
-    --frame-edge: clamp(12px, 2vw, 32px);
-    --frame-gutter: clamp(16px, 1.5vw, 24px);
+    /* Grows with the screen so large monitors keep narrow side margins. */
+    --frame-max: 2200px;
+    --frame-edge: clamp(12px, 2vw, 40px);
+    --frame-gutter: clamp(16px, 1.5vw, 32px);
   }
   @media (max-width: 1023px) {
     :root {
@@ -807,9 +808,11 @@
   }
 
   /* Each section opens on a hairline, the way the landing page divides ideas. */
-  /* The text fills the column beside the contents rail. */
+  /* The text fills the column beside the contents rail, up to a line length
+     that stays readable on very wide monitors. */
   .legal {
     min-width: 0;
+    max-width: 1100px;
   }
   .legal h2 {
     margin-top: 3rem;
