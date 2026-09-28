@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { LegalDocument } from "@/components/patterns/legal-document";
 import { pageOpenGraph } from "@/lib/seo/metadata";
+import { CONTACT_EMAIL } from "@/lib/seo/site";
 
 export const metadata: Metadata = {
   title: "Contribute To Open-Source Hackathon Infrastructure",
@@ -318,7 +319,7 @@ pnpm run contracts:test    # Hardhat tests for the contracts`}</code>
         <a href={`${REPO}/security/advisories/new`} target="_blank" rel="noopener noreferrer">
           GitHub&apos;s private vulnerability reporting
         </a>{" "}
-        (preferred), or email <a href="mailto:cyberuhurultd@gmail.com">cyberuhurultd@gmail.com</a>{" "}
+        (preferred), or email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>{" "}
         with the subject <code>[SECURITY] HackVillage</code>. We acknowledge reports within 72 hours
         and triage them within 7 days. See the{" "}
         <a href={`${REPO}/blob/main/SECURITY.md`} target="_blank" rel="noopener noreferrer">
