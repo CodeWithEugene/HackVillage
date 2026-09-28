@@ -8,7 +8,7 @@ import { allPosts, formatPostDate } from "@/lib/blog";
 export function LatestPosts() {
   const [featured, ...rest] = allPosts();
   if (!featured) return null;
-  const more = rest.slice(0, 3);
+  const more = rest.slice(0, 5);
 
   return (
     <section className="lp-section" aria-labelledby="lp-latest-heading">
