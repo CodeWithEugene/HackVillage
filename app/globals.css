@@ -399,18 +399,24 @@
     font-weight: 600;
   }
 
-  /* Left-aligned bar: logo, then the links beside it, actions pushed right. */
+  /* Left-aligned bar (logo, links beside it, actions pushed right) sitting in
+     the same ruled frame as every page body: same width, gutter and hairline
+     side rules, so the lines run unbroken from the header down the page. */
   .site-header-grid {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    height: var(--site-header-height);
-    gap: 16px;
-  }
-  /* On the landing page the bar lines up with the ruled frame below it. */
-  body:has(.lp) .site-header-grid {
     width: min(100% - 2 * var(--frame-edge), var(--frame-max));
+    height: var(--site-header-height);
+    margin-inline: auto;
     padding-inline: var(--frame-gutter);
+    gap: 16px;
+    border-inline: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  }
+  @media (max-width: 1023px) {
+    .site-header-grid {
+      border-inline-color: transparent;
+    }
   }
   .site-header-links,
   .site-header-actions {
@@ -817,7 +823,8 @@
     letter-spacing: -0.015em;
     scroll-margin-top: calc(var(--site-header-height, 64px) + 1.5rem);
   }
-  .legal h2:first-of-type {
+  /* The opening section needs no rule above it, unless an intro comes first. */
+  .legal > h2:first-of-type:not(:is(p, ul, ol, div) ~ h2) {
     margin-top: 0;
     padding-top: 0;
     border-top: 0;
@@ -893,6 +900,63 @@
   .legal strong {
     font-weight: 600;
     color: var(--color-ink);
+  }
+
+  /* Blog (app/(marketing)/blog, components/patterns/blog-card.tsx). */
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .blog-card {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+  .blog-card:hover {
+    border-color: color-mix(in srgb, var(--color-brand) 45%, transparent);
+    box-shadow: var(--shadow-card);
+  }
+  .blog-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-ink-soft);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .blog-back:hover {
+    color: var(--color-ink);
+  }
+  .blog-byline {
+    margin-top: 16px;
+    color: var(--color-muted);
+    font-size: 14px;
+  }
+  .blog-cover-frame {
+    padding-top: clamp(24px, 3vw, 40px);
+  }
+  .blog-cover {
+    position: relative;
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: color-mix(in srgb, var(--color-brand) 10%, transparent);
+  }
+  @media (max-width: 1023px) {
+    .blog-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 639px) {
+    .blog-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   /* Shared marketing page hero (components/patterns/page-hero.tsx). */

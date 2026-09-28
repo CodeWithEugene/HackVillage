@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { BlogCard } from "@/components/patterns/blog-card";
+import { PageHero } from "@/components/patterns/page-hero";
 import { Pagination } from "@/components/patterns/pagination";
 import { JsonLd } from "@/components/seo/json-ld";
 import { allPosts } from "@/lib/blog";
@@ -14,7 +15,10 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const page = parsePage((await searchParams).page, count);
   return {
     // Later pages say so in the title, so they aren't duplicates of page 1.
-    title: page === 1 ? "Blog: Hackathon Guides And Stories" : `Blog: Hackathon Guides And Stories, Page ${page}`,
+    title:
+      page === 1
+        ? "Blog: Hackathon Guides And Stories"
+        : `Blog: Hackathon Guides And Stories, Page ${page}`,
     description:
       "Guides and stories from HackVillage: how escrowed prizes work, how winners get paid instantly, and how to run hackathons builders trust in Kenya and beyond.",
     // Self-canonical per pagination page; page 1 canonicalizes to the clean URL.
@@ -44,26 +48,22 @@ export default async function BlogPage({ searchParams }: PageProps) {
           visible.map(({ meta }) => ({ title: meta.title, path: `/blog/${meta.slug}` })),
         )}
       />
-      <div className="site-container py-16">
-        <header className="mb-10 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.18em] text-ink-soft uppercase">
-            Blog
-          </p>
-          <h1 className="mt-3 font-display text-3xl font-bold text-ink sm:text-4xl">
-            Stories And Guides From HackVillage
-          </h1>
-          <p className="mx-auto mt-3 max-w-xl text-muted">
-            How prizes stay safe, how winners get paid, and how to run and win hackathons in Kenya
-            and beyond.
-          </p>
-        </header>
-
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((post) => (
-            <BlogCard key={post.meta.slug} post={post.meta} />
-          ))}
-        </div>
-        <Pagination page={page} pageCount={count} label="Blog pages" hrefFor={blogPageHref} />
+      <div className="lp">
+        <PageHero
+          kicker="Blog"
+          title="Stories And Guides From HackVillage"
+          lead="How prizes stay safe, how winners get paid, and how to run and win hackathons in Kenya and beyond."
+        />
+        <section className="lp-section" aria-label="Posts">
+          <div className="lp-frame lp-block lp-divided">
+            <div className="blog-grid">
+              {visible.map((post) => (
+                <BlogCard key={post.meta.slug} post={post.meta} />
+              ))}
+            </div>
+            <Pagination page={page} pageCount={count} label="Blog pages" hrefFor={blogPageHref} />
+          </div>
+        </section>
       </div>
     </>
   );

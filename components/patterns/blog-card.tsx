@@ -11,7 +11,7 @@ export function BlogCard({ post }: { post: BlogPostMeta }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group flex h-full flex-col overflow-hidden rounded-card bg-surface shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+      className="blog-card group focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
     >
       <div className="relative aspect-[21/9] overflow-hidden bg-brand/10">
         <Image

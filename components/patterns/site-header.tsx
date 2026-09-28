@@ -40,7 +40,7 @@ export function SiteHeader({ className }: { className?: string }) {
       )}
     >
       <HeaderScrollState />
-      <div className="site-container site-header-grid">
+      <div className="site-header-grid">
         <Link href="/" className="flex shrink-0 items-center gap-3" aria-label="HackVillage home">
           {/* eslint-disable-next-line @next/next/no-img-element -- animated brand lockup, no static/SVG source */}
           <img

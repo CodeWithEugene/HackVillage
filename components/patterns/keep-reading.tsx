@@ -21,25 +21,23 @@ export function KeepReading({ posts }: { posts: BlogPostMeta[] }) {
   }
 
   return (
-    <section
-      ref={sectionRef}
-      className="site-container scroll-mt-24 pb-16"
-      aria-labelledby="keep-reading-heading"
-    >
-      <h2 id="keep-reading-heading" className="font-display text-2xl font-bold text-ink">
-        Keep Reading
-      </h2>
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
-        {pageSlice(posts, page, KEEP_READING_PAGE_SIZE).map((post) => (
-          <BlogCard key={post.slug} post={post} />
-        ))}
+    <section ref={sectionRef} className="lp scroll-mt-24" aria-labelledby="keep-reading-heading">
+      <div className="lp-frame lp-block lp-divided">
+        <h2 id="keep-reading-heading" className="lp-statement lp-statement-sm">
+          Keep Reading
+        </h2>
+        <div className="blog-grid mt-8" aria-live="polite">
+          {pageSlice(posts, page, KEEP_READING_PAGE_SIZE).map((post) => (
+            <BlogCard key={post.slug} post={post} />
+          ))}
+        </div>
+        <Pagination
+          page={page}
+          pageCount={pageCount(posts.length, KEEP_READING_PAGE_SIZE)}
+          label="More posts"
+          onSelect={showPage}
+        />
       </div>
-      <Pagination
-        page={page}
-        pageCount={pageCount(posts.length, KEEP_READING_PAGE_SIZE)}
-        label="More posts"
-        onSelect={showPage}
-      />
     </section>
   );
 }
