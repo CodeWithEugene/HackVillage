@@ -196,62 +196,66 @@ export default async function OrganizerTrustPage({ params }: PageProps) {
             : {}),
         }}
       />
-      <div className="site-container py-16">
-        <div className="mx-auto max-w-3xl">
-          <header>
-            <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">{org.name}</h1>
-            {facts.length > 0 ? (
-              <p className="mt-2 flex items-center gap-1.5 text-sm text-muted">
-                {location ? <MapPin aria-hidden className="size-3.5 shrink-0" /> : null}
-                {facts.join(" · ")}
-              </p>
-            ) : null}
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {verified ? (
-                <Badge variant="brand">
-                  <ShieldCheck aria-hidden className="size-3.5" /> Verified Organization
-                </Badge>
-              ) : null}
-              <Badge variant="success">Trust score {org.trustScore}</Badge>
-            </div>
-            {org.about ? (
-              <p className="mt-4 leading-7 whitespace-pre-line text-body-copy">{org.about}</p>
-            ) : null}
-            {links.length > 0 ? (
-              <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-                {links.map((link) => (
-                  <li key={link} className="min-w-0">
-                    <a
-                      href={link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex max-w-full items-center gap-1 font-semibold text-ink-soft hover:text-ink"
-                    >
-                      <span className="truncate">{linkLabel(link)}</span>
-                      <ExternalLink aria-hidden className="size-3.5 shrink-0" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            <dl className="mt-6 grid grid-cols-3 gap-2 rounded-2xl bg-brand/10 p-4 text-center">
-              {stats.map((stat) => (
-                <div key={stat.label} className="min-w-0">
-                  <dt className="text-[11px] leading-4 text-ink-soft">{stat.label}</dt>
-                  <dd className="mt-1 font-display text-sm font-bold text-ink sm:text-base">
-                    {stat.value}
-                  </dd>
+      <div className="lp">
+        <section className="hk-hero" aria-labelledby="org-name">
+          <div className="lp-frame hk-hero-frame">
+            <div className="pg-hero-grid pf-hero-grid">
+              <div>
+                <h1 id="org-name" className="pg-title">
+                  {org.name}
+                </h1>
+                {facts.length > 0 ? (
+                  <p className="pf-location">
+                    {location ? <MapPin aria-hidden className="size-3.5 shrink-0" /> : null}
+                    {facts.join(" · ")}
+                  </p>
+                ) : null}
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {verified ? (
+                    <Badge variant="brand">
+                      <ShieldCheck aria-hidden className="size-3.5" /> Verified Organization
+                    </Badge>
+                  ) : null}
+                  <Badge variant="success">Trust score {org.trustScore}</Badge>
                 </div>
-              ))}
-            </dl>
-          </header>
+                {org.about ? <p className="pf-bio whitespace-pre-line">{org.about}</p> : null}
+                {links.length > 0 ? (
+                  <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                    {links.map((link) => (
+                      <li key={link} className="min-w-0">
+                        <a
+                          href={link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex max-w-full items-center gap-1 font-semibold text-ink-soft hover:text-ink"
+                        >
+                          <span className="truncate">{linkLabel(link)}</span>
+                          <ExternalLink aria-hidden className="size-3.5 shrink-0" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+              <dl className="pf-stats">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="min-w-0">
+                    <dt>{stat.label}</dt>
+                    <dd>{stat.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </section>
 
-          <section aria-labelledby="payout-performance" className="mt-10">
-            <h2 id="payout-performance" className="font-display text-xl font-bold text-ink sm:text-2xl">
+        <section aria-labelledby="payout-performance" className="lp-section">
+          <div className="lp-frame lp-block lp-divided">
+            <h2 id="payout-performance" className="lp-statement lp-statement-sm">
               Payout Performance
             </h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-3">
-              <Card>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <Card className="shadow-none">
                 <CardTitle className="text-base">Instant Payouts</CardTitle>
                 {performance.instantTotal === 0 ? (
                   <CardDescription>
@@ -269,7 +273,7 @@ export default async function OrganizerTrustPage({ params }: PageProps) {
                   </>
                 )}
               </Card>
-              <Card>
+              <Card className="shadow-none">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Timer aria-hidden className="size-4" /> Announce→Paid
                 </CardTitle>
@@ -288,7 +292,7 @@ export default async function OrganizerTrustPage({ params }: PageProps) {
                   </>
                 )}
               </Card>
-              <Card>
+              <Card className="shadow-none">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <CalendarDays aria-hidden className="size-4" /> Media Delivery
                 </CardTitle>
@@ -308,27 +312,29 @@ export default async function OrganizerTrustPage({ params }: PageProps) {
                 )}
               </Card>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <section aria-labelledby="hosted-events" className="mt-10">
-            <h2 id="hosted-events" className="font-display text-xl font-bold text-ink sm:text-2xl">
+        <section aria-labelledby="hosted-events" className="lp-section">
+          <div className="lp-frame lp-block lp-divided">
+            <h2 id="hosted-events" className="lp-statement lp-statement-sm">
               Hackathons
             </h2>
             {events.length === 0 ? (
-              <Card className="mt-4">
+              <Card className="mt-6 shadow-none">
                 <CardDescription>
                   {org.name} has not published a hackathon yet. When they do, it appears here with
                   its escrow status.
                 </CardDescription>
               </Card>
             ) : (
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-6 space-y-3">
                 {events.map((event) => {
                   const isPublic = isPublicHackathon(event);
                   const poolKes = event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0);
                   return (
                     <li key={event.slug}>
-                      <Card>
+                      <Card className="shadow-none">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
                             {isPublic ? (
@@ -364,13 +370,15 @@ export default async function OrganizerTrustPage({ params }: PageProps) {
                 })}
               </ul>
             )}
-          </section>
+          </div>
+        </section>
 
-          <section aria-labelledby="trust-history" className="mt-10">
-            <h2 id="trust-history" className="font-display text-xl font-bold text-ink sm:text-2xl">
+        <section aria-labelledby="trust-history" className="lp-section">
+          <div className="lp-frame lp-block lp-divided">
+            <h2 id="trust-history" className="lp-statement lp-statement-sm">
               Trust History
             </h2>
-            <Card className="mt-4">
+            <Card className="mt-6 shadow-none">
               {trustEvents.length === 0 ? (
                 <CardDescription>
                   No trust events yet. The score moves with payout speed, media delivery and
@@ -410,8 +418,8 @@ export default async function OrganizerTrustPage({ params }: PageProps) {
               </Link>
               .
             </p>
-          </section>
-        </div>
+          </div>
+        </section>
       </div>
     </>
   );
