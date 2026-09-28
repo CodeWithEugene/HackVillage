@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 
-import { BuilderJourney } from "@/components/patterns/builder-journey";
-import { CtaBanner } from "@/components/patterns/cta-banner";
-import { LandingAbout } from "@/components/patterns/landing-about";
-import { LandingHero } from "@/components/patterns/landing-hero";
-import { TrustImpact } from "@/components/patterns/trust-impact";
+import { AudienceSections } from "@/components/landing/audience-sections";
+import { GetStarted } from "@/components/landing/get-started";
+import { LandingAbout } from "@/components/landing/landing-about";
+import { LandingBanner } from "@/components/landing/landing-banner";
+import { LandingHero } from "@/components/landing/landing-hero";
+import { LatestPosts } from "@/components/landing/latest-posts";
+import { OpenInfrastructure } from "@/components/landing/open-infrastructure";
+import { PartnerStrip } from "@/components/landing/partner-strip";
+import { PlatformGrid } from "@/components/landing/platform-grid";
+import { TrustBand } from "@/components/landing/trust-band";
 import { pageOpenGraph } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = {
@@ -16,18 +21,24 @@ export const metadata: Metadata = {
   openGraph: pageOpenGraph("/"),
 };
 
+/*
+ * The landing page follows one continuous frame: every section's content
+ * sits inside `.lp-frame`, whose hairline side rules run the full height
+ * of the page, with horizontal rules marking where one idea ends.
+ */
 export default function LandingPage() {
   return (
-    <div className="font-display">
+    <div className="lp">
       <LandingHero />
-
+      <PartnerStrip />
+      <PlatformGrid />
+      <LandingBanner />
+      <TrustBand />
       <LandingAbout />
-
-      <BuilderJourney />
-
-      <TrustImpact />
-
-      <CtaBanner />
+      <AudienceSections />
+      <OpenInfrastructure />
+      <LatestPosts />
+      <GetStarted />
     </div>
   );
 }
