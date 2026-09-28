@@ -1,26 +1,34 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarDays, Clock, MapPin, Users } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
-import { KeyDatesCard } from "@/components/patterns/key-dates-card";
+import {
+  DetailRail,
+  DetailSection,
+  EscrowCallout,
+  KeyDates,
+  PrizeTable,
+  RegistrationAction,
+} from "@/components/hackathons/detail-parts";
+import { HackathonCard } from "@/components/hackathons/hackathon-card";
+import { LandingLink } from "@/components/landing/landing-link";
 import { OrganizerCard } from "@/components/patterns/organizer-card";
 import { PrizeVerifiedBadge } from "@/components/patterns/prize-verified-badge";
 import { StatusTimeline } from "@/components/patterns/status-timeline";
 import { JsonLd } from "@/components/seo/json-ld";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { currentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/db";
-import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
 import { categoryLabel, isCategory } from "@/lib/events/categories";
 import { coverFor } from "@/lib/events/covers";
-import { formatEventDates } from "@/lib/events/format";
-import { registrationOpen } from "@/lib/events/lifecycle";
+import { formatEventDates, hackathonPhase } from "@/lib/events/format";
+import { isPrizeVerified, registrationOpen } from "@/lib/events/lifecycle";
+import { relativeDay, venueLabel, type ListingCard } from "@/lib/events/listing";
+import { getListingCards } from "@/lib/events/listing-data";
+import { PUBLIC_HACKATHON_WHERE } from "@/lib/events/visibility";
 import { breadcrumbSchema, eventSchema } from "@/lib/seo/schema";
 import { formatKes } from "@/lib/utils";
-import Link from "next/link";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -65,12 +73,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-const dateFormat = new Intl.DateTimeFormat("en-KE", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-});
-const timeFormat = new Intl.DateTimeFormat("en-KE", { hour: "numeric", minute: "2-digit" });
+/** Other hackathons to look at next: live and upcoming first, soonest first. */
+function moreHackathons(cards: ListingCard[], slug: string, now: Date): ListingCard[] {
+  const others = cards.filter((card) => card.slug !== slug);
+  const current = others
+    .filter((card) => hackathonPhase(card, now) !== "past")
+    .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
+  const past = others.filter((card) => hackathonPhase(card, now) === "past");
+  return [...current, ...past].slice(0, 3);
+}
 
 export default async function EventDetailPage({ params, searchParams }: PageProps) {
   const [{ slug }, { registration }, viewer] = await Promise.all([
@@ -117,21 +128,51 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
   });
   if (!event) notFound();
 
+  const now = new Date();
   const poolKes = event.prizes.reduce((sum, prize) => sum + prize.amountKes, 0);
-  const open = registrationOpen(event);
+  const open = registrationOpen(event, now);
+  const verified = isPrizeVerified(event.status, event.prizeVerifiedAt);
   const categories = event.categories.filter(isCategory);
   const cover = coverFor(event);
   const gallery = event.media;
+  const teams = event._count.teams;
 
-  const registration_ = viewer
-    ? await prisma.registration.findUnique({
-        where: { eventId_userId: { eventId: event.id, userId: viewer.id } },
-      })
-    : null;
+  const [registration_, listing] = await Promise.all([
+    viewer
+      ? prisma.registration.findUnique({
+          where: { eventId_userId: { eventId: event.id, userId: viewer.id } },
+        })
+      : null,
+    getListingCards(),
+  ]);
   const isRegistered = registration_?.status === "REGISTERED";
+  const more = moreHackathons(listing, event.slug, now);
+
+  const prizes = event.prizes.map((prize) => {
+    const winner = event.winners.find((w) => w.place === prize.place);
+    return {
+      id: prize.id,
+      label: prize.label,
+      amountKes: prize.amountKes,
+      milestoneRequired: prize.milestoneRequired,
+      winner: winner ? { team: winner.team.name, handle: winner.user.handle } : null,
+      firstHalfPaid: Boolean(
+        winner?.payouts.some((p) => p.tranche === "INSTANT" && p.status === "SUCCEEDED"),
+      ),
+    };
+  });
+
+  const action = (
+    <RegistrationAction
+      slug={event.slug}
+      open={open}
+      signedIn={Boolean(viewer)}
+      registered={isRegistered}
+    />
+  );
 
   return (
-    <div className="site-container py-12">
+    <div className="lp">
       {/* Event + breadcrumb structured data: makes the hackathon eligible for
           Google event listings and quotable by AI answer engines. Demo
           hackathons get none: Event markup must describe real events. */}
@@ -141,18 +182,18 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
             ? []
             : [
                 eventSchema({
-            slug: event.slug,
-            title: event.title,
-            summary: event.summary,
-            startsAt: event.startsAt,
-            endsAt: event.endsAt,
-            venueType: event.venueType,
-            location: event.location,
-            coverUrl: cover,
-            orgName: event.org.name,
-            orgWebsite: event.org.website,
-            registrationDeadline: event.registrationDeadline,
-          }),
+                  slug: event.slug,
+                  title: event.title,
+                  summary: event.summary,
+                  startsAt: event.startsAt,
+                  endsAt: event.endsAt,
+                  venueType: event.venueType,
+                  location: event.location,
+                  coverUrl: cover,
+                  orgName: event.org.name,
+                  orgWebsite: event.org.website,
+                  registrationDeadline: event.registrationDeadline,
+                }),
               ]),
           breadcrumbSchema([
             { name: "Hackathons", path: "/hackathons" },
@@ -160,222 +201,178 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
           ]),
         ]}
       />
-      {/* Status banner — P1: money state is one glance away */}
-      {registration === "closed" ? (
-        <div className="mb-6 rounded-card border border-warning/40 bg-warning/10 p-4 text-sm font-semibold text-ink">
-          Registration for this hackathon has closed.
-        </div>
-      ) : null}
 
-      <header className="text-center">
-        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
-          <h1 className="font-display text-3xl leading-tight font-bold text-ink sm:text-4xl">
-            {event.title}
-          </h1>
-          <Badge variant="neutral">
-            <Users aria-hidden className="size-3.5" /> {event._count.teams} team
-            {event._count.teams === 1 ? "" : "s"}
-          </Badge>
-          {event.prizeVerifiedAt ? <PrizeVerifiedBadge /> : null}
-        </div>
-        {event.summary ? (
-          <p className="mx-auto mt-2 max-w-2xl text-lg text-muted">{event.summary}</p>
-        ) : null}
-        {categories.length > 0 ? (
-          <ul className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Categories">
-            {categories.map((key) => (
-              <li key={key}>
-                <Link
-                  href={`/hackathons?category=${key}`}
-                  className="inline-block rounded-full border border-ink/15 px-3 py-1 text-xs font-semibold text-ink-soft hover:border-ink/30"
-                >
-                  {categoryLabel(key)}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </header>
+      <section className="hk-hero hkd-hero" aria-labelledby="hkd-title">
+        <div className="lp-frame hk-hero-frame">
+          <div className="hk-hero-bar">
+            <nav aria-label="Breadcrumb" className="hkd-crumbs">
+              <Link href="/hackathons">Hackathons</Link>
+              <span aria-hidden="true">/</span>
+              <span aria-current="page">{event.title}</span>
+            </nav>
+            <Link href="/hackathons#directory" className="hkd-all">
+              All hackathons <ChevronRight aria-hidden className="size-3.5" />
+            </Link>
+          </div>
 
-      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] xl:gap-8">
-        <div className="min-w-0 space-y-6">
-          <Card>
-            <CardTitle className="text-center text-base font-semibold text-muted">Status</CardTitle>
-            <div className="mt-3 overflow-x-auto">
+          {/* Status banner — P1: money state is one glance away */}
+          {registration === "closed" ? (
+            <p className="hkd-banner" role="status">
+              Registration for this hackathon has closed.
+            </p>
+          ) : null}
+
+          <div className="hkd-hero-grid">
+            <div>
+              <h1 id="hkd-title" className="hkd-title">
+                {event.title}
+              </h1>
+              {event.summary ? <p className="hkd-summary">{event.summary}</p> : null}
+              {categories.length > 0 ? (
+                <ul className="hkd-tracks" aria-label="Categories">
+                  {categories.map((key) => (
+                    <li key={key}>
+                      <Link href={`/hackathons?category=${key}#directory`}>
+                        {categoryLabel(key)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+            <div className="hkd-card">
+              <div className="hkd-card-cover">
+                <Image
+                  src={cover}
+                  alt={`${event.title} hackathon cover`}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 380px, 100vw"
+                  unoptimized={!cover.startsWith("/")}
+                  className="object-cover"
+                />
+                {verified ? <PrizeVerifiedBadge className="absolute top-3 right-3" /> : null}
+              </div>
+              <dl className="hkd-card-facts">
+                <div>
+                  <dt>Hosted by</dt>
+                  <dd>{event.org.name}</dd>
+                </div>
+                <div>
+                  <dt>Trust score</dt>
+                  <dd>{event.org.trustScore}</dd>
+                </div>
+                <div>
+                  <dt>Format</dt>
+                  <dd className="capitalize">{event.venueType.toLowerCase()}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="lp-frame lp-divided hkd-body">
+        <DetailRail
+          stats={[
+            { label: "Prize pool", value: formatKes(poolKes) },
+            { label: "Dates", value: formatEventDates(event.startsAt, event.endsAt) },
+            { label: "Where", value: venueLabel(event) },
+            { label: "Teams", value: `${teams} of ${event.maxTeams} places taken` },
+            {
+              label: "Registration",
+              value: open ? `Closes ${relativeDay(event.registrationDeadline, now)}` : "Closed",
+            },
+          ]}
+          action={action}
+        />
+
+        <div className="hkd-content">
+          <DetailSection id="hkd-status" title="Where it stands">
+            <div className="hkd-status">
               <StatusTimeline status={event.status} />
             </div>
-          </Card>
+          </DetailSection>
 
-          <Card>
-            <CardTitle>Problem Statement</CardTitle>
-            <p className="mt-3 leading-7 whitespace-pre-line text-ink-soft">
-              {event.problemStatement}
-            </p>
-            {event.rules ? (
+          <DetailSection id="hkd-brief" title="The challenge">
+            <p className="hkd-prose">{event.problemStatement}</p>
+            {event.rolesWanted.length > 0 ? (
               <>
-                <CardTitle className="mt-6 text-base">Rules</CardTitle>
-                <p className="mt-2 text-sm leading-6 whitespace-pre-line text-muted">
-                  {event.rules}
-                </p>
+                <h3 className="hkd-subtitle">Roles wanted</h3>
+                <ul className="hk-tags">
+                  {event.rolesWanted.map((tag) => (
+                    <li key={tag}>{tag}</li>
+                  ))}
+                </ul>
               </>
             ) : null}
-            {event.rolesWanted.length > 0 ? (
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {event.rolesWanted.map((tag) => (
-                  <Badge key={tag}>{tag}</Badge>
-                ))}
-              </div>
+            {event.rules ? (
+              <>
+                <h3 className="hkd-subtitle">Rules</h3>
+                <p className="hkd-prose hkd-prose-sm">{event.rules}</p>
+              </>
             ) : null}
-          </Card>
+          </DetailSection>
+
+          <EscrowCallout poolKes={poolKes} verified={verified} />
+
+          <DetailSection id="hkd-prizes" title="Prizes">
+            <PrizeTable prizes={prizes} />
+            <p className="hkd-muted hkd-small">
+              Winners receive 50% instantly on the day; the rest releases on verified milestone
+              completion.
+            </p>
+          </DetailSection>
+
+          <DetailSection id="hkd-dates" title="Key dates">
+            <KeyDates event={event} />
+          </DetailSection>
+
+          <DetailSection id="hkd-organizer" title="The organizer">
+            <OrganizerCard org={{ id: event.orgId, ...event.org }} />
+          </DetailSection>
+
+          {/* Public gallery — 48-hour media vault */}
+          {gallery.length > 0 ? (
+            <DetailSection id="hkd-gallery" title="Hackathon gallery">
+              <ul className="hkd-gallery">
+                {gallery.map((asset) => (
+                  <li key={asset.id}>
+                    {asset.kind === "PHOTO" ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- media vault assets from dynamic storage
+                      <img src={asset.url} alt={asset.caption ?? "Hackathon photo"} />
+                    ) : (
+                      <video src={asset.url} controls />
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <p className="hkd-muted hkd-small">
+                Delivered within the 48-hour standard: high-resolution, community-first.
+              </p>
+            </DetailSection>
+          ) : null}
         </div>
-
-        <aside className="space-y-6" aria-label="Hackathon details">
-          <div className="relative aspect-[16/9] overflow-hidden rounded-card bg-brand/10 shadow-card">
-            <Image
-              src={cover}
-              alt={`${event.title} hackathon cover`}
-              fill
-              priority
-              sizes="(min-width: 1024px) 400px, 100vw"
-              unoptimized={!cover.startsWith("/")}
-              className="object-cover"
-            />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-            <Card>
-              <p className="text-xs font-semibold tracking-wide text-muted uppercase">Prize pool</p>
-              <p className="mt-1 font-display text-2xl font-bold text-ink">{formatKes(poolKes)}</p>
-            </Card>
-            <Card>
-              <p className="text-xs font-semibold tracking-wide text-muted uppercase">Runs</p>
-              <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-ink">
-                <CalendarDays aria-hidden className="size-4" />
-                {dateFormat.format(event.startsAt)} to {dateFormat.format(event.endsAt)}
-              </p>
-              <p className="mt-1 flex items-center gap-1.5 text-xs text-muted">
-                <Clock aria-hidden className="size-3.5" />
-                {timeFormat.format(event.startsAt)}
-              </p>
-            </Card>
-            <Card>
-              <p className="text-xs font-semibold tracking-wide text-muted uppercase">Venue</p>
-              <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-ink">
-                <MapPin aria-hidden className="size-4" />
-                {event.venueType === "ONLINE"
-                  ? "Online"
-                  : (event.location ?? event.venueType.toLowerCase())}
-              </p>
-              <p className="mt-1 text-xs text-muted capitalize">{event.venueType.toLowerCase()}</p>
-            </Card>
-          </div>
-
-          {/* CTA */}
-          <div>
-            {isRegistered ? (
-              <div className="space-y-3">
-                <Badge variant="success">Registered ✓</Badge>
-                <Link href={`/hackathons/${event.slug}/workspace`} className="block">
-                  <Button arrow size="lg" className="w-full">
-                    Open Team Workspace
-                  </Button>
-                </Link>
-              </div>
-            ) : open ? (
-              viewer ? (
-                <form action={`/api/events/${event.slug}/register`} method="post">
-                  <Button type="submit" size="lg" className="w-full">
-                    Register For This Hackathon
-                  </Button>
-                </form>
-              ) : (
-                <Link href="/signin" className="block">
-                  <Button size="lg" arrow className="w-full">
-                    Sign In To Register
-                  </Button>
-                </Link>
-              )
-            ) : (
-              <Button size="lg" disabled className="w-full">
-                Registration Closed
-              </Button>
-            )}
-          </div>
-        </aside>
       </div>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardTitle>Prize Breakdown</CardTitle>
-          <ul className="mt-3 text-sm">
-            {event.prizes.map((prize) => {
-              const winner = event.winners.find((w) => w.place === prize.place);
-              const instantNote = winner
-                ? winner.payouts.some((p) => p.tranche === "INSTANT" && p.status === "SUCCEEDED")
-                  ? "50% paid ✓"
-                  : "paying…"
-                : "50% on the day";
-              const restNote = prize.milestoneRequired ? "50% on milestone" : "full payout on win";
-              return (
-                <li
-                  key={prize.id}
-                  className="flex items-start justify-between gap-4 border-b border-ink/5 py-3 last:border-0"
-                >
-                  <div className="min-w-0">
-                    <p className="font-semibold text-ink">{prize.label}</p>
-                    {winner ? (
-                      <p className="text-xs text-muted">
-                        won by {winner.team.name} ·{" "}
-                        <Link href={`/developers/${winner.user.handle}`} className="underline">
-                          @{winner.user.handle}
-                        </Link>
-                      </p>
-                    ) : null}
-                    <p className="mt-0.5 text-xs text-muted">
-                      {instantNote} · {restNote}
-                    </p>
-                  </div>
-                  <p className="shrink-0 font-display text-base font-bold whitespace-nowrap text-ink">
-                    {formatKes(prize.amountKes)}
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
-          <CardDescription>
-            Winners receive 50% instantly on the day; the rest releases on verified milestone
-            completion.
-          </CardDescription>
-        </Card>
-
-        <OrganizerCard org={{ id: event.orgId, ...event.org }} />
-
-        <KeyDatesCard event={event} />
-      </div>
-
-      {/* Public gallery — 48-hour media vault */}
-      {gallery.length > 0 ? (
-        <Card className="mt-6">
-          <CardTitle>Hackathon Gallery</CardTitle>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-3">
-            {gallery.map((asset) => (
-              <li key={asset.id} className="overflow-hidden rounded-card border border-ink/10">
-                {asset.kind === "PHOTO" ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- media vault assets from dynamic storage
-                  <img
-                    src={asset.url}
-                    alt={asset.caption ?? "Hackathon photo"}
-                    className="aspect-[4/3] w-full object-cover"
-                  />
-                ) : (
-                  <video src={asset.url} controls className="aspect-[4/3] w-full" />
-                )}
-              </li>
-            ))}
-          </ul>
-          <CardDescription>
-            Delivered within the 48-hour standard: high-resolution, community-first.
-          </CardDescription>
-        </Card>
+      {more.length > 0 ? (
+        <section className="lp-section" aria-labelledby="hkd-more">
+          <div className="lp-frame lp-block lp-divided">
+            <div className="hkd-more-head">
+              <h2 id="hkd-more" className="lp-statement lp-statement-sm">
+                More hackathons. <span>Every one Prize Verified before it went live.</span>
+              </h2>
+              <LandingLink href="/hackathons#directory" variant="secondary">
+                Browse All
+              </LandingLink>
+            </div>
+            <div className="hk-grid hkd-more-grid">
+              {more.map((card) => (
+                <HackathonCard key={card.slug} event={card} now={now} />
+              ))}
+            </div>
+          </div>
+        </section>
       ) : null}
     </div>
   );

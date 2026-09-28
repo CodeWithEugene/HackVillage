@@ -3896,6 +3896,481 @@
 }
 
 /*
+ * Hackathon detail page (app/(marketing)/hackathons/[slug],
+ * components/hackathons/detail-parts.tsx), laid out like a customer story:
+ * breadcrumb hero with a facts card, then a sticky rail beside sections.
+ */
+@layer components {
+  .hkd-crumbs {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+  .hkd-crumbs a {
+    color: var(--color-ink-soft);
+    font-weight: 600;
+  }
+  .hkd-crumbs [aria-current] {
+    overflow: hidden;
+    color: var(--color-body-copy);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hkd-crumbs span[aria-hidden] {
+    color: var(--color-muted);
+  }
+  .hkd-all {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 2px;
+    color: var(--color-ink-soft);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .hkd-banner {
+    margin-top: 20px;
+    padding: 12px 16px;
+    border: 1px solid color-mix(in srgb, var(--color-warning) 40%, transparent);
+    border-radius: var(--radius-control);
+    background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+    color: var(--color-ink);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .hkd-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
+    align-items: start;
+    gap: clamp(32px, 6vw, 96px);
+    margin-top: clamp(32px, 5vw, 56px);
+  }
+  .hkd-title {
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: clamp(36px, 4.4vw, 60px);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .hkd-summary {
+    max-width: 56ch;
+    margin-top: 20px;
+    color: var(--color-body-copy);
+    font-size: 18px;
+    line-height: 1.6;
+  }
+  .hkd-tracks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .hkd-tracks a {
+    display: inline-block;
+    padding: 4px 12px;
+    border: 1px solid var(--lp-line);
+    border-radius: 999px;
+    color: var(--color-ink-soft);
+    font-size: 13px;
+    font-weight: 600;
+    transition: border-color 150ms ease, background 150ms ease;
+  }
+  .hkd-tracks a:hover {
+    border-color: var(--color-brand);
+    background: color-mix(in srgb, var(--color-brand) 8%, transparent);
+  }
+  .hkd-card {
+    overflow: hidden;
+    border: 1px solid var(--lp-line);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
+  .hkd-card-cover {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: color-mix(in srgb, var(--color-brand) 10%, transparent);
+  }
+  .hkd-card-facts {
+    display: flex;
+    flex-direction: column;
+    padding: 6px 18px 10px;
+  }
+  .hkd-card-facts div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 10px;
+    border-bottom: 1px solid var(--lp-line);
+    font-size: 14px;
+  }
+  .hkd-card-facts div:last-child {
+    border-bottom: 0;
+  }
+  .hkd-card-facts dt {
+    color: var(--color-muted);
+  }
+  .hkd-card-facts dd {
+    color: var(--color-ink);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  /* ---- Body: sticky rail + sections ---- */
+  .hkd-body {
+    display: grid;
+    grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 96px);
+    padding-block: clamp(48px, 6vw, 80px);
+  }
+  .hkd-rail {
+    position: sticky;
+    top: calc(var(--site-header-height) + 24px);
+    align-self: start;
+  }
+  .hkd-rail-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .hkd-rail-stats div {
+    position: relative;
+    padding-left: 14px;
+    border-left: 1px solid var(--lp-line);
+  }
+  .hkd-rail-stats div::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: -1px;
+    width: 1px;
+    height: 20px;
+    background: var(--color-brand);
+  }
+  .hkd-rail-stats dt {
+    color: var(--color-muted);
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+  .hkd-rail-stats dd {
+    margin-top: 2px;
+    color: var(--color-ink);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .hkd-rail-stats div:first-child dd {
+    font-family: var(--font-display);
+    font-size: 24px;
+    letter-spacing: -0.02em;
+  }
+  .hkd-rail-action {
+    margin-top: 28px;
+  }
+  .hkd-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .hkd-action-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-body-copy);
+    font-size: 13.5px;
+  }
+  .hkd-action-note a {
+    color: var(--color-ink-soft);
+    font-weight: 600;
+  }
+  .hkd-action-note-ok {
+    color: var(--color-success);
+    font-weight: 600;
+  }
+  .hkd-register {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    height: 44px;
+    align-items: center;
+    overflow: hidden;
+    padding-inline: 20px;
+    border-radius: 999px;
+    background: var(--color-brand);
+    color: var(--color-brand-ink);
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .hkd-content {
+    display: flex;
+    min-width: 0;
+    max-width: 760px;
+    flex-direction: column;
+    gap: clamp(40px, 5vw, 56px);
+  }
+  .hkd-section-title {
+    margin-bottom: 16px;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2vw, 26px);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+  .hkd-subtitle {
+    margin: 24px 0 10px;
+    color: var(--color-ink);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .hkd-prose {
+    color: var(--color-body-copy);
+    font-size: 16.5px;
+    line-height: 1.75;
+    white-space: pre-line;
+  }
+  .hkd-prose-sm {
+    font-size: 15px;
+  }
+  .hkd-muted {
+    color: var(--color-muted);
+  }
+  .hkd-small {
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .hkd-status {
+    overflow-x: auto;
+    padding: 18px;
+    border: 1px solid var(--lp-line);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+  }
+
+  /* The escrow pull-quote: a brand-gradient card like a testimonial block. */
+  .hkd-callout {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(24px, 4vw, 40px);
+    border-radius: var(--radius-card);
+    background: linear-gradient(125deg, var(--lp-navy), var(--lp-blue-deep) 55%, var(--color-brand));
+    color: #fff;
+    isolation: isolate;
+  }
+  .hkd-callout-art {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      repeating-linear-gradient(115deg, rgb(255 255 255 / 0.08) 0 1px, transparent 1px 8px),
+      radial-gradient(60% 90% at 90% 20%, rgb(127 208 248 / 0.55), transparent 70%);
+  }
+  .hkd-callout blockquote {
+    max-width: 44ch;
+    font-family: var(--font-display);
+    font-size: clamp(19px, 1.9vw, 24px);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .hkd-callout figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-top: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.95;
+  }
+  .hkd-callout-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: #cdeefe;
+  }
+  .hkd-callout-link:hover {
+    color: #fff;
+  }
+
+  .hkd-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--lp-line);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+  }
+  .hkd-table {
+    width: 100%;
+    min-width: 560px;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .hkd-table th,
+  .hkd-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--lp-line);
+    color: var(--color-body-copy);
+    text-align: left;
+    vertical-align: top;
+  }
+  .hkd-table thead th {
+    padding-block: 10px;
+    color: var(--color-muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .hkd-table tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+  .hkd-table tbody th {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .hkd-table-amount {
+    color: var(--color-ink) !important;
+    font-family: var(--font-display);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .hkd-winner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .hkd-winner a {
+    color: var(--color-ink-soft);
+    font-weight: 600;
+  }
+
+  .hkd-dates {
+    border-left: 1px solid var(--lp-line);
+    margin-left: 10px;
+  }
+  .hkd-date {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 16px;
+    padding: 0 0 22px 26px;
+  }
+  .hkd-date:last-child {
+    padding-bottom: 0;
+  }
+  .hkd-date-mark {
+    position: absolute;
+    top: 1px;
+    left: -11px;
+    display: grid;
+    place-items: center;
+    width: 21px;
+    height: 21px;
+    border: 1px solid var(--lp-line);
+    border-radius: 50%;
+    background: var(--color-paper);
+    color: var(--color-brand-ink);
+  }
+  .hkd-date-done .hkd-date-mark {
+    border-color: var(--color-brand);
+    background: var(--color-brand);
+  }
+  .hkd-date-next .hkd-date-mark {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-brand) 22%, transparent);
+  }
+  .hkd-date-label {
+    color: var(--color-ink);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .hkd-date-done .hkd-date-label {
+    color: var(--color-muted);
+  }
+  .hkd-date-next {
+    margin-left: 8px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-brand) 15%, transparent);
+    color: var(--color-ink-soft);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .hkd-date time {
+    color: var(--color-body-copy);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hkd-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .hkd-gallery li {
+    overflow: hidden;
+    border: 1px solid var(--lp-line);
+    border-radius: var(--radius-card);
+  }
+  .hkd-gallery img,
+  .hkd-gallery video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .hkd-more-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .hkd-more-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 32px;
+  }
+
+  @media (max-width: 1023px) {
+    .hkd-hero-grid,
+    .hkd-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hkd-card {
+      max-width: 520px;
+    }
+    .hkd-rail {
+      position: static;
+    }
+    .hkd-rail-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .hkd-more-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 639px) {
+    .hkd-gallery {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .hkd-more-head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .hkd-date {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hkd-more-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
+
+/*
  * Landing page: the header is see-through while the hero is under it, so
  * the ribbon shows behind the nav, and turns solid once the page scrolls
  * (data-scrolled comes from components/patterns/header-scroll-state.tsx).
