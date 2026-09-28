@@ -150,7 +150,7 @@ function Filters({
   return (
     <div className="hk-filters">
       <FacetGroup title="Status" options={phaseOptions} defaultOpen />
-      <FacetGroup title="Category" options={categoryOptions} />
+      <FacetGroup title="Category" options={categoryOptions} defaultOpen />
       <FacetGroup title="Where" options={venueOptions} />
       <FacetGroup title="Prize pool" options={prizeOptions} />
       {isFiltered(query) ? (
