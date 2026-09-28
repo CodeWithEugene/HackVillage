@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { AudienceSections } from "@/components/landing/audience-sections";
-import { GetStarted } from "@/components/landing/get-started";
 import { LandingAbout } from "@/components/landing/landing-about";
 import { LandingHero } from "@/components/landing/landing-hero";
 import { LatestPosts } from "@/components/landing/latest-posts";
@@ -34,7 +33,6 @@ export default function LandingPage() {
       <LandingAbout />
       <AudienceSections />
       <LatestPosts />
-      <GetStarted />
     </div>
   );
 }
