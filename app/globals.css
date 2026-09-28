@@ -1832,8 +1832,10 @@
   .lp-band {
     background: linear-gradient(180deg, var(--color-paper) 0%, var(--lp-tint) 22%, var(--lp-tint) 100%);
   }
+  /* The section above already ends in a full block of padding, so the band
+     only adds a little of its own before the heading. */
   .lp-band-frame {
-    padding-top: var(--lp-space);
+    padding-top: clamp(16px, 2.5vw, 32px);
   }
   .lp-band-heading {
     font-family: var(--font-display);
