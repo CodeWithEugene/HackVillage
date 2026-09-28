@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Landmark, Lock, Wallet, type LucideIcon } from "lucide-react";
 
@@ -40,9 +41,22 @@ export function VerifySection({ recent }: { recent: ListingCard[] }) {
     <section className="lp-section" aria-labelledby="listing-about">
       <div className="lp-frame lp-block lp-divided">
         <div className="lp-split hk-about">
-          <h2 id="listing-about" className="lp-split-heading">
-            Hackathons With Prizes You Can Verify
-          </h2>
+          <div className="hk-about-side">
+            <h2 id="listing-about" className="lp-split-heading">
+              Hackathons With Prizes You Can Verify
+            </h2>
+            {/* Fills only the space the text column leaves under the heading;
+                it is positioned absolutely, so it never adds height. */}
+            <div className="hk-about-photo">
+              <Image
+                src="/marketing/blog/hackathon-winners-checking-prize-payout.webp"
+                alt="Kenyan hackathon winners checking their prize payout on a phone"
+                fill
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+          </div>
           <div className="hk-about-text">
             <p>
               HackVillage lists hackathons in Nairobi, across Kenya, Africa-wide and fully online:

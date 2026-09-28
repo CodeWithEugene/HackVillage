@@ -3228,7 +3228,23 @@
 
   /* ---- Verify / about ---- */
   .hk-about {
+    align-items: stretch;
     padding-bottom: 0;
+  }
+  .hk-about-side {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .hk-about-photo {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+  }
+  .hk-about-photo img {
+    object-position: center 35%;
   }
   .hk-about-text {
     display: flex;
@@ -3330,6 +3346,10 @@
     }
     .hk-notify {
       grid-template-columns: minmax(0, 1fr);
+    }
+    .hk-about-photo {
+      flex: none;
+      aspect-ratio: 21 / 9;
     }
   }
 
