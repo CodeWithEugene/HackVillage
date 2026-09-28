@@ -36,9 +36,23 @@ interface FacetOption {
   active: boolean;
 }
 
-function FacetGroup({ title, options }: { title: string; options: FacetOption[] }) {
+/**
+ * One collapsible filter group. Groups start collapsed, like a directory's
+ * filter menus, unless told to open or one of their options is in use, so
+ * the sidebar stays short enough to sit still beside the results.
+ */
+function FacetGroup({
+  title,
+  options,
+  defaultOpen = false,
+}: {
+  title: string;
+  options: FacetOption[];
+  defaultOpen?: boolean;
+}) {
+  const inUse = options.some((option, index) => option.active && index > 0);
   return (
-    <details className="hk-facet" open>
+    <details className="hk-facet" open={defaultOpen || inUse}>
       <summary>{title}</summary>
       <ul>
         {options.map((option) => (
@@ -135,7 +149,7 @@ function Filters({
 
   return (
     <div className="hk-filters">
-      <FacetGroup title="Status" options={phaseOptions} />
+      <FacetGroup title="Status" options={phaseOptions} defaultOpen />
       <FacetGroup title="Category" options={categoryOptions} />
       <FacetGroup title="Where" options={venueOptions} />
       <FacetGroup title="Prize pool" options={prizeOptions} />

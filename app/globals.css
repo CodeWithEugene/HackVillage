@@ -3321,10 +3321,16 @@
     gap: clamp(24px, 3vw, 40px);
     margin-top: 32px;
   }
+  /* Stays put while the results scroll past, like the legal pages' table of
+     contents; if the open groups outgrow the window it scrolls on its own. */
   .hk-sidebar {
     position: sticky;
-    top: calc(var(--site-header-height) + 16px);
+    top: calc(var(--site-header-height) + 24px);
     align-self: start;
+    max-height: calc(100dvh - var(--site-header-height) - 48px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
   }
   .hk-filters {
     display: flex;
