@@ -49,3 +49,6 @@ next-env.d.ts
 
 # claude-flow local tooling data
 .claude-flow/
+
+# Claude Code local settings (per-machine, never committed)
+.claude/
