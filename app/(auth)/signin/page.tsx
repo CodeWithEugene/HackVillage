@@ -8,6 +8,8 @@ export const metadata: Metadata = { title: "Sign In" };
 const NOTICES: Record<string, string> = {
   registered: "Account created, check your email for the verification link.",
   reset: "Password updated, sign in with your new password.",
+  signedout: "You're signed out on every device.",
+  expired: "For your security, you were signed out. Sign in again to continue.",
 };
 
 const OAUTH_ERROR_NOTICES: Record<string, string> = {
@@ -23,10 +25,20 @@ const OAUTH_ERROR_NOTICES: Record<string, string> = {
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ registered?: string; reset?: string; error?: string }>;
+  searchParams: Promise<{
+    registered?: string;
+    reset?: string;
+    signedout?: string;
+    expired?: string;
+    error?: string;
+  }>;
 }) {
   const params = await searchParams;
-  const notice = (params.registered && NOTICES.registered) || (params.reset && NOTICES.reset);
+  const notice =
+    (params.registered && NOTICES.registered) ||
+    (params.reset && NOTICES.reset) ||
+    (params.signedout && NOTICES.signedout) ||
+    (params.expired && NOTICES.expired);
   const errorNotice =
     params.error &&
     (OAUTH_ERROR_NOTICES[params.error] ?? "Something went wrong with that sign-in, try again.");

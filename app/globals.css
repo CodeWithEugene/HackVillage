@@ -4168,3 +4168,287 @@ input::-ms-reveal,
 input::-ms-clear {
   display: none;
 }
+
+/*
+ * Authenticated app shell (app/(app)/layout.tsx, app/admin/layout.tsx,
+ * components/patterns/app-sidebar.tsx): the marketing ruled frame, same
+ * width, edge and hairline side rules, with the sidebar as its first column.
+ * The sidebar's brand cell and the content's top bar share one height, so a
+ * single hairline runs across the frame like the site header's. Nav
+ * sections and the active link use rules and a tick, not rounded pills.
+ * Below 1024px the rules drop out (as on the marketing pages) and the top
+ * bar's drawer carries the nav.
+ */
+.app-shell {
+  --app-line: color-mix(in srgb, var(--color-ink) 10%, transparent);
+  --app-sidebar-width: 256px;
+  width: min(100% - 2 * var(--frame-edge), var(--frame-max));
+  min-height: 100dvh;
+  margin-inline: auto;
+  border-inline: 1px solid var(--app-line);
+}
+@media (min-width: 1024px) {
+  .app-shell {
+    display: grid;
+    grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
+  }
+}
+@media (max-width: 1023px) {
+  .app-shell {
+    border-inline-color: transparent;
+  }
+}
+
+/* ── Sidebar (≥1024px) ───────────────────────────────────────────────── */
+.app-sidebar {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .app-sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    border-right: 1px solid var(--app-line);
+  }
+}
+.app-sidebar-brand {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: var(--site-header-height);
+  padding-inline: var(--frame-gutter);
+  border-bottom: 1px solid var(--app-line);
+}
+.app-sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  /* Scrolling the sidebar must never chain into the page beside it. */
+  overscroll-behavior: contain;
+}
+
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.app-brand-note {
+  padding-left: 10px;
+  border-left: 1px solid var(--app-line, color-mix(in srgb, var(--color-ink) 10%, transparent));
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Nav sections: each a ruled band; the rules run edge to edge. */
+.app-nav-section {
+  padding-block: 16px;
+}
+.app-nav-section + .app-nav-section {
+  border-top: 1px solid var(--app-line, color-mix(in srgb, var(--color-ink) 10%, transparent));
+}
+.app-nav-title {
+  padding-inline: var(--frame-gutter);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.app-nav-section ul {
+  margin-top: 6px;
+}
+
+/* One nav link, full width. The current page (aria-current, so sight and
+   screen readers agree) gets a tint and a brand tick on the left edge. */
+.app-nav-link {
+  position: relative;
+  display: block;
+  padding: 8px var(--frame-gutter);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-nav-idle);
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+.app-nav-link:hover {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+}
+.app-nav-link[aria-current="page"] {
+  color: var(--color-nav-active);
+  background: color-mix(in srgb, var(--color-brand) 8%, transparent);
+}
+.app-nav-link[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--color-nav-active);
+}
+.app-nav-link:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: -2px;
+}
+
+/* ── Content column ──────────────────────────────────────────────────── */
+.app-content {
+  display: flex;
+  min-width: 0;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: var(--site-header-height);
+  padding-inline: var(--frame-gutter);
+  border-bottom: 1px solid var(--app-line);
+  background: color-mix(in srgb, var(--color-paper) 92%, transparent);
+  backdrop-filter: blur(10px);
+}
+.app-topbar-mobile {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+@media (min-width: 1024px) {
+  /* The sidebar carries the brand and the nav here. */
+  .app-topbar-mobile {
+    visibility: hidden;
+  }
+}
+.app-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.app-main {
+  flex: 1;
+  padding: clamp(24px, 3vw, 40px) var(--frame-gutter) 64px;
+}
+.app-foot {
+  padding: 14px var(--frame-gutter);
+  border-top: 1px solid var(--app-line);
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.app-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  color: var(--color-ink);
+}
+.app-menu-button:hover {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+
+/* ── Drawer (<1024px), portaled to body ──────────────────────────────── */
+.app-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  touch-action: none;
+  transition:
+    opacity 220ms ease,
+    visibility 0s linear 220ms;
+}
+.app-drawer-overlay-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 220ms ease,
+    visibility 0s;
+}
+.app-drawer-panel {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 71;
+  display: flex;
+  flex-direction: column;
+  width: min(300px, 84vw);
+  height: 100dvh;
+  border-right: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  background: var(--color-paper);
+  transform: translateX(-100%);
+  transition: transform 280ms cubic-bezier(0.65, 0, 0.35, 1);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.app-drawer-panel-open {
+  transform: translateX(0);
+}
+.app-drawer-head {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--site-header-height);
+  padding-inline: var(--frame-gutter) 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-drawer-overlay,
+  .app-drawer-panel,
+  .app-nav-link {
+    transition: none;
+  }
+}
+
+/*
+ * Inside the app shell, cards follow the ruled frame too: square, flat and
+ * outlined with the same hairline as the frame. Unlayered on purpose (like
+ * the auth form slot) so it outranks the Card's radius and shadow utilities.
+ * Buttons, badges and inputs keep their own shapes, as on marketing pages.
+ */
+.app-main .rounded-card {
+  border-radius: 0;
+  border-color: color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+.app-main .shadow-card,
+.app-main .rounded-card.shadow-card {
+  box-shadow: none;
+}
+
+/* Inactivity warning (components/patterns/session-timeout.tsx). */
+.session-timeout {
+  position: fixed;
+  right: var(--frame-gutter);
+  bottom: var(--frame-gutter);
+  left: var(--frame-gutter);
+  z-index: 80;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 560px;
+  margin-inline: auto;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  font-size: 14px;
+  color: var(--color-ink);
+}

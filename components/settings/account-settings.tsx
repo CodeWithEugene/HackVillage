@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useTransition } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import {
   changePasswordAction,
   deactivateAccountAction,
+  signOutEverywhereAction,
   type AccountActionState,
 } from "@/lib/account/actions";
 
@@ -31,6 +32,7 @@ export function AccountSettings({
     {}
   );
   const [confirming, setConfirming] = useState(false);
+  const [signingOut, startSignOut] = useTransition();
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6">
@@ -69,7 +71,10 @@ export function AccountSettings({
 
       <Card>
         <CardTitle>Change Password</CardTitle>
-        <CardDescription>At least 10 characters, with a letter and a number.</CardDescription>
+        <CardDescription>
+          At least 10 characters, with a letter and a number. You&apos;ll be signed out on every
+          device and sign in again with the new password.
+        </CardDescription>
         <form action={changePassword} className="mt-4 space-y-4">
           <div>
             <Label htmlFor="currentPassword">Current password</Label>
@@ -96,6 +101,22 @@ export function AccountSettings({
             Update Password
           </Button>
         </form>
+      </Card>
+
+      <Card>
+        <CardTitle>Sessions</CardTitle>
+        <CardDescription>
+          Signed in on a shared or lost device? Sign out everywhere ends every session, this one
+          included. Changing or resetting your password does the same.
+        </CardDescription>
+        <Button
+          variant="secondary"
+          className="mt-4"
+          loading={signingOut}
+          onClick={() => startSignOut(() => void signOutEverywhereAction())}
+        >
+          Sign Out Everywhere
+        </Button>
       </Card>
 
       <Card className="border-danger/30">

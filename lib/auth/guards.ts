@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { auth } from "@/lib/auth";
 import type { Role, SessionUserLike, Surface } from "@/lib/auth/rbac";
@@ -7,8 +8,8 @@ import { canAccessSurface, isOnboarded } from "@/lib/auth/rbac";
 /**
  * Server-side guards (Phase 1). Layouts and server actions call these —
  * enforcement NEVER lives in the client. Middleware is deliberately unused:
- * database sessions + Prisma don't belong on the edge runtime; the layout
- * tree is the single, stronger gate.
+ * the session check reads Prisma (revocation, roles), which doesn't belong in
+ * middleware; the layout tree is the single, stronger gate.
  */
 
 export interface CurrentUser extends SessionUserLike {
@@ -18,7 +19,12 @@ export interface CurrentUser extends SessionUserLike {
   emailVerified: Date | null;
 }
 
-export async function currentUser(): Promise<CurrentUser | null> {
+/**
+ * The signed-in user for this request. Cached per request: a layout, its page
+ * and their server components all share one session check (two queries)
+ * instead of repeating it for every guard call.
+ */
+export const currentUser = cache(async (): Promise<CurrentUser | null> => {
   const session = await auth();
   const user = session?.user;
   if (!user?.id || !user.email) return null;
@@ -34,7 +40,7 @@ export async function currentUser(): Promise<CurrentUser | null> {
     emailVerified: user.emailVerified,
     deletedAt: null,
   };
-}
+});
 
 export async function requireUser(): Promise<CurrentUser> {
   const user = await currentUser();
