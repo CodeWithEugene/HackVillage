@@ -9,7 +9,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 import { AppSidebar, AppTopBar, type AppNavSection } from "@/components/patterns/app-sidebar";
+import { SessionTimeout } from "@/components/patterns/session-timeout";
 import { requireOnboardedUser } from "@/lib/auth/guards";
+import { sessionLimitsFor } from "@/lib/auth/session-policy";
 
 /** Builder links every authenticated user gets. */
 const BUILDER_ITEMS = [
@@ -76,6 +78,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <main className="app-main">{children}</main>
         <footer className="app-foot">HackVillage: trust is the product.</footer>
       </div>
+      <SessionTimeout idleMs={sessionLimitsFor(user.roles).idleMs} />
     </div>
   );
 }

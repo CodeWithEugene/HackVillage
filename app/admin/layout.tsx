@@ -10,7 +10,9 @@ import { notFound } from "next/navigation";
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 import { AppSidebar, AppTopBar, type AppNavSection } from "@/components/patterns/app-sidebar";
+import { SessionTimeout } from "@/components/patterns/session-timeout";
 import { requireSurface } from "@/lib/auth/guards";
+import { sessionLimitsFor } from "@/lib/auth/session-policy";
 
 /** The admin surfaces (plan §7.8), one section in the shared shell. */
 const ADMIN_SECTIONS: AppNavSection[] = [
@@ -53,6 +55,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <main className="app-main">{children}</main>
         <footer className="app-foot">HackVillage: trust is the product.</footer>
       </div>
+      <SessionTimeout idleMs={sessionLimitsFor(user.roles).idleMs} />
     </div>
   );
 }

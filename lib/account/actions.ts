@@ -7,6 +7,7 @@ import { signOut } from "@/lib/auth";
 import { accountDeactivatedEmail, passwordChangedEmail } from "@/lib/auth/mail-templates";
 import { passwordSchema } from "@/lib/auth/password-policy";
 import { requireUser } from "@/lib/auth/guards";
+import { revokeAllSessions } from "@/lib/auth/session-version";
 import { prisma } from "@/lib/db";
 import { sendMail } from "@/lib/ports/mail";
 import { rateLimit } from "@/lib/rate-limit";
@@ -43,14 +44,28 @@ export async function changePasswordAction(
   if (!valid) return { error: "Your current password doesn't match." };
 
   const { hash } = await import("@node-rs/argon2");
+  // The new password and the session revocation land together: every
+  // session, including one an attacker may hold, ends now.
   await prisma.user.update({
     where: { id: user.id },
-    data: { passwordHash: await hash(parsed.data.newPassword) },
+    data: {
+      passwordHash: await hash(parsed.data.newPassword),
+      sessionVersion: { increment: 1 },
+    },
   });
 
   await sendMail({ to: record.email, ...passwordChangedEmail() });
 
-  return { message: "Password updated." };
+  // This device's session ended with the rest; sign in again with the new password.
+  await signOut({ redirectTo: "/signin?reset=1" });
+  return {};
+}
+
+/** Ends every session on every device (this one included) and signs out. */
+export async function signOutEverywhereAction(): Promise<void> {
+  const user = await requireUser();
+  await revokeAllSessions(user.id);
+  await signOut({ redirectTo: "/signin?signedout=1" });
 }
 
 /**
@@ -79,6 +94,8 @@ export async function deactivateAccountAction(
         name: "Deleted account",
         email: `deleted+${user.id}@hackvillage.invalid`,
         avatarUrl: null,
+        // Ends sessions on every other device too, not just this one.
+        sessionVersion: { increment: 1 },
       },
     });
     await tx.session.deleteMany({ where: { userId: user.id } });

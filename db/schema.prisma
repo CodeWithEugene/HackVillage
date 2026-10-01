@@ -143,6 +143,10 @@ model User {
   updatedAt     DateTime  @updatedAt
   // Soft delete: anonymize on account deletion, payout obligations remain.
   deletedAt     DateTime?
+  // Session revocation: every session token carries the version it was
+  // issued under; bumping it (password change/reset, "sign out everywhere",
+  // deactivation) ends every existing session on its next request.
+  sessionVersion Int      @default(0)
 
   accounts       Account[]
   sessions       Session[]

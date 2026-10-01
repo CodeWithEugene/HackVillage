@@ -9,6 +9,8 @@ import { z } from "zod";
 import { HackVillageAdapter } from "@/lib/auth/adapter";
 import { pickVerifiedGithubEmail } from "@/lib/auth/github-email";
 import { oauthSignInAllowed } from "@/lib/auth/oauth-linking";
+import { MAX_IDLE_SECONDS, sessionAge, sessionLimitsFor } from "@/lib/auth/session-policy";
+import { isSessionCurrent } from "@/lib/auth/session-version";
 import { sendSignInAlert, sendWelcomeEmail } from "@/lib/auth/sign-in-alert";
 import type { PrimaryRole, Role } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/db";
@@ -24,6 +26,27 @@ declare module "next-auth" {
       emailVerified: Date | null;
     } & DefaultSession["user"];
   }
+}
+
+/** Fresh per-request account state, re-read in the jwt callback. */
+interface SessionProfile {
+  handle: string;
+  primaryRole: PrimaryRole;
+  roles: Role[];
+  onboardingCompletedAt: string | null;
+  emailVerified: string | null;
+}
+
+/** Our fields on the Auth.js JWT (typed loosely by the library). */
+interface HackVillageToken {
+  id?: string;
+  /** User.sessionVersion this token was issued under (see session-version.ts). */
+  sv?: number;
+  /** When the user signed in (ms), for the overall session limit. */
+  authTime?: number;
+  /** The user's last request (ms), for the inactivity limit. */
+  lastActive?: number;
+  profile?: SessionProfile;
 }
 
 const credentialsSchema = z.object({
@@ -108,10 +131,13 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: HackVillageAdapter(prisma),
   // Auth.js v5 constraint: the Credentials provider requires JWT sessions.
-  // Revocation is preserved in practice — the session callback re-reads the
-  // user from the DB on every request and neuters deleted accounts (ADR-005
-  // amended; documented in the session callback).
-  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 }, // 30 days
+  // Revocation still works: every token carries User.sessionVersion, and the
+  // jwt callback ends any session whose version is stale or whose account is
+  // gone (ADR-005 amended; see lib/auth/session-version.ts).
+  // The cookie lives as long as the longest inactivity window and slides on
+  // every request (middleware.ts refreshes it). The exact per-role idle and
+  // overall limits are enforced in the jwt callback (lib/auth/session-policy).
+  session: { strategy: "jwt", maxAge: MAX_IDLE_SECONDS },
   pages: { signIn: "/signin", error: "/signin" },
   trustHost: true,
   providers,
@@ -135,21 +161,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ user, account, profile }) {
       return oauthSignInAllowed({ provider: account?.provider, email: user.email, profile });
     },
-    async jwt({ token, user }) {
-      // First sign-in: capture the DB id so the session callback never has to
-      // resolve by email (OAuth and credentials both provide it here).
+    async jwt({ token: rawToken, user }) {
+      const token = rawToken as typeof rawToken & HackVillageToken;
+      const now = Date.now();
+      // First sign-in: capture the DB id so later requests never resolve by
+      // email (OAuth and credentials both provide it here), and start both
+      // session clocks.
       if (user?.id) {
         token.id = user.id;
+        token.authTime = now;
+        token.lastActive = now;
       }
-      return token;
-    },
-    async session({ session, token }) {
-      const userId = token.id as string | undefined;
-      if (!userId) return session;
+      const userId = token.id;
+      if (!userId) return null;
 
-      // Re-read our fields on EVERY request (the adapter types don't carry
-      // them) and attach the role set. This is also the revocation check:
-      // deleted accounts get a neutered session until sign-out is forced.
+      // Every request re-reads the account (roles, onboarding, deletion) and
+      // checks the session version. Returning null ends the session: Auth.js
+      // treats the visitor as signed out and clears the cookie.
       const [dbUser, grants] = await Promise.all([
         prisma.user.findUnique({
           where: { id: userId },
@@ -159,29 +187,44 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             onboardingCompletedAt: true,
             emailVerified: true,
             deletedAt: true,
+            sessionVersion: true,
           },
         }),
-        prisma.roleGrant.findMany({
-          where: { userId },
-          select: { role: true },
-        }),
+        prisma.roleGrant.findMany({ where: { userId }, select: { role: true } }),
       ]);
 
-      session.user.id = userId;
-      if (!dbUser || dbUser.deletedAt) {
-        session.user.handle = "";
-        session.user.primaryRole = "DEVELOPER";
-        session.user.roles = [];
-        session.user.onboardingCompletedAt = null;
-        session.user.emailVerified = null;
-        return session;
-      }
+      // A fresh sign-in adopts the account's current version.
+      if (user?.id && dbUser) token.sv = dbUser.sessionVersion;
+      if (!dbUser || !isSessionCurrent(token.sv, dbUser)) return null;
 
-      session.user.handle = dbUser.handle;
-      session.user.primaryRole = dbUser.primaryRole;
-      session.user.roles = grants.map((grant) => grant.role);
-      session.user.onboardingCompletedAt = dbUser.onboardingCompletedAt;
-      session.user.emailVerified = dbUser.emailVerified;
+      // Inactivity and overall limits (stricter for admins). Past either one
+      // the session ends and the user signs in again.
+      const roles = grants.map((grant) => grant.role);
+      if (sessionAge(token, sessionLimitsFor(roles), now) !== "active") return null;
+      token.lastActive = now;
+
+      token.profile = {
+        handle: dbUser.handle,
+        primaryRole: dbUser.primaryRole,
+        roles,
+        onboardingCompletedAt: dbUser.onboardingCompletedAt?.toISOString() ?? null,
+        emailVerified: dbUser.emailVerified?.toISOString() ?? null,
+      };
+      return token;
+    },
+    session({ session, token: rawToken }) {
+      const token = rawToken as typeof rawToken & HackVillageToken;
+      const profile = token.profile;
+      if (!token.id || !profile) return session;
+
+      session.user.id = token.id;
+      session.user.handle = profile.handle;
+      session.user.primaryRole = profile.primaryRole;
+      session.user.roles = profile.roles;
+      session.user.onboardingCompletedAt = profile.onboardingCompletedAt
+        ? new Date(profile.onboardingCompletedAt)
+        : null;
+      session.user.emailVerified = profile.emailVerified ? new Date(profile.emailVerified) : null;
       return session;
     },
   },

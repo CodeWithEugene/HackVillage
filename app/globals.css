@@ -4430,3 +4430,25 @@ input::-ms-clear {
 .app-main .rounded-card.shadow-card {
   box-shadow: none;
 }
+
+/* Inactivity warning (components/patterns/session-timeout.tsx). */
+.session-timeout {
+  position: fixed;
+  right: var(--frame-gutter);
+  bottom: var(--frame-gutter);
+  left: var(--frame-gutter);
+  z-index: 80;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 560px;
+  margin-inline: auto;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  font-size: 14px;
+  color: var(--color-ink);
+}

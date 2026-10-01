@@ -304,7 +304,9 @@ export async function resetPasswordAction(
   await prisma.$transaction([
     prisma.user.update({
       where: { email: record.identifier },
-      data: { passwordHash: await hash(parsed.data.password) },
+      // A reset ends every existing session: whoever prompted it may not be
+      // the only one holding a signed-in device.
+      data: { passwordHash: await hash(parsed.data.password), sessionVersion: { increment: 1 } },
     }),
     prisma.verificationToken.deleteMany({ where: { identifier: record.identifier } }),
   ]);
