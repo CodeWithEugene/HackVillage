@@ -135,7 +135,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // jwt callback ends any session whose version is stale or whose account is
   // gone (ADR-005 amended; see lib/auth/session-version.ts).
   // The cookie lives as long as the longest inactivity window and slides on
-  // every request (middleware.ts refreshes it). The exact per-role idle and
+  // every request (proxy.ts refreshes it). The exact per-role idle and
   // overall limits are enforced in the jwt callback (lib/auth/session-policy).
   session: { strategy: "jwt", maxAge: MAX_IDLE_SECONDS },
   pages: { signIn: "/signin", error: "/signin" },

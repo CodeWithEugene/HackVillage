@@ -14,6 +14,10 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
   if (
     !invitation ||
     invitation.acceptedAt ||
+    // Server Component: runs once per server request, so Date.now() is the
+    // intended per-request expiry check (react-hooks/purity is new in
+    // eslint-config-next 16 and doesn't distinguish RSC render from client).
+    // eslint-disable-next-line react-hooks/purity -- see comment above
     invitation.expiresAt.getTime() <= Date.now()
   ) {
     return <AcceptInvitationClient invalid orgName={invitation?.org.name} />;

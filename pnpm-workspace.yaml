@@ -5,3 +5,13 @@ allowBuilds:
   keccak: true
   prisma: true
   unrs-resolver: true
+
+overrides:
+  # next@16.3.8 declares an optional sharp@^0.35.4; 0.35.5 patches a high
+  # severity librsvg CVE and still satisfies next's own range.
+  sharp: ^0.35.5
+  # Transitive leaf dep of postcss (next's own CSS build step) and of
+  # Prisma's CLI config loader (@prisma/config>c12>magicast). 1.2.2 is a
+  # same-major patch that satisfies every declared range (postcss wants
+  # ^1.2.1) and touches no money-path code — pure build-time source maps.
+  source-map-js: ^1.2.2

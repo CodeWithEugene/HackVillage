@@ -7,9 +7,8 @@ import { canAccessSurface, isOnboarded } from "@/lib/auth/rbac";
 
 /**
  * Server-side guards (Phase 1). Layouts and server actions call these —
- * enforcement NEVER lives in the client. Middleware is deliberately unused:
- * the session check reads Prisma (revocation, roles), which doesn't belong in
- * middleware; the layout tree is the single, stronger gate.
+ * enforcement NEVER lives in the client. proxy.ts only refreshes sessions and
+ * never decides access: the layout tree is the single, stronger gate.
  */
 
 export interface CurrentUser extends SessionUserLike {

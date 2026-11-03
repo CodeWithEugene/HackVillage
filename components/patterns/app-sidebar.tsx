@@ -138,6 +138,10 @@ export function AppTopBar({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Hydration-safe mount flag: intentionally renders differently once the
+    // client has mounted (react-hooks/set-state-in-effect is new in
+    // eslint-config-next 16; this is the standard pattern for it).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above
     setMounted(true);
   }, []);
 

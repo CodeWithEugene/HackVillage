@@ -52,7 +52,10 @@ export function OAuthPopupDone() {
   const [orphaned, setOrphaned] = useState(false);
   useEffect(() => {
     if (!reportToOpener({ type: OAUTH_POPUP_NAME, status: "success" })) {
-      // Opened outside the popup flow (or the original tab was closed): carry on here.
+      // Opened outside the popup flow (or the original tab was closed): carry
+      // on here. This relays a one-time external result, not reactive state
+      // (react-hooks/set-state-in-effect is new in eslint-config-next 16).
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above
       setOrphaned(true);
       window.location.replace("/dashboard");
     }

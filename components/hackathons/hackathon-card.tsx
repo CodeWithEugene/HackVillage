@@ -35,7 +35,7 @@ export function HackathonCover({
       // Uploaded covers live on R2 and are already sized to 1600x900.
       unoptimized={!cover.startsWith("/")}
       alt={`${event.title}, a hackathon on HackVillage`}
-      priority={priority}
+      preload={priority}
       fill
       sizes={sizes}
       className={cn(

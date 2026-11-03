@@ -52,3 +52,4 @@ next-env.d.ts
 
 # Claude Code local settings (per-machine, never committed)
 .claude/
+.npmrc

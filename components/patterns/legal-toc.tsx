@@ -25,6 +25,10 @@ export function LegalToc({ containerId }: { containerId: string }) {
     headings.forEach((heading, index) => {
       heading.id = ids[index];
     });
+    // Builds the TOC from headings read out of the DOM after mount, which
+    // only exists client-side (react-hooks/set-state-in-effect is new in
+    // eslint-config-next 16 and flags this DOM-read-then-setState pattern).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above
     setEntries(
       headings.map((heading, index) => ({
         id: ids[index],

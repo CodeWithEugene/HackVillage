@@ -91,7 +91,7 @@ export default async function BlogPostPage({ params }: PageProps) {
               src={meta.cover}
               alt={meta.coverAlt}
               fill
-              priority
+              preload
               sizes="(min-width: 1440px) 1392px, 100vw"
               className="object-cover"
             />

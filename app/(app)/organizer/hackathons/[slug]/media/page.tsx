@@ -31,9 +31,15 @@ export default async function EventMediaPage({
   if (!membership || membership.role === "MEMBER") notFound();
 
   const deadline = event.mediaDeadlineAt;
+  // Server Component: this runs once per server request, not a client
+  // re-render, so Date.now() is the intended per-request deadline check
+  // (react-hooks/purity is new in eslint-config-next 16 and doesn't
+  // distinguish RSC render from client render).
   const hoursLeft = deadline
-    ? Math.round((deadline.getTime() - Date.now()) / 3_600_000)
+    ? // eslint-disable-next-line react-hooks/purity -- see comment above
+      Math.round((deadline.getTime() - Date.now()) / 3_600_000)
     : null;
+  // eslint-disable-next-line react-hooks/purity -- see comment above
   const pastDeadline = deadline ? deadline.getTime() < Date.now() : false;
   const approvedCount = event.media.filter((asset) => asset.status === "APPROVED").length;
 

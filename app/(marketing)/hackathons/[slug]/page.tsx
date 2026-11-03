@@ -246,7 +246,7 @@ export default async function EventDetailPage({ params, searchParams }: PageProp
                   src={cover}
                   alt={`${event.title} hackathon cover`}
                   fill
-                  priority
+                  preload
                   sizes="(min-width: 1024px) 380px, 100vw"
                   unoptimized={!cover.startsWith("/")}
                   className="object-cover"

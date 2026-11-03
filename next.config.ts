@@ -103,7 +103,7 @@ function sentryIngestOrigin(): string | null {
  * keeps 'unsafe-inline' because the App Router streams its RSC payload in
  * inline <script> tags (self.__next_f) and app/layout.tsx ships an inline
  * theme-init script — strict 'self' would blank every page without a nonce
- * pipeline (deliberately not added: no middleware). JSON-LD <script> tags are
+ * pipeline (deliberately not added: proxy.ts only refreshes sessions). JSON-LD <script> tags are
  * type="application/ld+json" and execute nowhere, so they are unaffected.
  */
 function securityHeaders(): Array<{ key: string; value: string }> {

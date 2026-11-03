@@ -13,7 +13,7 @@ export function AuthVisual() {
         src="/marketing/auth/hackathon-builders-welcome.webp"
         alt=""
         fill
-        priority
+        preload
         sizes="50vw"
         className="object-cover object-top"
       />

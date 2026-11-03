@@ -26,6 +26,10 @@ export async function JudgingSection({
   status: EventStatus;
 }) {
   const readiness = await judgingReadiness(eventId);
+  // Server Component: runs once per server request, so Date.now() is the
+  // intended per-request "has the event ended" check (react-hooks/purity is
+  // new in eslint-config-next 16 and doesn't distinguish RSC from client).
+  // eslint-disable-next-line react-hooks/purity -- see comment above
   const ended = endsAt.getTime() <= Date.now();
   const judging = status === "JUDGING";
 
