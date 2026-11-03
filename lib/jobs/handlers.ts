@@ -9,6 +9,15 @@ import { getQueue } from "@/lib/queue";
  * stay idempotent (pg-boss delivers at-least-once, work() receives batches).
  */
 
+/**
+ * pg-boss polls Postgres once per interval per worker (default 2s). On
+ * Vercel's Fluid compute every warm instance pays CPU for that, so the
+ * intervals are kept long: job families are not latency-critical (payout KPI
+ * is one hour), and cron jobs fire at most every ten minutes.
+ */
+const JOB_POLLING = { pollingIntervalSeconds: 30 };
+const CRON_POLLING = { pollingIntervalSeconds: 60 };
+
 const g = globalThis as unknown as { __hv_jobs_registered?: boolean };
 
 async function registerJob(
@@ -20,7 +29,7 @@ async function registerJob(
   await boss.createQueue(name).catch((error: { code?: string }) => {
     if (error?.code !== "B03") throw error;
   });
-  await boss.work(name, async (jobs: Job<Record<string, unknown>>[]) => {
+  await boss.work(name, JOB_POLLING, async (jobs: Job<Record<string, unknown>>[]) => {
     for (const job of jobs) {
       try {
         await handler(job.data ?? {});
@@ -84,7 +93,7 @@ export async function registerJobs(): Promise<void> {
   await boss
     .schedule("escrow.cron", "0 * * * *", { kind: "expire-deposits" })
     .catch(() => undefined); // schedule already exists — idempotent registration
-  await boss.work("escrow.cron", async (jobs: Job<{ kind?: string }>[]) => {
+  await boss.work("escrow.cron", CRON_POLLING, async (jobs: Job<{ kind?: string }>[]) => {
     for (const job of jobs) {
       if (job.data?.kind !== "expire-deposits") continue;
       const expired = await deposits.expireStaleDeposits();
@@ -113,7 +122,7 @@ export async function registerJobs(): Promise<void> {
   await boss
     .schedule("payout.cron", "*/10 * * * *", { kind: "sweep-payouts" })
     .catch(() => undefined);
-  await boss.work("payout.cron", async (jobs: Job<{ kind?: string }>[]) => {
+  await boss.work("payout.cron", CRON_POLLING, async (jobs: Job<{ kind?: string }>[]) => {
     for (const job of jobs) {
       if (job.data?.kind !== "sweep-payouts") continue;
       const driven = await payouts.sweepStuckPayouts();
@@ -132,7 +141,7 @@ export async function registerJobs(): Promise<void> {
   await boss
     .schedule("media.cron", "*/15 * * * *", { kind: "enforce-media-deadlines" })
     .catch(() => undefined);
-  await boss.work("media.cron", async (jobs: Job<{ kind?: string }>[]) => {
+  await boss.work("media.cron", CRON_POLLING, async (jobs: Job<{ kind?: string }>[]) => {
     for (const job of jobs) {
       if (job.data?.kind !== "enforce-media-deadlines") continue;
       const result = await media.enforceMediaDeadlines();
@@ -150,7 +159,7 @@ export async function registerJobs(): Promise<void> {
   await boss
     .schedule("legacy.cron", "0 9 * * *", { kind: "legacy-sweep" })
     .catch(() => undefined);
-  await boss.work("legacy.cron", async (jobs: Job<{ kind?: string }>[]) => {
+  await boss.work("legacy.cron", CRON_POLLING, async (jobs: Job<{ kind?: string }>[]) => {
     for (const job of jobs) {
       if (job.data?.kind !== "legacy-sweep") continue;
       const legacyResult = await legacy.runLegacySweep();
@@ -171,7 +180,7 @@ export async function registerJobs(): Promise<void> {
   await boss
     .schedule("ledger.cron", "0 3 * * *", { kind: "reconcile-ledger" })
     .catch(() => undefined);
-  await boss.work("ledger.cron", async (jobs: Job<{ kind?: string }>[]) => {
+  await boss.work("ledger.cron", CRON_POLLING, async (jobs: Job<{ kind?: string }>[]) => {
     for (const job of jobs) {
       if (job.data?.kind !== "reconcile-ledger") continue;
       const result = await reconcileLedger();
