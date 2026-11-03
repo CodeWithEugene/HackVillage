@@ -19,7 +19,14 @@ export async function getQueue(): Promise<PgBoss> {
   if (starting) return starting;
 
   starting = (async () => {
-    const instance = new PgBoss({ connectionString: getEnv().DATABASE_URL });
+    const instance = new PgBoss({
+      connectionString: getEnv().DATABASE_URL,
+      // Keep background loops slow: on Vercel every warm instance is billed
+      // CPU for them (cron schedules fire at most every ten minutes).
+      cronMonitorIntervalSeconds: 45,
+      cronWorkerIntervalSeconds: 45,
+      maintenanceIntervalSeconds: 600,
+    });
     instance.on("error", (error) => {
       // Queue errors must be visible but never crash the request path.
       console.error("[pg-boss]", error);
